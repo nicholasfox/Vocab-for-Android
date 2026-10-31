@@ -11,16 +11,16 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class EcdictLookupServiceTest {
-    @Test fun definitionsUseTraditionalChinese() = runTest {
+    @Test fun definitionsUseSimplifiedChinese() = runTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
-        for ((word, traditional, simplified) in listOf(
-            Triple("apple", "苹果", "苹果"),
-            Triple("software", "软件", "软件"),
-            Triple("memory", "记忆", "记忆")
+        for ((word, simplified, traditional) in listOf(
+            Triple("apple", "苹果", "蘋果"),
+            Triple("software", "软件", "軟體"),
+            Triple("memory", "记忆", "記憶")
         )) {
             val result = EcdictLookupService.lookup(context, word)
-            assertTrue(result.definition.contains(traditional))
-            assertFalse(result.definition.contains(simplified))
+            assertTrue(result.definition.contains(simplified))
+            assertFalse(result.definition.contains(traditional))
         }
     }
     @Test fun bundledLookupAndMissingFields() = runTest {
