@@ -328,6 +328,14 @@ fun SettingsScreen(
                         ) { Text("前往取得 OpenRouter API Key") }
                     }
                     item {
+                        Text("DeepSeek / 小米 MiMo / Agnes AI", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("1. 到对应平台创建 API Key。\n2. 回到 Vocab，选择供应商并贴上 Key。\n3. 按「更新模型」选择模型，或手动输入模型 ID。\n4. 按「测试这组」确认连接。")
+                    }
+                    item {
+                        Text("OpenAI 兼容（自定义）", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("1. 在「API Base URL」填写服务商提供的地址，通常以 /v1 结尾。\n2. 贴上 API Key。\n3. 输入服务商提供的模型 ID。\n4. 仅支持文字模型时无法使用图片识别。")
+                    }
+                    item {
                         Text(
                             "安全提醒：API Key 只贴在 Vocab 的设置字段，不要传到聊天室、截图、GitHub 或分享网址。",
                             color = MaterialTheme.colorScheme.error,

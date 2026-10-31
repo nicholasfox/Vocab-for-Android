@@ -201,7 +201,7 @@ fun WritingLibraryScreen(
     ) {
         item {
             Text("作文练习", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-            Text("保留原稿、修改版本与逐项说明，让每次修改都能变成薄薄弱点练习。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("保留原稿、修改版本与逐项说明，让每次修改都能变成薄弱点练习。", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {

@@ -659,7 +659,7 @@ fun CardListScreen(
                 item { PlainTab("全部 ${deckFilteredCards.size}", selectedTab == 0, { selectedTab = 0 }, Modifier.width(96.dp)) }
                 item { PlainTab("待复习 $dueCount", selectedTab == 1, { selectedTab = 1 }, Modifier.width(96.dp)) }
                 item { PlainTab("收藏 $favoriteCount", selectedTab == 2, { selectedTab = 2 }, Modifier.width(96.dp)) }
-                item { PlainTab("发音薄薄弱点 $pronunciationWeakCount", selectedTab == 3, { selectedTab = 3 }, Modifier.width(112.dp)) }
+                item { PlainTab("发音薄弱点 $pronunciationWeakCount", selectedTab == 3, { selectedTab = 3 }, Modifier.width(112.dp)) }
             }
 
             if (isMultiSelectMode) {

@@ -69,8 +69,11 @@ object GeminiService {
         scopeInstructions:String=com.example.util.ScanInstructions.build()
     ): List<OcrCardCandidate> {
         if (personalConfigs.isEmpty()) error("请先在设置中加入至少一组 AI API Key")
+        if (personalConfigs.none { it.provider.supportsVision }) {
+            error("当前没有支持图片输入的 AI 供应商；请改用 Gemini、OpenAI、Claude、小米 MiMo 或支持视觉的自定义模型")
+        }
         return runCatching {
-            withPersonalFailover { config ->
+            withPersonalFailover(filter = { it.provider.supportsVision }) { config ->
                 DirectAiService.analyzeImages(config, images, imagePrompt, scopeInstructions)
             }
         }
@@ -217,10 +220,12 @@ object GeminiService {
     }
 
     private suspend fun <T> withPersonalFailover(
+        filter: (PersonalAiConfig) -> Boolean = { true },
         request: suspend (PersonalAiConfig) -> T
     ): T = kotlinx.coroutines.withTimeout(120_000) {
         var lastError: Throwable? = null
         val available = personalConfigs
+            .filter(filter)
             .groupBy { it.provider }
             .flatMap { (provider, configs) ->
                 if (configs.size < 2) configs else {

@@ -915,19 +915,19 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     }
                     val noteId = existingNote?.id ?: db.grammarNoteDao().insert(
                         GrammarNote(
-                            course = "写作薄薄弱点", folder = "写作薄薄弱点", title = issue.title,
+                            course = "写作薄弱点", folder = "写作薄弱点", title = issue.title,
                             summary = issue.explanation, commonMistakes = "${issue.originalText} → ${issue.correctedText}",
                             sourceType = "WRITING_CHECK"
                         )
                     )
                     if (db.grammarLibraryDao().getAllOnce().none {
-                            it.course == "写作薄薄弱点" && it.name == "写作薄薄弱点"
+                            it.course == "写作薄弱点" && it.name == "写作薄弱点"
                         }) {
                         db.grammarLibraryDao().insert(
                             GrammarLibrary(
-                                course = "写作薄薄弱点",
-                                name = "写作薄薄弱点",
-                                description = "由作文批改自动整理的语法薄薄弱点"
+                                course = "写作薄弱点",
+                                name = "写作薄弱点",
+                                description = "由作文批改自动整理的语法薄弱点"
                             )
                         )
                     }
@@ -959,7 +959,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     noteId
                 }
             }.onSuccess(onComplete).onFailure {
-                _dataMessage.value = "创建薄薄弱点练习失败：${it.message ?: "未知错误"}"
+                _dataMessage.value = "创建薄弱点练习失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -3056,7 +3056,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private fun prepareAssistantWeaknessFolder(result: JSONObject, message: String) {
-        val name = result.optString("name", "薄薄弱点复习").trim().take(60).ifBlank { "薄薄弱点复习" }
+        val name = result.optString("name", "薄弱点复习").trim().take(60).ifBlank { "薄弱点复习" }
         val category = result.optString("category").trim().take(40)
         if (category.isBlank()) {
             appendAssistantMessage("ASSISTANT", "「$name」要放在哪个课程？")
@@ -3071,7 +3071,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "CREATE_WEAKNESS_FOLDER", deckId = 0,
-            title = "创建薄薄弱点文件夹「$name」", description = "课程：$category\n复制 ${safeIds.size} 张真实错题卡，原卡片不会移动。",
+            title = "创建薄弱点文件夹「$name」", description = "课程：$category\n复制 ${safeIds.size} 张真实错题卡，原卡片不会移动。",
             payload = JSONObject().put("name", name).put("category", category).put("cardIds", JSONArray(safeIds)).toString()
         )
         appendAssistantMessage("ASSISTANT", "已依错题次数与低评分纪录选出 ${safeIds.size} 张卡片。", kind = "STATUS")
@@ -3376,7 +3376,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val name = payload.getString("name").trim().take(60)
         val category = payload.getString("category").trim().take(40)
         require(name.isNotBlank() && category.isNotBlank()) { "文件夹名称与课程不能空白" }
-        check(allDecks.value.none { it.name.equals(name, true) && it.category.equals(category, true) }) { "已有同名薄薄弱点文件夹" }
+        check(allDecks.value.none { it.name.equals(name, true) && it.category.equals(category, true) }) { "已有同名薄弱点文件夹" }
         val weakFromLogs = recentStudyLogs.value.filter { it.rating <= 2 }.mapTo(hashSetOf()) { it.cardId }
         val requested = payload.getJSONArray("cardIds").longValues().toSet()
         val weakCards = allCards.value.filter { it.id in requested && (it.mistakeCount > 0 || it.id in weakFromLogs) }
@@ -3386,7 +3386,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val inserted = weakCards.map { repository.insertCard(it.copyForAssistantDeck(newId)) }
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "UNDO_WEAKNESS_FOLDER", deckId = newId,
-            title = "恢复薄薄弱点文件夹", description = "删除刚创建的「$name」与其中副本",
+            title = "恢复薄弱点文件夹", description = "删除刚创建的「$name」与其中副本",
             payload = JSONObject().put("deckId", newId).put("cardIds", JSONArray(inserted)).toString()
         )
     }
@@ -3745,7 +3745,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             只有用户明确要求统一、修正或转换中文文字时使用。逐张检查提供的真实卡片，只把 definition 与 exampleTranslation 的繁体中文转为简体中文；
             必须保留原意、标点和原有内容，不可翻译或改写英文字段，也不可用新的例句取代原文。没有变更的卡片不要放入 updates。
             AUDIT_REPORT：另加 suspectedTypos：[ {"cardId":1,"suggestion":"正确拼字","reason":"理由"} ]；不确定就不要列为拼错。
-            CREATE_WEAKNESS_FOLDER：{"type":"CREATE_WEAKNESS_FOLDER","name":"薄薄弱点复习","category":"课程，未指定留空","cardIds":[真实低评分或错题卡ID]}
+            CREATE_WEAKNESS_FOLDER：{"type":"CREATE_WEAKNESS_FOLDER","name":"薄弱点复习","category":"课程，未指定留空","cardIds":[真实低评分或错题卡ID]}
             UPDATE_DAILY_PLAN：{"type":"UPDATE_DAILY_PLAN","dailyGoalCards":20,"dailyNewCardLimit":10,"dailyReviewLimit":50,"message":"依真实纪录说明理由"}
             LEARNING_ANALYSIS：另加 analysis，根据真实学习摘要分析，不可捏造次数。
             SORT 另加 direction（AZ 或 ZA）。
