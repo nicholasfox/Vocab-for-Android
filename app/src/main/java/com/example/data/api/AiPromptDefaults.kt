@@ -9,7 +9,7 @@ object AiPromptDefaults {
 3. exampleSentence 必须是自然、完整、适合学习者的英文例句。
 4. exampleTranslation 必须是该英文例句的完整简体中文翻译。
    如果已经提供 exampleSentence 而只缺 exampleTranslation，必须逐句忠实翻译原本的英文例句，禁止另写新的中文句子或改动英文例句。
-5. phonetic 必须填入可靠的美式 KK 音标，使用 /.../ 包住；不可留空，也不可填入单词拼法或中文拼音。
+5. phonetic 必须填入可靠的美式 IPA 音标，使用 /.../ 包住；不可留空，也不可填入单词拼法或中文拼音。
 
 示例 active：
 partOfSpeech: adj./n.
@@ -36,7 +36,7 @@ exampleTranslation: 这只狗非常活跃，喜欢在公园里玩丢接游戏。
 3. exampleSentence 必须是自然、完整、适合学习者的英文例句。
 4. exampleTranslation 必须是该英文例句的完整简体中文翻译。
    如果图片或既有数据已提供 exampleSentence，缺少中文时只能翻译该英文原句，不可另外生成不相符的中文句子。
-5. 需要补齐字段时，phonetic 必须填入可靠的美式 KK 音标并使用 /.../ 包住；不可填入单词拼法或中文拼音。
+5. 需要补齐字段时，phonetic 必须填入可靠的美式 IPA 音标并使用 /.../ 包住；不可填入单词拼法或中文拼音。
 
 示例 active：
 partOfSpeech: adj./n.

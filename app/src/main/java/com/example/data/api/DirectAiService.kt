@@ -258,7 +258,7 @@ object DirectAiService {
                 - definition and exampleTranslation use Simplified Chinese.
                 - If exampleSentence is already non-empty and exampleTranslation is empty, translate that exact English sentence faithfully. Never invent a different Chinese sentence and never replace the English sentence.
                 - Only create a new natural exampleSentence when the input exampleSentence is empty; its exampleTranslation must translate that newly created sentence exactly.
-                - phonetic is required and must use reliable American KK notation wrapped in /.../.
+                - phonetic is required and must use reliable American IPA notation wrapped in /.../.
                 - Never substitute another word.
                 - Do not include Markdown or commentary.
             """.trimIndent()

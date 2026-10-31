@@ -7,7 +7,7 @@ data class DictionaryEntry(
     val definition: String,
     val exampleSentence: String,
     val exampleTranslation: String,
-    val category: String = "多益高频"
+    val category: String = "托业高频"
 )
 
 object DictionaryEngine {

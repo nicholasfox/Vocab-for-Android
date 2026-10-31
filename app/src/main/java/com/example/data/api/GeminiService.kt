@@ -116,7 +116,7 @@ object GeminiService {
             return runCatching {
                 withPersonalFailover { config ->
                     DirectAiService.fetchWordDetails(config, normalized, wordDetailsPrompt)
-                        ?: error("AI 未返回完整的 KK 音标与单词数据")
+                        ?: error("AI 未返回完整的 IPA 音标与单词数据")
                 }
             }
                 .onFailure { _lastError.value = it.message ?: "个人 AI API 呼叫失败" }
