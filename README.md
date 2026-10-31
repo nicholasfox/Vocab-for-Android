@@ -15,7 +15,7 @@
   </p>
 
   <p>
-    <a href="https://github.com/adam10000423-oss/Vocab/releases/latest"><img alt="前往 Releases 下载最新版 APK" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89%E6%9C%80%E6%96%B0%E7%89%88_APK-GitHub_Releases-1976D2?style=for-the-badge&logo=github&logoColor=white"></a>
+    <a href="https://github.com/nicholasfox/Vocab-for-Android/releases/latest"><img alt="前往 Releases 下载最新版 APK" src="https://img.shields.io/badge/%E4%B8%8B%E8%BC%89%E6%9C%80%E6%96%B0%E7%89%88_APK-GitHub_Releases-1976D2?style=for-the-badge&logo=github&logoColor=white"></a>
   </p>
 
   <p>
@@ -36,7 +36,7 @@
 > 2. **新增 AI 供应商**：DeepSeek、小米 MiMo、Agnes AI，以及可自行填写 Base URL 的「OpenAI 兼容（自定义）」，均可直接使用官方 API Key。
 > 3. **新增 GitHub Actions 构建**：每次推送自动构建可安装的 debug APK，可在 Actions 的 `Build Simplified Chinese APK` 运行记录中下载 `vocab-zh-debug-apk`；推送 `zh-v*` 标签会自动发布到 Releases，可直接下载 APK。
 >
-> 当前 APK：[Releases · zh-v3.2.1](https://github.com/nicholasfox/Vocab-for-Android/releases/tag/zh-v3.2.1)
+> 当前 APK：[Releases · zh-v3.2.2](https://github.com/nicholasfox/Vocab-for-Android/releases/tag/zh-v3.2.2)
 >
 > debug 版包名为 `com.aistudio.vocabpulse.srsapp.zh`，可与官方繁体版共存。首次使用请在「设置 → AI 连接」中选择供应商并填入 API Key；自定义供应商还需填写 Base URL 与模型 ID。后续版本可直接覆盖安装（CI 会缓存同一个 debug 签名）。
 
