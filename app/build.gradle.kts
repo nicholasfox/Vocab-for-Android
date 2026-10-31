@@ -30,8 +30,8 @@ android {
     applicationId = "com.aistudio.vocabpulse.srsapp"
     minSdk = 24
     targetSdk = 36
-    versionCode = 38
-    versionName = "3.2.5"
+    versionCode = 39
+    versionName = "3.2.6"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField("String", "BACKEND_BASE_URL", "\"${backendBaseUrl.trimEnd('/')}\"")
@@ -54,6 +54,12 @@ android {
       // Install side by side with the upstream Traditional Chinese build.
       applicationIdSuffix = ".zh"
       versionNameSuffix = "-zh"
+      // CI provides a fixed keystore through KEYSTORE_PATH so consecutive
+      // builds can be installed over each other. Without it the build falls
+      // back to the machine-local debug key.
+      if (hasReleaseSigning) {
+        signingConfig = signingConfigs.getByName("release")
+      }
     }
     release {
       isCrunchPngs = false

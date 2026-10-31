@@ -22,13 +22,25 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Restore debug signing key
-        uses: actions/cache@v4
-        with:
-          path: ~/.android/debug.keystore
-          key: vocab-zh-debug-keystore-v1
+      # Use one fixed keystore for every build so a new APK can be installed
+      # over an older one. Provide it as a base64 GitHub secret.
+      - name: Restore signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            mkdir -p keystore
+            printf '%s' "$KEYSTORE_BASE64" | base64 -d > keystore/release.jks
+          else
+            echo "::warning::SIGNING_KEYSTORE_BASE64 is not set; this build uses an ephemeral debug key and will not install over older releases."
+          fi
 
       - name: Build debug APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/keystore/release.jks
+          STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         run: |
           chmod +x gradlew
           ./gradlew testDebugUnitTest assembleDebug
@@ -40,4 +52,4 @@ jobs:
         run: |
           gh release create "$GITHUB_REF_NAME" "Vocab-${GITHUB_REF_NAME}.apk" \
             --title "Vocab 简体 $GITHUB_REF_NAME" \
-            --notes "简体中文界面与词典、自定义 AI 模型（DeepSeek / 小米 MiMo / Agnes / OpenAI 兼容）构建。APK 使用固定 debug 签名，可直接覆盖安装后续版本。"
+            --notes "简体中文界面与词典、自定义 AI 模型（DeepSeek / 小米 MiMo / Agnes / OpenAI 兼容）构建。自 3.2.6 起 APK 使用固定签名，可直接覆盖安装后续版本。"
