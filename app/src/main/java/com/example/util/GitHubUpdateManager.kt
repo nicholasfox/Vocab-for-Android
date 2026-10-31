@@ -59,7 +59,9 @@ object GitHubUpdateManager {
                 if (response.code == 404) return@withContext UpdateCheckResult.UpToDate
                 if (!response.isSuccessful) error("GitHub 回应 ${response.code}")
                 val root = JSONObject(response.body?.string().orEmpty())
-                val version = root.getString("tag_name").removePrefix("v")
+                val version = root.getString("tag_name")
+                    .removePrefix("zh-")
+                    .removePrefix("v")
                 val assets = root.getJSONArray("assets")
                 var apkUrl = ""
                 for (index in 0 until assets.length()) {
