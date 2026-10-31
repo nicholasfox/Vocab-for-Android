@@ -1,0 +1,31 @@
+name: Check APK signing
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release APKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p /tmp/apks
+          for tag in zh-v3.2.1 zh-v3.2.2 zh-v3.2.3 zh-v3.2.4 zh-v3.2.5; do
+            gh release download "$tag" --repo "$GITHUB_REPOSITORY" --pattern "*.apk" --dir "/tmp/apks/$tag" || echo "NO ASSET FOR $tag"
+          done
+
+      - name: Print signing certificates
+        run: |
+          BT="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)"
+          for d in /tmp/apks/*; do
+            apk="$(ls "$d"/*.apk 2>/dev/null | head -1)"
+            [ -z "$apk" ] && continue
+            echo "===== $d ====="
+            "$BT/apksigner" verify --print-certs "$apk" | grep -E "Signer #1 certificate (DN|SHA-256)" || true
+            "$BT/aapt2" dump badging "$apk" | grep -E "^package:" || true
+          done
