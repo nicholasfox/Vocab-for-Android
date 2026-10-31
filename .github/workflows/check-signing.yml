@@ -28,6 +28,6 @@ jobs:
             apk="$(ls "$d"/*.apk 2>/dev/null | head -1)"
             [ -z "$apk" ] && continue
             echo "===== $d ====="
-            "$BT/apksigner" verify --print-certs "$apk" | grep -E "Signer #1 certificate (DN|SHA-256)" || true
+            "$BT/apksigner" verify --print-certs "$apk" 2>&1 | head -20 || true
             "$BT/aapt2" dump badging "$apk" | grep -E "^package:" || true
           done
