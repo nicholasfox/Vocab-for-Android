@@ -31,3 +31,26 @@ jobs:
             "$BT/apksigner" verify --print-certs "$apk" 2>&1 | head -20 || true
             "$BT/aapt2" dump badging "$apk" | grep -E "^package:" || true
           done
+
+  gen-keystore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Generate stable debug keystore
+        run: |
+          mkdir -p out
+          keytool -genkeypair -v \
+            -keystore out/vocab-debug.jks \
+            -storetype JKS \
+            -alias vocabdebug \
+            -keyalg RSA -keysize 2048 -validity 10950 \
+            -storepass android -keypass android \
+            -dname "CN=Vocab Debug, O=nicholasfox, C=CN"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vocab-debug-keystore
+          path: out/vocab-debug.jks
+          if-no-files-found: error
