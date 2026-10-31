@@ -126,6 +126,7 @@ fun VocabApp(
     val aiConnectionStatus by viewModel.aiConnectionStatus.collectAsStateWithLifecycle()
     val ttsVoices by viewModel.ttsVoices.collectAsStateWithLifecycle()
     val ttsStatus by viewModel.ttsStatus.collectAsStateWithLifecycle()
+    val ttsActiveVoice by viewModel.ttsActiveVoice.collectAsStateWithLifecycle()
     val assistantConversations by viewModel.assistantConversations.collectAsStateWithLifecycle()
     val assistantMessages by viewModel.assistantMessages.collectAsStateWithLifecycle()
     val savedArticles by viewModel.savedArticles.collectAsStateWithLifecycle()
@@ -941,6 +942,7 @@ fun VocabApp(
                 onDictionarySourceChange = viewModel::updateDictionarySource,
                 ttsVoices = ttsVoices,
                 ttsStatus = ttsStatus,
+                ttsActiveVoice = ttsActiveVoice,
                 onTtsVoiceStyleChange = viewModel::updateTtsVoiceStyle,
                 onTtsVoiceNameChange = viewModel::updateTtsVoiceName,
                 onPreviewTtsVoice = viewModel::previewTtsVoice,

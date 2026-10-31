@@ -119,6 +119,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     val ttsManager = TtsManager(application)
     val ttsVoices = ttsManager.voices
     val ttsStatus = ttsManager.status
+    val ttsActiveVoice = ttsManager.activeVoice
 
     private val currentTime = flow {
         while (true) {

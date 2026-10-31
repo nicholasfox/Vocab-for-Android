@@ -104,6 +104,7 @@ fun SettingsScreen(
     onDictionarySourceChange: (String) -> Unit,
     ttsVoices: List<TtsVoiceOption>,
     ttsStatus: String?,
+    ttsActiveVoice: String?,
     onTtsVoiceStyleChange: (String) -> Unit,
     onTtsVoiceNameChange: (String) -> Unit,
     onPreviewTtsVoice: () -> Unit,
@@ -794,10 +795,29 @@ fun SettingsScreen(
                         }
                     )
                     Text(
-                        "实际可用声音由手机的语音引擎决定。",
+                        "自动模式会优先选「设备内建」语音，避免线上语音因网络抖动而断续、颤抖。若发音仍不自然，可到系统设置更换语音引擎（例如 Google 文字转语音）或安装离线英文语音包。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    ttsActiveVoice?.let {
+                        Text(
+                            "当前语音：$it",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    OutlinedButton(
+                        onClick = {
+                            val opened = runCatching {
+                                context.startActivity(Intent("com.android.settings.TTS_SETTINGS"))
+                            }.isSuccess || runCatching {
+                                context.startActivity(Intent(AndroidSettings.ACTION_ACCESSIBILITY_SETTINGS))
+                            }.isSuccess
+                            if (!opened) {
+                                Toast.makeText(context, "无法打开系统语音设置", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) { Text("打开系统语音设置") }
                     ttsStatus?.let {
                         Text(
                             it,

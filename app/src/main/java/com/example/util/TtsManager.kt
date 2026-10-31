@@ -44,6 +44,8 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
     val voices: StateFlow<List<TtsVoiceOption>> = _voices.asStateFlow()
     private val _status = MutableStateFlow<String?>(null)
     val status: StateFlow<String?> = _status.asStateFlow()
+    private val _activeVoice = MutableStateFlow<String?>(null)
+    val activeVoice: StateFlow<String?> = _activeVoice.asStateFlow()
     private var initFailed = false
 
     override fun onInit(status: Int) {
@@ -95,9 +97,13 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
             engine.voices.orEmpty()
                 .filter { it.locale.language.equals("en", ignoreCase = true) }
                 .sortedWith(
+                    // Prefer the US locale, then an offline (device-built-in)
+                    // voice. Network voices are streamed in chunks, so a weak
+                    // connection makes them stutter and warble; offline voices
+                    // are stable even if they sound slightly less polished.
                     compareByDescending<Voice> { it.locale == Locale.US }
-                        .thenByDescending { it.quality }
                         .thenBy { it.isNetworkConnectionRequired }
+                        .thenByDescending { it.quality }
                         .thenBy { it.name }
                 )
         }.getOrDefault(emptyList())
@@ -216,7 +222,10 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         } else {
             val voices = runCatching { engine.voices.orEmpty() }.getOrDefault(emptySet())
             voices.filter { it.locale.language == locale.language }
-                .maxByOrNull { it.quality }
+                .minWithOrNull(
+                    compareBy<Voice> { it.isNetworkConnectionRequired }
+                        .thenByDescending { it.quality }
+                )
                 ?.let { engine.voice = it }
                 ?: engine.setLanguage(locale)
         }
@@ -230,7 +239,10 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         )
         val result = engine.speak(
             segment.text.trim(),
-            TextToSpeech.QUEUE_FLUSH,
+            // QUEUE_ADD instead of QUEUE_FLUSH: on engines that report
+            // onDone when synthesis (not playback) finishes, flushing here
+            // clips the tail of the previous segment and sounds choppy.
+            TextToSpeech.QUEUE_ADD,
             null,
             "vocab_sequence_${System.nanoTime()}"
         )
@@ -263,18 +275,43 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         val selected = available.firstOrNull { it.name == voiceName }
             ?: available
                 .filter { it.locale.language == "en" }
-                .maxWithOrNull(
-                    compareBy<Voice> { it.locale == Locale.US }
-                        .thenBy { it.quality }
-                        .thenBy { !it.isNetworkConnectionRequired }
+                .minWithOrNull(
+                    compareBy<Voice> { it.locale != Locale.US }
+                        .thenBy { it.isNetworkConnectionRequired }
+                        .thenByDescending { it.quality }
                 )
-        selected?.let { engine.voice = it }
+        if (selected == null) return
+        if (runCatching { engine.voice?.name }.getOrNull() == selected.name) return
+        engine.voice = selected
+        updateActiveVoice(engine)
     }
 
     private fun chooseBestVoice(engine: TextToSpeech, voices: List<Voice>) {
-        voices.firstOrNull()?.let { engine.voice = it }
+        voices.firstOrNull()?.let {
+            if (runCatching { engine.voice?.name }.getOrNull() != it.name) engine.voice = it
+        }
         engine.setSpeechRate(0.9f)
         engine.setPitch(1f)
+        updateActiveVoice(engine)
+    }
+
+    /**
+     * Surfaces which voice the engine actually uses, so a user can tell whether
+     * a stuttering "online" voice is selected.
+     */
+    private fun updateActiveVoice(engine: TextToSpeech) {
+        val voice = runCatching { engine.voice }.getOrNull()
+        if (voice == null) {
+            _activeVoice.value = null
+            return
+        }
+        val engineName = runCatching { TextToSpeech.getDefaultEngine() }.getOrNull()
+        _activeVoice.value = buildString {
+            append(voice.locale.displayName)
+            append(if (voice.isNetworkConnectionRequired) "・线上语音" else "・设备内建")
+            append("（${voice.name}）")
+            if (!engineName.isNullOrBlank()) append("；引擎 $engineName")
+        }
     }
 
     fun stop() {

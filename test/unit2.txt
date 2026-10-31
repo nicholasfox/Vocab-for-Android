@@ -1,0 +1,71 @@
+﻿Sunday	周日
+Monday	周一
+Tuesday	周二
+Wednesday	周三
+Thursday	周四
+Friday	周五
+Saturday	周六
+favourite	最喜欢的
+towel	浴巾
+weekend	周末
+feed	喂养
+a week	一周
+come before	在...之前来临
+come after	在...之后来临
+a day	一天
+swimsuit	泳衣
+Maths	数学
+get on the table	跳上桌子
+a new pet	一只新宠物
+on Saturdays	在周六
+how often	多久一次
+feed us	喂我们
+wash its face	洗它的脸
+How often do you clean your teeth? -- I always clean them after breakfast, lunch and dinner.	你多久刷一次牙？--我总是在早饭午饭晚饭后刷牙。
+Do you ever get up late? -- No, I never get up late.	你有起晚过吗？--不，我从来不晚起。
+listen to music	听音乐
+write an email	写一封电子邮件
+go skating	去溜冰
+read a comic	看漫画
+go shopping	去购物
+watch films	看电影
+Do you ever...?	你有没有过？
+how often	多久一次
+watch a DVD	看DVD(视频光碟)
+listen to a CD	听CD（唱片）
+What must I do?	我必须做什么？
+You mustn't wear your skates in the house.	你禁止在家里穿溜冰鞋。
+You must put them in the cupboard.	你必须把它们放在橱柜里。
+exercise	锻炼
+is good for	对...有好处
+accidents	意外
+important	重要的
+correct	正确的
+protect	保护
+elbows	胳膊肘
+knees	膝盖
+bones	骨头
+muscles	肌肉
+hurt	使...受伤
+sweat	流汗
+lose	丢失/失去
+sun cream	防晒霜
+beach	沙滩
+skin	皮肤
+outside	外面
+warm up	热身
+inside	内部
+sports	运动
+want to sleep	想睡觉
+turn off my alarm	关闭闹钟
+tell you about	告诉你关于..
+pull off my blanket	拉下我的毯子
+have a presentation	有一个演讲
+jump out of bed	从床上跳起来
+run downstairs	跑下楼
+start to say	开始说
+drive to school	开车去学校
+all the lights	所有的灯
+run to the assembly hall	跑到礼堂
+look in the mirror	照镜子
+in all directions	四面八方
