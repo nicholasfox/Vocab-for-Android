@@ -2,6 +2,8 @@ name: Check APK signing
 
 on:
   workflow_dispatch:
+  push:
+    branches: [signcheck]
 
 permissions:
   contents: read
