@@ -69,11 +69,11 @@ object GeminiService {
         scopeInstructions:String=com.example.util.ScanInstructions.build()
     ): List<OcrCardCandidate> {
         if (personalConfigs.isEmpty()) error("请先在设置中加入至少一组 AI API Key")
-        if (personalConfigs.none { it.provider.supportsVision }) {
+        if (personalConfigs.none { it.provider.canAnalyzeImages(it.model) }) {
             error("当前没有支持图片输入的 AI 供应商；请改用 Gemini、OpenAI、Claude、小米 MiMo 或支持视觉的自定义模型")
         }
         return runCatching {
-            withPersonalFailover(filter = { it.provider.supportsVision }) { config ->
+            withPersonalFailover(filter = { it.provider.canAnalyzeImages(it.model) }) { config ->
                 DirectAiService.analyzeImages(config, images, imagePrompt, scopeInstructions)
             }
         }

@@ -322,7 +322,7 @@ object DirectAiService {
         check(fetchWordDetails(config, "apple") != null) {
             "API 已回应，但选定模型没有返回合格的词典数据"
         }
-        if (config.provider.supportsVision) {
+        if (config.provider.canAnalyzeImages(config.model)) {
             analyzeImages(
                 config = config,
                 images = listOf(
@@ -577,12 +577,18 @@ object DirectAiService {
         images: List<ImagePayload>
     ): String {
         require(config.model.isNotBlank()) { "请先设置模型 ID" }
+        val chatFallbackModel = config.provider.recommendedModels
+            .firstOrNull { !config.provider.isImageGenerationModel(it) }
+            ?: "文字模型"
+        require(!config.provider.isImageGenerationModel(config.model)) {
+            "${config.model} 是图片生成模型，不能用于单词查询或图片识别；请改用 $chatFallbackModel"
+        }
         val base = apiBase(config)
         require(base.isNotBlank()) { "请先填写 API Base URL" }
         val userContent = JSONArray()
             .put(JSONObject().put("type", "text").put("text", prompt))
         if (images.isNotEmpty()) {
-            require(config.provider.supportsVision) {
+            require(config.provider.canAnalyzeImages(config.model)) {
                 "${config.provider.displayName} 的 ${config.model} 不支持图片输入；请改用文字查询或换用支持视觉的模型"
             }
             images.forEach { image ->

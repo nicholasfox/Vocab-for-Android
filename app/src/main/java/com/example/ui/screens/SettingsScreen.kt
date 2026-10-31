@@ -329,7 +329,7 @@ fun SettingsScreen(
                     }
                     item {
                         Text("DeepSeek / 小米 MiMo / Agnes AI", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("1. 到对应平台创建 API Key。\n2. 回到 Vocab，选择供应商并贴上 Key。\n3. 按「更新模型」选择模型，或手动输入模型 ID。\n4. 按「测试这组」确认连接。")
+                        Text("1. 到对应平台创建 API Key。\n2. 回到 Vocab，选择供应商并贴上 Key。\n3. 按「更新模型」选择模型，或手动输入模型 ID。\n4. 按「测试这组」确认连接。\nAgnes 可选 agnes-2.5-flash、agnes-3.0-flash；agnes-image-2.5-flash 是图片生成模型，不能用于查词或图片识别。")
                     }
                     item {
                         Text("OpenAI 兼容（自定义）", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

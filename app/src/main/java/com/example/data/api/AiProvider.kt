@@ -69,8 +69,13 @@ enum class AiProvider(
         "Agnes AI",
         "agnes-2.5-flash",
         "https://platform.agnes-ai.com",
-        listOf("agnes-2.5-flash"),
+        listOf(
+            "agnes-2.5-flash",
+            "agnes-3.0-flash",
+            "agnes-image-2.5-flash"
+        ),
         defaultBaseUrl = "https://apihub.agnes-ai.com/v1",
+        // Image input support varies by model, so keep OCR opt-in off for now.
         supportsVision = false
     ),
     OPENAI_COMPATIBLE(
@@ -81,6 +86,19 @@ enum class AiProvider(
         defaultBaseUrl = "",
         supportsVision = true
     );
+
+    /**
+     * Image generation models (for example agnes-image-2.5-flash) only speak
+     * the /images/generations endpoint and cannot answer chat or OCR requests.
+     */
+    fun isImageGenerationModel(model: String): Boolean =
+        model.startsWith("agnes-image") ||
+            model.startsWith("dall-e") ||
+            model.startsWith("gpt-image")
+
+    /** Whether this provider and model pair accepts images as analysis input. */
+    fun canAnalyzeImages(model: String = defaultModel): Boolean =
+        supportsVision && !isImageGenerationModel(model)
 
     companion object {
         fun from(value: String): AiProvider =
