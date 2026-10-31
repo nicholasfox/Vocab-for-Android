@@ -103,6 +103,7 @@ fun SettingsScreen(
     onSpeechRateChange: (Float) -> Unit,
     onDictionarySourceChange: (String) -> Unit,
     ttsVoices: List<TtsVoiceOption>,
+    ttsStatus: String?,
     onTtsVoiceStyleChange: (String) -> Unit,
     onTtsVoiceNameChange: (String) -> Unit,
     onPreviewTtsVoice: () -> Unit,
@@ -797,6 +798,13 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    ttsStatus?.let {
+                        Text(
+                            it,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                     Text("学习卡正面自动朗读", fontWeight = FontWeight.Bold)
                     Text(
                         "自动播放会等正面内容全部念完才翻到背面。",

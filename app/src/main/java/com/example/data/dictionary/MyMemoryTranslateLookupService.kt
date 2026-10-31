@@ -15,9 +15,9 @@ object MyMemoryTranslateLookupService {
         .readTimeout(18, TimeUnit.SECONDS)
         .build()
 
-    suspend fun lookupChinese(rawText: String): DictionaryEntry = lookup(rawText, "zh-TW|en", true)
+    suspend fun lookupChinese(rawText: String): DictionaryEntry = lookup(rawText, "zh-CN|en", true)
 
-    suspend fun lookupEnglish(rawText: String): DictionaryEntry = lookup(rawText, "en|zh-TW", false)
+    suspend fun lookupEnglish(rawText: String): DictionaryEntry = lookup(rawText, "en|zh-CN", false)
 
     private suspend fun lookup(rawText: String, languagePair: String, chineseToEnglish: Boolean): DictionaryEntry = withContext(Dispatchers.IO) {
         val text = rawText.trim()

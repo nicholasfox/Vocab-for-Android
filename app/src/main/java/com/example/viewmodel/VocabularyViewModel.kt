@@ -118,6 +118,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     private val cardSaveMutex = Mutex()
     val ttsManager = TtsManager(application)
     val ttsVoices = ttsManager.voices
+    val ttsStatus = ttsManager.status
 
     private val currentTime = flow {
         while (true) {
@@ -1992,7 +1993,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 if (spelling.isNotBlank()) add(SpeechSegment(spelling, "en-US"))
             }
             if (value.ttsReadDefinition && card.definition.isNotBlank()) {
-                add(SpeechSegment(card.definition, "zh-TW"))
+                add(SpeechSegment(card.definition, "zh-CN"))
             }
             if (value.ttsReadPhonetic && card.phonetic.isNotBlank()) {
                 add(SpeechSegment(card.phonetic, "en-US"))
@@ -2004,7 +2005,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 add(SpeechSegment(card.exampleSentence, "en-US"))
             }
             if (value.ttsReadExampleTranslation && card.exampleTranslation.isNotBlank()) {
-                add(SpeechSegment(card.exampleTranslation, "zh-TW"))
+                add(SpeechSegment(card.exampleTranslation, "zh-CN"))
             }
         }
         ttsManager.speakSequence(

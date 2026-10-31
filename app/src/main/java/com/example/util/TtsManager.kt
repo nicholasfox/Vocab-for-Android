@@ -42,21 +42,45 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
     private var sequenceVoiceStyle = "NATURAL"
     private val _voices = MutableStateFlow<List<TtsVoiceOption>>(emptyList())
     val voices: StateFlow<List<TtsVoiceOption>> = _voices.asStateFlow()
+    private val _status = MutableStateFlow<String?>(null)
+    val status: StateFlow<String?> = _status.asStateFlow()
+    private var initFailed = false
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) {
+            initFailed = true
+            _status.value = "语音引擎初始化失败，请检查系统设置中的文字转语音引擎"
             finishPendingSequence()
             return
         }
         val engine = tts ?: run {
+            initFailed = true
+            _status.value = "语音引擎无法启动"
             finishPendingSequence()
             return
         }
-        val result = engine.setLanguage(Locale.US)
+        var result = engine.setLanguage(Locale.US)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            // Some engines only expose a non-US English voice; use it instead of
+            // failing silently.
+            val englishVoice = runCatching {
+                engine.voices.orEmpty().firstOrNull {
+                    it.locale.language.equals("en", ignoreCase = true)
+                }
+            }.getOrNull()
+            if (englishVoice != null) {
+                engine.voice = englishVoice
+                result = TextToSpeech.LANG_AVAILABLE
+            }
+        }
+        if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+            initFailed = true
+            _status.value = "系统缺少英语语音数据，请到系统设置的文字转语音中安装英文语音"
             finishPendingSequence()
             return
         }
+        initFailed = false
+        _status.value = null
         isInitialized = true
         engine.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) = Unit
@@ -127,6 +151,7 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
             }
         ) return
         if (!isInitialized) {
+            if (initFailed) return
             pendingSpeech = PendingSpeech(normalized, rate, voiceName, voiceStyle)
             return
         }
@@ -161,6 +186,10 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
         sequenceVoiceStyle = voiceStyle
         val repeated = List(repetitions.coerceIn(1, 3)) { valid }.flatten()
         if (!isInitialized) {
+            if (initFailed) {
+                onComplete?.invoke()
+                return
+            }
             pendingSequence = repeated
             pendingSequenceOnComplete = onComplete
             return

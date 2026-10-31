@@ -93,8 +93,8 @@ object GoogleTranslateLookupService {
     private fun request(text: String, includeDictionary: Boolean, chineseToEnglish: Boolean = false): JSONArray {
         val url = "https://translate.googleapis.com/translate_a/single".toHttpUrl().newBuilder()
             .addQueryParameter("client", "gtx")
-            .addQueryParameter("sl", if (chineseToEnglish) "zh-TW" else "en")
-            .addQueryParameter("tl", if (chineseToEnglish) "en" else "zh-TW")
+            .addQueryParameter("sl", if (chineseToEnglish) "zh-CN" else "en")
+            .addQueryParameter("tl", if (chineseToEnglish) "en" else "zh-CN")
             .addQueryParameter("dt", "t")
             .addQueryParameter("dt", "rm")
             .apply {

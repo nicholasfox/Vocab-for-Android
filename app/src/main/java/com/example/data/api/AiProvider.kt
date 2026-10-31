@@ -75,8 +75,9 @@ enum class AiProvider(
             "agnes-image-2.5-flash"
         ),
         defaultBaseUrl = "https://apihub.agnes-ai.com/v1",
-        // Image input support varies by model, so keep OCR opt-in off for now.
-        supportsVision = false
+        // agnes-3.0-flash and agnes-2.5-flash accept image input; the
+        // agnes-image-* models are generation-only and filtered out below.
+        supportsVision = true
     ),
     OPENAI_COMPATIBLE(
         "OpenAI 兼容（自定义）",
