@@ -148,7 +148,7 @@ fun FlipCard(
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Text(
-                                text = card.partOfSpeech.ifBlank { "單字卡" },
+                                text = card.partOfSpeech.ifBlank { "单词卡" },
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
@@ -212,13 +212,13 @@ fun FlipCard(
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "播放發音",
+                                    contentDescription = "播放发音",
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                     modifier = Modifier.size(22.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = "發音",
+                                    text = "发音",
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -229,7 +229,7 @@ fun FlipCard(
                     // Hint at bottom
                     if (showSwipeHint) {
                         Text(
-                            text = "左滑：不熟  ·  右滑：記住",
+                            text = "左滑：不熟  ·  右滑：记住",
                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
                             color = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.align(Alignment.BottomCenter)
@@ -275,7 +275,7 @@ fun FlipCard(
                             IconButton(onClick = { onSpeak("${card.word}. ${card.exampleSentence}") }) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.VolumeUp,
-                                    contentDescription = "朗讀例句",
+                                    contentDescription = "朗读例句",
                                     tint = MaterialTheme.colorScheme.primary
                                 )
                             }
@@ -322,7 +322,7 @@ fun FlipCard(
                         if (card.notes.isNotBlank()) {
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "註記: ${card.notes}",
+                                text = "注记: ${card.notes}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.tertiary
                             )
@@ -331,7 +331,7 @@ fun FlipCard(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = "點一下回正面",
+                            text = "点一下回正面",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                             modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -351,7 +351,7 @@ fun FlipCard(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "記住",
+                    text = "记住",
                     color = MaterialTheme.colorScheme.onPrimary,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)

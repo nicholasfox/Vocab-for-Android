@@ -113,19 +113,19 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 
 private enum class QuizPlayMode(val label: String) {
-    CHINESE_TO_ENGLISH("中選英"),
-    ENGLISH_TO_CHINESE("英選中"),
+    CHINESE_TO_ENGLISH("中选英"),
+    ENGLISH_TO_CHINESE("英选中"),
     CHINESE_TYPE_ENGLISH("中文填英文"),
-    CLOZE_CHOICE("英文克漏字選擇"),
-    CLOZE_TYPING("英文克漏字填空"),
-    LISTENING_CHOICE("聽力選字"),
-    LISTENING_SPELLING("聽力拼字"),
-    SENTENCE_ORDER("句子重組"),
-    PART_OF_SPEECH("詞性選擇"),
-    SYNONYM_DISCRIMINATION("近義字辨析"),
-    PRONOUNCE_WORD("念單字"),
+    CLOZE_CHOICE("英文完形填空选择"),
+    CLOZE_TYPING("英文完形填空填空"),
+    LISTENING_CHOICE("听力选字"),
+    LISTENING_SPELLING("听力拼字"),
+    SENTENCE_ORDER("句子重组"),
+    PART_OF_SPEECH("词性选择"),
+    SYNONYM_DISCRIMINATION("近义字辨析"),
+    PRONOUNCE_WORD("念单词"),
     PRONOUNCE_SENTENCE("念例句"),
-    MATCH("配對")
+    MATCH("配对")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -183,13 +183,13 @@ fun QuizGamesScreen(
                 decks.any { it.id == requestedId } && cards.any { it.deckId == requestedId }
             }
             if (validIds.isNotEmpty()) {
-                pendingGameSelection = validIds to launchTitle.ifBlank { "全部單字卡" }
+                pendingGameSelection = validIds to launchTitle.ifBlank { "全部单词卡" }
             }
             onLaunchConsumed()
         } else launchDeckId?.let { requestedId ->
             if (decks.any { it.id == requestedId } && cards.any { it.deckId == requestedId }) {
                 pendingGameSelection =
-                    setOf(requestedId) to (decks.firstOrNull { it.id == requestedId }?.name ?: "測驗")
+                    setOf(requestedId) to (decks.firstOrNull { it.id == requestedId }?.name ?: "测试")
             }
             onLaunchConsumed()
         }
@@ -198,7 +198,7 @@ fun QuizGamesScreen(
     pendingGameSelection?.let { (deckIds, title) ->
         AlertDialog(
             onDismissRequest = { pendingGameSelection = null },
-            title = { Text("選擇模式", fontWeight = FontWeight.Bold) },
+            title = { Text("选择模式", fontWeight = FontWeight.Bold) },
             text = {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -206,7 +206,7 @@ fun QuizGamesScreen(
                         .heightIn(max = 520.dp)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Text("$title・共 ${cards.count { it.deckId in deckIds }} 張")
+                    Text("$title・共 ${cards.count { it.deckId in deckIds }} 张")
                     val selectedCards = cards.filter { it.deckId in deckIds }
                     QuizPlayMode.entries.forEach { mode ->
                         val eligibleCount = eligibleCardsForMode(mode, selectedCards).size
@@ -239,7 +239,7 @@ fun QuizGamesScreen(
 
     if (activeGameDeckIds.isNotEmpty() && selectedPlayMode != null) {
         val deckCards = cards.filter { it.deckId in activeGameDeckIds }
-        val deckTitle = activeGameTitle.ifBlank { "單字測驗" }
+        val deckTitle = activeGameTitle.ifBlank { "单词测试" }
 
         Scaffold(
             topBar = {
@@ -279,8 +279,8 @@ fun QuizGamesScreen(
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CalmEmptyState(
                             icon = Icons.Default.Folder,
-                            title = "沒有可測驗的單字",
-                            message = "先新增單字卡再回來。"
+                            title = "没有可测试的单词",
+                            message = "先添加单词卡再回来。"
                         )
                     }
                 } else {
@@ -330,7 +330,7 @@ fun QuizGamesScreen(
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("測驗", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                        Text("测试", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                     }
                 },
                 actions = {
@@ -356,14 +356,14 @@ fun QuizGamesScreen(
                 item {
                     CalmEmptyState(
                         icon = Icons.Default.Folder,
-                        title = "還沒有資料夾",
-                        message = "先建立資料夾，再開始測驗。"
+                        title = "还没有文件夹",
+                        message = "先创建文件夹，再开始测试。"
                     )
                 }
             } else {
                 item {
                     Text(
-                        text = "選擇課程",
+                        text = "选择课程",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -381,7 +381,7 @@ fun QuizGamesScreen(
                                 modifier = Modifier.clickable { selectedCourse = null }
                             ) {
                                 Text(
-                                    text = "全部資料夾 (${decks.size})",
+                                    text = "全部文件夹 (${decks.size})",
                                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -412,13 +412,13 @@ fun QuizGamesScreen(
                     Button(
                         onClick = {
                             pendingGameSelection = courseIds to
-                                (selectedCourse?.let { "$it・全部資料夾" } ?: "全部資料夾")
+                                (selectedCourse?.let { "$it・全部文件夹" } ?: "全部文件夹")
                         },
                         enabled = courseCount > 0,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.Extension, contentDescription = null)
-                        Text("測驗全部 · $courseCount")
+                        Text("测试全部 · $courseCount")
                     }
                 }
                 items(filteredDecks) { deck ->
@@ -488,7 +488,7 @@ private fun PronunciationQuizView(
     onFinish: () -> Unit
 ) {
     if (cards.isEmpty()) {
-        CalmEmptyState(Icons.Default.Mic, "沒有可練習的內容", if (sentenceMode) "請先補上英文例句。" else "請先新增單字。")
+        CalmEmptyState(Icons.Default.Mic, "没有可练习的内容", if (sentenceMode) "请先补上英文例句。" else "请先添加单词。")
         return
     }
     val context = LocalContext.current
@@ -496,7 +496,7 @@ private fun PronunciationQuizView(
     var listening by remember(index) { mutableStateOf(false) }
     var recognized by remember(index) { mutableStateOf("") }
     var score by remember(index) { mutableStateOf<Int?>(null) }
-    var feedback by remember(index) { mutableStateOf("先聽一次示範，再按錄音開始作答。") }
+    var feedback by remember(index) { mutableStateOf("先听一次示范，再按录音开始作答。") }
     val card = cards[index.coerceIn(0, cards.lastIndex)]
     val target = if (sentenceMode) card.exampleSentence.trim() else card.word.trim()
     val recognizer = remember(context, index) {
@@ -505,13 +505,13 @@ private fun PronunciationQuizView(
 
     fun startListening() {
         if (recognizer == null) {
-            feedback = "此裝置沒有可用的 Android 語音辨識服務。"
+            feedback = "此设备没有可用的 Android 语音识别服务。"
             return
         }
         onStopSpeaking()
         score = null
         recognized = ""
-        feedback = "正在錄音，念完後按停止並評分。"
+        feedback = "正在录音，念完后按停止并评分。"
         recognizer.startListening(Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.US.toLanguageTag())
@@ -524,7 +524,7 @@ private fun PronunciationQuizView(
         if (granted) {
             startListening()
         } else {
-            feedback = "需要麥克風權限才能進行口說測驗。"
+            feedback = "需要麦克风权限才能进行口语测试。"
         }
     }
 
@@ -542,13 +542,13 @@ private fun PronunciationQuizView(
             override fun onBeginningOfSpeech() = Unit
             override fun onRmsChanged(rmsdB: Float) = Unit
             override fun onBufferReceived(buffer: ByteArray?) = Unit
-            override fun onEndOfSpeech() { listening = false; feedback = "正在評分…" }
+            override fun onEndOfSpeech() { listening = false; feedback = "正在评分…" }
             override fun onError(error: Int) {
                 listening = false
                 feedback = when (error) {
-                    SpeechRecognizer.ERROR_NO_MATCH -> "沒有辨識到完整內容，請再試一次。"
-                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "沒有聽到聲音，請再試一次。"
-                    else -> "語音辨識暫時失敗，請確認網路與系統語音服務。"
+                    SpeechRecognizer.ERROR_NO_MATCH -> "没有识别到完整内容，请再试一次。"
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "没有听到声音，请再试一次。"
+                    else -> "语音识别暂时失败，请确认网络与系统语音服务。"
                 }
             }
             override fun onResults(results: Bundle?) {
@@ -559,7 +559,7 @@ private fun PronunciationQuizView(
                 else pronunciationScore(target, heard, confidence)
                 recognized = heard
                 score = calculated
-                feedback = if (calculated >= 80) "通過，可以前往下一題。" else "尚未通過，請再聽一次並重新錄音。"
+                feedback = if (calculated >= 80) "通过，可以前往下一题。" else "尚未通过，请再听一次并重新录音。"
                 onResult(card.id, calculated)
             }
             override fun onPartialResults(partialResults: Bundle?) = Unit
@@ -579,7 +579,7 @@ private fun PronunciationQuizView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text("${if (sentenceMode) "念例句" else "念單字"} · ${index + 1} / ${cards.size}", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+        Text("${if (sentenceMode) "念例句" else "念单词"} · ${index + 1} / ${cards.size}", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
         Card(
             shape = RoundedCornerShape(18.dp),
             colors = CardDefaults.cardColors(containerColor = Color.Transparent),
@@ -593,17 +593,17 @@ private fun PronunciationQuizView(
             }
         }
         score?.let {
-            Text("$it 分 · ${if (it >= 80) "通過" else "再試一次"}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold,
+            Text("$it 分 · ${if (it >= 80) "通过" else "再试一次"}", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold,
                 color = if (it >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
         }
-        if (recognized.isNotBlank()) Text("辨識結果：$recognized")
+        if (recognized.isNotBlank()) Text("识别结果：$recognized")
         Text(feedback, textAlign = TextAlign.Center)
         Button(
             onClick = { if (listening) recognizer?.stopListening() else requestStart() },
             modifier = Modifier.fillMaxWidth()
         ) {
             Icon(if (listening) Icons.Default.Stop else Icons.Default.Mic, null)
-            Text(if (listening) "停止並評分" else "開始錄音")
+            Text(if (listening) "停止并评分" else "开始录音")
         }
         if (score != null) {
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -613,7 +613,7 @@ private fun PronunciationQuizView(
                 Button(
                     onClick = { if (index == cards.lastIndex) onFinish() else index++ },
                     modifier = Modifier.weight(1f)
-                ) { Text(if (index == cards.lastIndex) "完成" else "下一題") }
+                ) { Text(if (index == cards.lastIndex) "完成" else "下一题") }
             }
         }
     }
@@ -769,12 +769,12 @@ private fun IndependentQuizView(
     if (eligible.isEmpty()) {
         CalmEmptyState(
             icon = Icons.Default.Lightbulb,
-            title = "沒有符合條件的題目",
+            title = "没有符合条件的题目",
             message = when (mode) {
-                QuizPlayMode.CLOZE_CHOICE, QuizPlayMode.CLOZE_TYPING -> "需要包含目標單字的完整英文例句。"
-                QuizPlayMode.PART_OF_SPEECH -> "需要至少兩種不同的已填詞性。"
-                QuizPlayMode.SYNONYM_DISCRIMINATION -> "需要至少兩張中文意思相近的卡片。"
-                else -> "請先補齊此題型需要的卡片資料。"
+                QuizPlayMode.CLOZE_CHOICE, QuizPlayMode.CLOZE_TYPING -> "需要包含目标单词的完整英文例句。"
+                QuizPlayMode.PART_OF_SPEECH -> "需要至少两种不同的已填词性。"
+                QuizPlayMode.SYNONYM_DISCRIMINATION -> "需要至少两张中文意思相近的卡片。"
+                else -> "请先补齐此题型需要的卡片数据。"
             }
         )
         return
@@ -800,7 +800,7 @@ private fun IndependentQuizView(
                     )
                     Text(mode.label, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                     Text(
-                        "答對 $correctCount / ${eligible.size} 題",
+                        "答对 $correctCount / ${eligible.size} 题",
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
@@ -812,11 +812,11 @@ private fun IndependentQuizView(
                             },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("繼續練習錯題（${wrongCardIds.size}）")
+                            Text("继续练习错题（${wrongCardIds.size}）")
                         }
                     }
                     Button(onClick = onFinish, modifier = Modifier.fillMaxWidth()) {
-                        Text("返回測驗")
+                        Text("返回测试")
                     }
                 }
             }
@@ -928,7 +928,7 @@ private fun IndependentQuizView(
                             Text(card.definition, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                         }
                         QuizPlayMode.ENGLISH_TO_CHINESE -> {
-                            Text("選擇正確中文", color = MaterialTheme.colorScheme.primary)
+                            Text("选择正确中文", color = MaterialTheme.colorScheme.primary)
                             Text(card.word, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                             card.exampleSentence.takeIf { it.isNotBlank() }?.let { Text(it) }
                         }
@@ -936,7 +936,7 @@ private fun IndependentQuizView(
                         QuizPlayMode.CLOZE_TYPING,
                         QuizPlayMode.SYNONYM_DISCRIMINATION -> {
                             Text(
-                                if (mode == QuizPlayMode.SYNONYM_DISCRIMINATION) "從相近單字中選出最符合者" else "完成例句",
+                                if (mode == QuizPlayMode.SYNONYM_DISCRIMINATION) "从相近单词中选出最符合者" else "完成例句",
                                 color = MaterialTheme.colorScheme.primary
                             )
                             clozeFor(card)?.let {
@@ -946,7 +946,7 @@ private fun IndependentQuizView(
                         }
                         QuizPlayMode.LISTENING_CHOICE,
                         QuizPlayMode.LISTENING_SPELLING -> {
-                            Text("聽發音作答", color = MaterialTheme.colorScheme.primary)
+                            Text("听发音作答", color = MaterialTheme.colorScheme.primary)
                             IconButton(onClick = { onSpeak(card.word) }, modifier = Modifier.size(64.dp)) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.VolumeUp,
@@ -954,10 +954,10 @@ private fun IndependentQuizView(
                                     modifier = Modifier.size(40.dp)
                                 )
                             }
-                            Text("點喇叭可以重播", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("点喇叭可以重播", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         QuizPlayMode.SENTENCE_ORDER -> {
-                            Text("依照正確順序重組例句", color = MaterialTheme.colorScheme.primary)
+                            Text("依照正确顺序重组例句", color = MaterialTheme.colorScheme.primary)
                             Text(
                                 card.exampleTranslation.ifBlank { card.definition },
                                 style = MaterialTheme.typography.bodyLarge,
@@ -965,7 +965,7 @@ private fun IndependentQuizView(
                             )
                         }
                         QuizPlayMode.PART_OF_SPEECH -> {
-                            Text("選擇詞性", color = MaterialTheme.colorScheme.primary)
+                            Text("选择词性", color = MaterialTheme.colorScheme.primary)
                             Text(card.word, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                             card.exampleSentence.takeIf { it.isNotBlank() }?.let { Text(it) }
                         }
@@ -986,7 +986,7 @@ private fun IndependentQuizView(
                     sentenceTokens.size >= 12 -> 11.sp
                     else -> 13.sp
                 }
-                Text("排列結果・點單字可放回下方", fontWeight = FontWeight.Bold)
+                Text("排列结果・点单词可放回下方", fontWeight = FontWeight.Bold)
                 Surface(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 112.dp, max = 180.dp),
                     shape = RoundedCornerShape(16.dp),
@@ -999,7 +999,7 @@ private fun IndependentQuizView(
                     ) {
                         if (selectedTokenIndices.isEmpty()) {
                             Text(
-                                "從下方選擇單字",
+                                "从下方选择单词",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(8.dp)
@@ -1018,7 +1018,7 @@ private fun IndependentQuizView(
                     }
                 }
 
-                Text("可選單字", fontWeight = FontWeight.Bold)
+                Text("可菜单词", fontWeight = FontWeight.Bold)
                 Surface(
                     modifier = Modifier.fillMaxWidth().heightIn(min = 130.dp, max = 210.dp),
                     shape = RoundedCornerShape(16.dp),
@@ -1048,9 +1048,9 @@ private fun IndependentQuizView(
                     value = typedAnswer,
                     onValueChange = { if (answerResult == null) typedAnswer = it },
                     label = {
-                        Text(if (mode == QuizPlayMode.LISTENING_SPELLING) "輸入聽到的英文" else "輸入完整英文單字")
+                        Text(if (mode == QuizPlayMode.LISTENING_SPELLING) "输入听到的英文" else "输入完整英文单词")
                     },
-                    supportingText = { Text("不分大小寫，但必須完整輸入") },
+                    supportingText = { Text("不分大小写，但必须完整输入") },
                     singleLine = true,
                     enabled = answerResult == null,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Default),
@@ -1077,9 +1077,9 @@ private fun IndependentQuizView(
             ) {
                 Text(
                     when (answerResult) {
-                        true -> "答對了"
-                        false -> "答錯了，答案：${expectedAnswer()}"
-                        null -> "完成後確認答案"
+                        true -> "答对了"
+                        false -> "答错了，答案：${expectedAnswer()}"
+                        null -> "完成后确认答案"
                     },
                     modifier = Modifier.weight(1f),
                     fontWeight = FontWeight.Bold
@@ -1093,13 +1093,13 @@ private fun IndependentQuizView(
                                 selectedTokenIndices.size == sentenceTokens.size
                             else -> typedAnswer.isNotBlank()
                         }
-                    ) { Text("確認") }
+                    ) { Text("确认") }
                 } else {
                     Button(
                         onClick = { questionIndex++ },
                         enabled = canAdvance
                     ) {
-                        Text(if (questionIndex == eligible.lastIndex) "查看結果" else "下一題")
+                        Text(if (questionIndex == eligible.lastIndex) "查看结果" else "下一题")
                     }
                 }
             }
@@ -1325,9 +1325,9 @@ private fun ThreeStageVocabularyGame(
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(64.dp)
                     )
-                    Text("全部答對了", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                    Text("全部答对了", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                     Button(onClick = onFinish, modifier = Modifier.fillMaxWidth()) {
-                        Text("返回測驗")
+                        Text("返回测试")
                     }
                 }
             }
@@ -1338,10 +1338,10 @@ private fun ThreeStageVocabularyGame(
     if (currentCard == null || currentQuestion == null) return
 
     val stageTitle = when (stage) {
-        ChallengeStage.MULTIPLE_CHOICE -> "第一部分・選擇題"
-        ChallengeStage.MULTIPLE_CHOICE_RETRY -> "第一部分錯題・再答一次"
-        ChallengeStage.TYPING -> "第二部分・自行輸入"
-        ChallengeStage.FINAL_REVIEW -> "第三部分・錯題循環"
+        ChallengeStage.MULTIPLE_CHOICE -> "第一部分・选择题"
+        ChallengeStage.MULTIPLE_CHOICE_RETRY -> "第一部分错题・再答一次"
+        ChallengeStage.TYPING -> "第二部分・自行输入"
+        ChallengeStage.FINAL_REVIEW -> "第三部分・错题循环"
         ChallengeStage.COMPLETE -> ""
     }
     val clozeSentence = remember(currentCard.id) {
@@ -1368,9 +1368,9 @@ private fun ThreeStageVocabularyGame(
             Text(stageTitle, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
             Text(
                 if (stage == ChallengeStage.FINAL_REVIEW) {
-                    "待通過 ${queue.size} 題"
+                    "待通过 ${queue.size} 题"
                 } else {
-                    "第 ${(stageTotal - queue.size + 1).coerceAtLeast(1)} / $stageTotal 題"
+                    "第 ${(stageTotal - queue.size + 1).coerceAtLeast(1)} / $stageTotal 题"
                 },
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary
@@ -1413,7 +1413,7 @@ private fun ThreeStageVocabularyGame(
                             color = MaterialTheme.colorScheme.primary
                         )
                         IconButton(onClick = { onSpeak(currentCard.word) }) {
-                            Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "播放發音")
+                            Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "播放发音")
                         }
                     }
                     Text(
@@ -1466,8 +1466,8 @@ private fun ThreeStageVocabularyGame(
                     onValueChange = {
                         if (answeredCorrectly == null) answerText = it
                     },
-                    label = { Text("輸入完整英文單字") },
-                    supportingText = { Text("不分大小寫，必須輸入完整單字") },
+                    label = { Text("输入完整英文单词") },
+                    supportingText = { Text("不分大小写，必须输入完整单词") },
                     singleLine = true,
                     enabled = answeredCorrectly == null,
                     shape = RoundedCornerShape(14.dp),
@@ -1495,9 +1495,9 @@ private fun ThreeStageVocabularyGame(
                     null -> {
                         Text(
                             if (currentQuestion.kind == ChallengeQuestionKind.MULTIPLE_CHOICE) {
-                                selectedOption?.let { "已選擇 $it" } ?: "選一個答案"
+                                selectedOption?.let { "已选择 $it" } ?: "选一个答案"
                             } else {
-                                "輸入後確認答案"
+                                "输入后确认答案"
                             },
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -1515,7 +1515,7 @@ private fun ThreeStageVocabularyGame(
                                 currentQuestion.kind == ChallengeQuestionKind.MULTIPLE_CHOICE
                             ) selectedOption != null else answerText.isNotBlank()
                         ) {
-                            Text("確認答案", fontWeight = FontWeight.Bold)
+                            Text("确认答案", fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -1531,7 +1531,7 @@ private fun ThreeStageVocabularyGame(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                if (correct) "答對了" else "答錯了",
+                                if (correct) "答对了" else "答错了",
                                 fontWeight = FontWeight.Bold,
                                 color = if (correct) {
                                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -1547,7 +1547,7 @@ private fun ThreeStageVocabularyGame(
                                 )
                             } else if (questionHadWrongAttempt) {
                                 Text(
-                                    "已修正，稍後會再練一次",
+                                    "已修正，稍后会再练一次",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
@@ -1560,11 +1560,11 @@ private fun ThreeStageVocabularyGame(
                         ) {
                             Text(
                                 when {
-                                    queue.size > 1 -> "下一題"
+                                    queue.size > 1 -> "下一题"
                                     stage == ChallengeStage.FINAL_REVIEW &&
-                                        questionHadWrongAttempt -> "再練一次"
-                                    stage == ChallengeStage.FINAL_REVIEW -> "完成測驗"
-                                    else -> "下一階段"
+                                        questionHadWrongAttempt -> "再练一次"
+                                    stage == ChallengeStage.FINAL_REVIEW -> "完成测试"
+                                    else -> "下一阶段"
                                 },
                                 fontWeight = FontWeight.Bold
                             )
@@ -1640,7 +1640,7 @@ private fun SpellingQuizView(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "第 ${quizIndex + 1} 題",
+                    text = "第 ${quizIndex + 1} 题",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
@@ -1651,7 +1651,7 @@ private fun SpellingQuizView(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "連勝 $streakCount",
+                    text = "连胜 $streakCount",
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Bold,
                         color = if (streakCount >= 3) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
@@ -1692,7 +1692,7 @@ private fun SpellingQuizView(
                     onClick = { onSpeak(currentCard.word) },
                     modifier = Modifier.size(40.dp)
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "發音", tint = MaterialTheme.colorScheme.primary)
+                    Icon(imageVector = Icons.AutoMirrored.Filled.VolumeUp, contentDescription = "发音", tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -1700,7 +1700,7 @@ private fun SpellingQuizView(
         if (hintLettersCount > 0) {
             val hintText = currentCard.word.take(hintLettersCount) + "_".repeat((currentCard.word.length - hintLettersCount).coerceAtLeast(0))
             Text(
-                text = "提示開頭：$hintText",
+                text = "提示开头：$hintText",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.tertiary
             )
@@ -1709,7 +1709,7 @@ private fun SpellingQuizView(
         OutlinedTextField(
             value = userInput,
             onValueChange = { userInput = it },
-            label = { Text("輸入英文單字") },
+            label = { Text("输入英文单词") },
             singleLine = true,
             enabled = !isAnswered,
             shape = RoundedCornerShape(16.dp),
@@ -1737,7 +1737,7 @@ private fun SpellingQuizView(
                 modifier = Modifier.weight(1f).testTag("spelling_submit_button")
             ) {
                 Text(
-                    text = if (!isAnswered) "確認" else "下一題",
+                    text = if (!isAnswered) "确认" else "下一题",
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -1763,7 +1763,7 @@ private fun SpellingQuizView(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = if (isCorrect) "答對了" else "正確拼法：${currentCard.word}",
+                        text = if (isCorrect) "答对了" else "正确拼法：${currentCard.word}",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             color = if (isCorrect) MaterialTheme.colorScheme.onPrimaryContainer
@@ -1778,7 +1778,7 @@ private fun SpellingQuizView(
 
 /**
  * Dynamic Word Matching Game View with continuous stream of cards based on queue.
- * Rule: 每答對一個框框就會自動消失並換成下一個單字，直到全部單字配對完成。
+ * Rule: 每答对一个框框就会自动消失并换成下一个单词，直到全部单词配对完成。
  */
 @Composable
 private fun DynamicWordMatchingGameView(
@@ -2015,7 +2015,7 @@ private fun DynamicWordMatchingGameView(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "配對",
+                    text = "配对",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
@@ -2029,7 +2029,7 @@ private fun DynamicWordMatchingGameView(
         }
 
         Text(
-            text = "左右各選一格；配對成功後會立即補入下一組。",
+            text = "左右各选一格；配对成功后会立即补入下一组。",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -2038,8 +2038,8 @@ private fun DynamicWordMatchingGameView(
         if (eligibleCards.isEmpty()) {
             CalmEmptyState(
                 icon = Icons.Default.Extension,
-                title = "沒有可配對的單字",
-                message = "配對題需要同時具有英文單字與中文解釋。"
+                title = "没有可配对的单词",
+                message = "配对题需要同时具有英文单词与中文解释。"
             )
         } else if (matchedCount >= totalCount) {
             Spacer(modifier = Modifier.height(20.dp))
@@ -2054,13 +2054,13 @@ private fun DynamicWordMatchingGameView(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "全部配對完成",
+                        text = "全部配对完成",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        text = "正確率 ${((totalCount.toFloat() / (totalCount + wrongAttempts).coerceAtLeast(1)) * 100).toInt()}%・答錯 $wrongAttempts 次・用時 ${(System.currentTimeMillis() - startedAt) / 1000} 秒",
+                        text = "正确率 ${((totalCount.toFloat() / (totalCount + wrongAttempts).coerceAtLeast(1)) * 100).toInt()}%・答错 $wrongAttempts 次・用时 ${(System.currentTimeMillis() - startedAt) / 1000} 秒",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )

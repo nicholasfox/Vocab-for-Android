@@ -23,15 +23,15 @@ class AssistantGrammarWriterTest {
         db = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext<Context>(), AppDatabase::class.java).allowMainThreadQueries().build()
     }
     @After fun cleanup() { db.close() }
-    private val draft = GrammarDraft(title = "現在完成式", summary = "過去事件與現在的關聯", structure = "have/has + p.p.",
-        patterns = listOf(GrammarPatternDraft(formula = "has + p.p.", examples = listOf(GrammarExampleDraft(sentence = "He has studied.", translation = "他已經讀過了。")))),
+    private val draft = GrammarDraft(title = "现在完成式", summary = "过去事件与现在的关联", structure = "have/has + p.p.",
+        patterns = listOf(GrammarPatternDraft(formula = "has + p.p.", examples = listOf(GrammarExampleDraft(sentence = "He has studied.", translation = "他已经读过了。")))),
         questions = listOf(GrammarQuestionDraft(grammarPatternIndex = 0, prompt = "He {{answer}} studied.", answer = "has", options = "has,have,had")))
 
     @Test fun createsNotePatternsExamplesAndQuestionsInTheChosenLibraryAndCanUndo() = runTest {
-        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(course = "高中英文", name = "時態"))
+        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(course = "高中英文", name = "时态"))
         val id = createAssistantGrammar(db, libraryId, draft)
         val note = db.grammarNoteDao().getById(id)!!
-        assertEquals("高中英文", note.course); assertEquals("時態", note.folder); assertEquals("AI", note.sourceType)
+        assertEquals("高中英文", note.course); assertEquals("时态", note.folder); assertEquals("AI", note.sourceType)
         val pattern = db.grammarContentDao().getPatternsForNote(id).single()
         assertEquals(pattern.id, db.grammarContentDao().getExamplesForNote(id).single().grammarPatternId)
         assertEquals(pattern.id, db.grammarQuestionDao().getForNote(id).single().grammarPatternId)
@@ -45,7 +45,7 @@ class AssistantGrammarWriterTest {
 
     @Test fun rejectsUnknownLibraryDuplicatesAndInvalidQuestionsWithoutPartialWrites() = runTest {
         assertTrue(runCatching { createAssistantGrammar(db, 999, draft) }.isFailure)
-        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(name = "時態"))
+        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(name = "时态"))
         val invalid = draft.copy(questions = listOf(GrammarQuestionDraft(prompt = "No answer marker", answer = "has")))
         assertTrue(runCatching { createAssistantGrammar(db, libraryId, invalid) }.isFailure)
         assertTrue(db.grammarNoteDao().getAllOnce().isEmpty())
@@ -55,12 +55,12 @@ class AssistantGrammarWriterTest {
     }
 
     @Test fun undoNeverDeletesSubsequentUserEdits() = runTest {
-        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(name = "時態"))
+        val libraryId = db.grammarLibraryDao().insert(GrammarLibrary(name = "时态"))
         val id = createAssistantGrammar(db, libraryId, draft)
         val snapshot = assistantGrammarSnapshot(db, id)
         val note = db.grammarNoteDao().getById(id)!!
-        db.grammarNoteDao().update(note.copy(summary = "使用者修改過的內容"))
+        db.grammarNoteDao().update(note.copy(summary = "用户修改过的内容"))
         assertTrue(runCatching { undoAssistantGrammarCreation(db, id, snapshot) }.isFailure)
-        assertEquals("使用者修改過的內容", db.grammarNoteDao().getById(id)!!.summary)
+        assertEquals("用户修改过的内容", db.grammarNoteDao().getById(id)!!.summary)
     }
 }

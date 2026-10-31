@@ -39,6 +39,7 @@ data class AppSettings(
     val usePersonalAiApi: Boolean = false,
     val aiProvider: String = "GEMINI",
     val aiModel: String = "gemini-3.6-flash",
+    val aiBaseUrl: String = "",
     val aiChatStyle: String = "NORMAL",
     val aiWordPrompt: String = AiPromptDefaults.WORD_DETAILS,
     val aiImagePrompt: String = AiPromptDefaults.IMAGE_VOCABULARY_EXTRACTION,

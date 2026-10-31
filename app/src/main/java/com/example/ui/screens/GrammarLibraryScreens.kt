@@ -112,7 +112,7 @@ fun GrammarLibrariesScreen(
     if (showAdd) AddFolderDialog(
         existingCourses = courses,
         defaultCourse = selectedCourse,
-        itemLabel = "文法庫",
+        itemLabel = "语法库",
         onDismiss = { showAdd = false },
         onConfirm = { course, name, description, color -> showAdd = false; onAdd(course, name, description, color) }
     )
@@ -125,9 +125,9 @@ fun GrammarLibrariesScreen(
     deleting?.let { library ->
         AlertDialog(
             onDismissRequest = { deleting = null },
-            title = { Text("刪除文法庫「${library.name}」？") },
-            text = { Text("其中的文法、句型與題目會一併刪除，且無法復原。") },
-            confirmButton = { Button(onClick = { deleting = null; onDelete(library) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("確定刪除") } },
+            title = { Text("删除语法库「${library.name}」？") },
+            text = { Text("其中的语法、句型与题目会一并删除，且无法恢复。") },
+            confirmButton = { Button(onClick = { deleting = null; onDelete(library) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("确定删除") } },
             dismissButton = { TextButton(onClick = { deleting = null }) { Text("取消") } }
         )
     }
@@ -142,7 +142,7 @@ fun GrammarLibrariesScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape,
                     modifier = Modifier.padding(bottom = 98.dp)
-                ) { Icon(Icons.Default.Add, "新增文法庫") }
+                ) { Icon(Icons.Default.Add, "添加语法库") }
             }
         }
     ) { padding ->
@@ -153,18 +153,18 @@ fun GrammarLibrariesScreen(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
-                Text("選擇課程", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
+                Text("选择课程", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.primary)
                 Spacer(Modifier.height(6.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item { CourseChip("全部文法庫 (${libraries.size})", selectedCourse == null) { selectedCourse = null } }
+                    item { CourseChip("全部语法库 (${libraries.size})", selectedCourse == null) { selectedCourse = null } }
                     items(courses) { course -> CourseChip("$course (${libraries.count { it.course == course }})", selectedCourse == course) { selectedCourse = course } }
                 }
                 if (highlightedAction == "manage" && libraries.isNotEmpty()) {
                     Spacer(Modifier.height(8.dp))
-                    Text("拖曳卡片右上方把手可調整整體順序。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("拖动卡片右上方把手可调整整体顺序。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            if (filtered.isEmpty()) item { CalmEmptyState(Icons.Default.MenuBook, "還沒有文法庫", "按右下角＋建立文法庫。") }
+            if (filtered.isEmpty()) item { CalmEmptyState(Icons.Default.MenuBook, "还没有语法库", "按右下角＋创建语法库。") }
             itemsIndexed(visibleIds, key = { _, id -> id }) { _, id ->
                 val library = filtered.firstOrNull { it.id == id } ?: return@itemsIndexed
                 ReorderableItem(reorderState, key = id) { dragging ->
@@ -266,13 +266,13 @@ private fun GrammarLibraryEditDialog(
     var description by remember { mutableStateOf(library.description) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("編輯文法庫") },
+        title = { Text("编辑语法库") },
         text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text("課程：${library.course}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-            OutlinedTextField(name, { name = it }, label = { Text("名稱") }, singleLine = true)
-            OutlinedTextField(description, { description = it }, label = { Text("說明（選填）") }, singleLine = true)
+            Text("课程：${library.course}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedTextField(name, { name = it }, label = { Text("名称") }, singleLine = true)
+            OutlinedTextField(description, { description = it }, label = { Text("说明（选填）") }, singleLine = true)
         } },
-        confirmButton = { Button(onClick = { onConfirm(library.copy(name = name.trim(), description = description.trim())) }, enabled = name.isNotBlank()) { Text("儲存") } },
+        confirmButton = { Button(onClick = { onConfirm(library.copy(name = name.trim(), description = description.trim())) }, enabled = name.isNotBlank()) { Text("保存") } },
         dismissButton = { TextButton(onClick = onDismiss) { Text("取消") } }
     )
 }
@@ -313,13 +313,13 @@ fun GrammarLibraryManageScreen(
     }
     pendingDelete?.let { note -> AlertDialog(
         onDismissRequest = { pendingDelete = null },
-        title = { Text("刪除文法「${note.title}」？") },
-        text = { Text("句型、例句、題目與學習紀錄會一併刪除。") },
-        confirmButton = { Button(onClick = { pendingDelete = null; onDelete(note) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("刪除") } },
+        title = { Text("删除语法「${note.title}」？") },
+        text = { Text("句型、例句、题目与学习纪录会一并删除。") },
+        confirmButton = { Button(onClick = { pendingDelete = null; onDelete(note) }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("删除") } },
         dismissButton = { TextButton(onClick = { pendingDelete = null }) { Text("取消") } }
     ) }
     Scaffold(
-        floatingActionButton = { FloatingActionButton(onClick = onAdd) { Icon(Icons.Default.Add, "新增文法") } }
+        floatingActionButton = { FloatingActionButton(onClick = onAdd) { Icon(Icons.Default.Add, "添加语法") } }
     ) { padding ->
         LazyColumn(state = listState, modifier = Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(16.dp, 8.dp, 16.dp, 96.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
@@ -331,11 +331,11 @@ fun GrammarLibraryManageScreen(
                 OutlinedTextField(
                     value = query, onValueChange = { query = it }, singleLine = true,
                     leadingIcon = { Icon(Icons.Default.Search, null) },
-                    placeholder = { Text("搜尋文法、句型或例句") },
+                    placeholder = { Text("搜索语法、句型或例句") },
                     shape = RoundedCornerShape(28.dp), modifier = Modifier.fillMaxWidth()
                 )
             }
-            if (filtered.isEmpty()) item { CalmEmptyState(Icons.Default.MenuBook, if (query.isBlank()) "尚無文法" else "找不到結果", if (query.isBlank()) "按右下角＋新增文法。" else "請換一個關鍵字。") }
+            if (filtered.isEmpty()) item { CalmEmptyState(Icons.Default.MenuBook, if (query.isBlank()) "尚无语法" else "找不到结果", if (query.isBlank()) "按右下角＋添加语法。" else "请换一个关键字。") }
             itemsIndexed(noteIds, key = { _, id -> id }) { _, id ->
                 val note = filtered.firstOrNull { it.id == id } ?: return@itemsIndexed
                 ReorderableItem(reorderState, key = id) { dragging ->
@@ -347,12 +347,12 @@ fun GrammarLibraryManageScreen(
                                     Text(note.title, style = MaterialTheme.typography.titleLarge)
                                     Text("${note.category} · ${note.level}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
-                                Icon(Icons.Default.DragHandle, "拖曳排序", Modifier.draggableHandle().size(32.dp))
+                                Icon(Icons.Default.DragHandle, "拖动排序", Modifier.draggableHandle().size(32.dp))
                                 Box {
-                                    IconButton(onClick = { noteMenu = true }) { Icon(Icons.Default.MoreVert, "文法操作") }
+                                    IconButton(onClick = { noteMenu = true }) { Icon(Icons.Default.MoreVert, "语法操作") }
                                     DropdownMenu(expanded = noteMenu, onDismissRequest = { noteMenu = false }) {
-                                        DropdownMenuItem(text = { Text("編輯") }, onClick = { noteMenu = false; onEdit(note) })
-                                        DropdownMenuItem(text = { Text("刪除", color = MaterialTheme.colorScheme.error) }, onClick = { noteMenu = false; pendingDelete = note })
+                                        DropdownMenuItem(text = { Text("编辑") }, onClick = { noteMenu = false; onEdit(note) })
+                                        DropdownMenuItem(text = { Text("删除", color = MaterialTheme.colorScheme.error) }, onClick = { noteMenu = false; pendingDelete = note })
                                     }
                                 }
                             }

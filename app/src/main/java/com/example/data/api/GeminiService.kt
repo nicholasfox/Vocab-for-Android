@@ -68,14 +68,14 @@ object GeminiService {
         images: List<DirectAiService.ImagePayload>,
         scopeInstructions:String=com.example.util.ScanInstructions.build()
     ): List<OcrCardCandidate> {
-        if (personalConfigs.isEmpty()) error("請先在設定中加入至少一組 AI API Key")
+        if (personalConfigs.isEmpty()) error("请先在设置中加入至少一组 AI API Key")
         return runCatching {
             withPersonalFailover { config ->
                 DirectAiService.analyzeImages(config, images, imagePrompt, scopeInstructions)
             }
         }
             .onSuccess { _lastError.value = null }
-            .onFailure { _lastError.value = it.message ?: "多模態圖片辨識失敗" }
+            .onFailure { _lastError.value = it.message ?: "多模态图片识别失败" }
             .getOrThrow()
     }
 
@@ -93,7 +93,7 @@ object GeminiService {
                 if (!response.isSuccessful) {
                     val message = runCatching {
                         JSONObject(responseText).optString("error")
-                    }.getOrNull().orEmpty().ifBlank { "AI 服務暫時無法使用 (${response.code})" }
+                    }.getOrNull().orEmpty().ifBlank { "AI 服务暂时无法使用 (${response.code})" }
                     _lastError.value = message
                     Log.w(TAG, "Backend request failed with HTTP ${response.code}")
                     return@withContext null
@@ -103,7 +103,7 @@ object GeminiService {
                 root.opt("data")
             }
         } catch (error: Exception) {
-            _lastError.value = "無法連線至 AI 服務，已改用離線資料"
+            _lastError.value = "无法连接至 AI 服务，已改用离线数据"
             Log.w(TAG, "Backend request unavailable", error)
             null
         }
@@ -116,10 +116,10 @@ object GeminiService {
             return runCatching {
                 withPersonalFailover { config ->
                     DirectAiService.fetchWordDetails(config, normalized, wordDetailsPrompt)
-                        ?: error("AI 未回傳完整的 KK 音標與單字資料")
+                        ?: error("AI 未返回完整的 KK 音标与单词数据")
                 }
             }
-                .onFailure { _lastError.value = it.message ?: "個人 AI API 呼叫失敗" }
+                .onFailure { _lastError.value = it.message ?: "个人 AI API 呼叫失败" }
                 .getOrNull()
                 .also { if (it != null) _lastError.value = null }
         }
@@ -140,7 +140,7 @@ object GeminiService {
             return runCatching {
                 withPersonalFailover { config -> DirectAiService.analyzeText(config, text) }
             }
-                .onFailure { _lastError.value = it.message ?: "個人 AI API 呼叫失敗" }
+                .onFailure { _lastError.value = it.message ?: "个人 AI API 呼叫失败" }
                 .getOrDefault(emptyList())
                 .also { result ->
                     if (result.isNotEmpty()) _lastError.value = null
@@ -161,7 +161,7 @@ object GeminiService {
                 withPersonalFailover { config -> DirectAiService.enrich(config, candidates) }
             }
                 .onSuccess { _lastError.value = null }
-                .onFailure { _lastError.value = it.message ?: "個人 AI API 呼叫失敗" }
+                .onFailure { _lastError.value = it.message ?: "个人 AI API 呼叫失败" }
                 .getOrDefault(candidates)
         }
         val sourceCards = candidates
@@ -187,7 +187,7 @@ object GeminiService {
         val enrichedByWord = data.toCandidates().associateBy { it.word.lowercase() }
         return candidates.map { candidate ->
             val enriched = enrichedByWord[candidate.word.trim().lowercase()] ?: return@map candidate
-            mergeAiCompletion(candidate.copy(definition = candidate.definition.takeUnless { it.contains("待補充") }.orEmpty()), enriched)
+            mergeAiCompletion(candidate.copy(definition = candidate.definition.takeUnless { it.contains("待补充") }.orEmpty()), enriched)
         }
     }
 
@@ -195,7 +195,7 @@ object GeminiService {
         candidates: List<com.example.data.importer.ExternalCardCandidate>,
         customInstructions: String
     ): Map<Int, DictionaryEntry> {
-        if (personalConfigs.isEmpty()) error("請先在設定中加入至少一組 AI API Key")
+        if (personalConfigs.isEmpty()) error("请先在设置中加入至少一组 AI API Key")
         return withPersonalFailover { config ->
             DirectAiService.formatImportedCards(config, candidates, customInstructions)
         }
@@ -205,14 +205,14 @@ object GeminiService {
         prompt: String,
         images: List<DirectAiService.ImagePayload> = emptyList()
     ): JSONObject {
-        if (personalConfigs.isEmpty()) error("請先在設定中加入至少一組 AI API Key")
+        if (personalConfigs.isEmpty()) error("请先在设置中加入至少一组 AI API Key")
         return runCatching {
             withPersonalFailover { config ->
                 DirectAiService.generateAssistantJson(config, prompt, images)
             }
         }
             .onSuccess { _lastError.value = null }
-            .onFailure { _lastError.value = it.message ?: "AI 助手暫時無法使用" }
+            .onFailure { _lastError.value = it.message ?: "AI 助手暂时无法使用" }
             .getOrThrow()
     }
 
@@ -240,7 +240,7 @@ object GeminiService {
                 lastError = error
             }
         }
-        throw lastError ?: error("沒有可用的個人 AI API")
+        throw lastError ?: error("没有可用的个人 AI API")
     }
 
     private fun JSONObject.toDictionaryEntry(fallbackWord: String): DictionaryEntry? {
@@ -257,7 +257,7 @@ object GeminiService {
             example.isBlank() ||
             translation.isBlank()
         ) {
-            _lastError.value = "AI 回傳內容未通過品質驗證，未套用任何資料"
+            _lastError.value = "AI 返回内容未通过质量验证，未应用任何数据"
             return null
         }
         return DictionaryEntry(
@@ -267,7 +267,7 @@ object GeminiService {
             definition = definition,
             exampleSentence = example,
             exampleTranslation = translation,
-            category = "AI 補充"
+            category = "AI 补充"
         )
     }
 

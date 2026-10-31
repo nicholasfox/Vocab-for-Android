@@ -56,7 +56,7 @@ class DueReviewWidgetProvider : SnapshotWidgetProvider() {
         views.setTextViewText(R.id.due_review_count, snapshot.dueCards.toString())
         views.setTextViewText(
             R.id.due_review_status,
-            if (snapshot.dueCards > 0) "待複習" else "已完成"
+            if (snapshot.dueCards > 0) "待复习" else "已完成"
         )
         views.setOnClickPendingIntent(R.id.due_review_root, startReviewPendingIntent(context, 4302))
         manager.updateAppWidget(widgetId, views)
@@ -74,7 +74,7 @@ class StreakWidgetProvider : SnapshotWidgetProvider() {
         views.setTextViewText(R.id.streak_days, "${snapshot.streakDays} 天")
         views.setTextViewText(
             R.id.streak_today,
-            if (snapshot.completedCards >= snapshot.goalCards) "今日目標已完成"
+            if (snapshot.completedCards >= snapshot.goalCards) "今日目标已完成"
             else "今日 ${snapshot.completedCards} / ${snapshot.goalCards}"
         )
         views.setProgressBar(R.id.streak_progress, 100, snapshot.goalPercent, false)

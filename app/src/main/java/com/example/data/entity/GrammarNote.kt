@@ -10,10 +10,10 @@ data class GrammarNote(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val course: String = "通用",
-    @ColumnInfo(defaultValue = "'未分類'") val folder: String = "未分類",
+    @ColumnInfo(defaultValue = "'未分类'") val folder: String = "未分类",
     val title: String,
     @ColumnInfo(defaultValue = "'其他'") val category: String = "其他",
-    @ColumnInfo(defaultValue = "'未分級'") val level: String = "未分級",
+    @ColumnInfo(defaultValue = "'未分级'") val level: String = "未分级",
     val summary: String = "",
     val structure: String = "",
     val usage: String = "",
@@ -93,7 +93,7 @@ data class GrammarExampleDraft(
 data class GrammarDraft(
     val title: String = "",
     val category: String = "其他",
-    val level: String = "未分級",
+    val level: String = "未分级",
     val summary: String = "",
     val structure: String = "",
     val usage: String = "",

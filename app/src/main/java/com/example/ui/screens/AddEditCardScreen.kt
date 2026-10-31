@@ -147,7 +147,7 @@ fun AddEditCardScreen(
 
     var selectedDeckId by remember { mutableLongStateOf(initialDeckId) }
 
-    val courses = remember(decks) { decks.map { it.category }.distinct().ifEmpty { listOf("通用課程") } }
+    val courses = remember(decks) { decks.map { it.category }.distinct().ifEmpty { listOf("通用课程") } }
     var selectedCourse by remember(initialDeck, courses) {
         mutableStateOf(initialDeck?.category ?: courses.first())
     }
@@ -188,21 +188,21 @@ fun AddEditCardScreen(
     pendingAiApply?.let { (target, entry) ->
         AlertDialog(
             onDismissRequest = { pendingAiApply = null },
-            title = { Text("確認套用 AI 資料") },
+            title = { Text("确认应用 AI 数据") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(entry.word, fontWeight = FontWeight.Bold)
                     Text("${entry.partOfSpeech} ${entry.phonetic}".trim())
                     Text(entry.definition)
                     Text(entry.exampleSentence, style = MaterialTheme.typography.bodySmall)
-                    Text("來源：${entry.category}", color = MaterialTheme.colorScheme.primary)
+                    Text("来源：${entry.category}", color = MaterialTheme.colorScheme.primary)
                 }
             },
             confirmButton = {
                 Button(onClick = {
                     applyAiToBlankFields(target, entry)
                     pendingAiApply = null
-                }) { Text("確認套用") }
+                }) { Text("确认应用") }
             },
             dismissButton = {
                 TextButton(onClick = { pendingAiApply = null }) { Text("取消") }
@@ -245,7 +245,7 @@ fun AddEditCardScreen(
 
     var isInitialized by remember { mutableStateOf(false) }
     var sharedTextApplied by remember(initialSharedText) { mutableStateOf(false) }
-    var saveStatus by remember { mutableStateOf("所有變更會自動儲存") }
+    var saveStatus by remember { mutableStateOf("所有变更会自动保存") }
     fun saveUnfinishedDraft(ownerDeckId:Long=selectedDeckId){
         val pending=editableCards.filter{it.originalId==0L&&(it.word.isNotBlank()||it.definition.isNotBlank()||it.exampleSentence.isNotBlank())}
         val rows=JSONArray(pending.map{JSONObject().put("word",it.word).put("definition",it.definition).put("partOfSpeech",it.partOfSpeech).put("phonetic",it.phonetic).put("exampleSentence",it.exampleSentence).put("exampleTranslation",it.exampleTranslation)})
@@ -262,8 +262,8 @@ fun AddEditCardScreen(
             .filterValues { it.size > 1 }
             .keys
         if (duplicates.isNotEmpty()) {
-            saveStatus = "尚未儲存：同一資料夾不能有重複單字"
-            snackbarHostState.showSnackbar("重複單字：${duplicates.joinToString()}，請保留其中一張")
+            saveStatus = "尚未保存：同一文件夹不能有重复单词"
+            snackbarHostState.showSnackbar("重复单词：${duplicates.joinToString()}，请保留其中一张")
             return false
         }
         val topSortOrder = maxOf(
@@ -298,19 +298,19 @@ fun AddEditCardScreen(
                 sortOrder = topSortOrder - index
             )
         }
-        saveStatus = "正在儲存…"
+        saveStatus = "正在保存…"
         return onSaveBatchCards(cardsToSave, deletedOriginalCards.toList())
             .fold(
                 onSuccess = { savedIds ->
                     validItems.zip(savedIds).forEach { (item, id) -> item.originalId = id }
                     deletedOriginalCards.clear()
                     saveUnfinishedDraft()
-                    saveStatus = "已自動儲存"
+                    saveStatus = "已自动保存"
                     true
                 },
                 onFailure = {
-                    saveStatus = "儲存失敗"
-                    snackbarHostState.showSnackbar(it.message ?: "自動儲存失敗")
+                    saveStatus = "保存失败"
+                    snackbarHostState.showSnackbar(it.message ?: "自动保存失败")
                     false
                 }
             )
@@ -319,7 +319,7 @@ fun AddEditCardScreen(
     LaunchedEffect(selectedDeckId) {
         isInitialized = false
         loadCardsForDeck(selectedDeckId)
-        runCatching{val raw=draftPreferences.getString("deck-$selectedDeckId",null);if(raw!=null){val rows=JSONArray(raw);for(index in 0 until rows.length()){val row=rows.getJSONObject(index);val word=row.optString("word");if(word.isBlank()||editableCards.none{it.word.equals(word,true)}){editableCards.add(EditableCardState(initialWord=word,initialDef=row.optString("definition"),initialPos=row.optString("partOfSpeech"),initialPhonetic=row.optString("phonetic"),initialSentence=row.optString("exampleSentence"),initialTranslation=row.optString("exampleTranslation")))}};saveStatus="已恢復未完成草稿"}}
+        runCatching{val raw=draftPreferences.getString("deck-$selectedDeckId",null);if(raw!=null){val rows=JSONArray(raw);for(index in 0 until rows.length()){val row=rows.getJSONObject(index);val word=row.optString("word");if(word.isBlank()||editableCards.none{it.word.equals(word,true)}){editableCards.add(EditableCardState(initialWord=word,initialDef=row.optString("definition"),initialPos=row.optString("partOfSpeech"),initialPhonetic=row.optString("phonetic"),initialSentence=row.optString("exampleSentence"),initialTranslation=row.optString("exampleTranslation")))}};saveStatus="已恢复未完成草稿"}}
         if (!sharedTextApplied && !initialSharedText.isNullOrBlank()) {
             val sharedWords = Regex("[A-Za-z]+(?:['’-][A-Za-z]+)*")
                 .findAll(initialSharedText)
@@ -424,7 +424,7 @@ fun AddEditCardScreen(
                 expandedHeight = 48.dp,
                 title = {
                     Text(
-                        text = if (editingCard == null) "新增單字卡" else "編輯單字卡",
+                        text = if (editingCard == null) "添加单词卡" else "编辑单词卡",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                 },
@@ -439,7 +439,7 @@ fun AddEditCardScreen(
                             val targets = editableCards.filter(::needsAiCompletion)
                             if (targets.isEmpty()) {
                                 coroutineScope.launch {
-                                    snackbarHostState.showSnackbar("沒有需要 AI 補齊的卡片")
+                                    snackbarHostState.showSnackbar("没有需要 AI 补齐的卡片")
                                 }
                             } else if (!isBatchAiLoading) {
                                 isBatchAiLoading = true
@@ -448,7 +448,7 @@ fun AddEditCardScreen(
                                     runCatching {
                                         onBatchFetchAiWordDetails?.invoke(
                                             targets.map(::aiCandidate)
-                                        ) ?: error("AI 一鍵補齊尚未設定")
+                                        ) ?: error("AI 一键补齐尚未设置")
                                     }.onSuccess { entries ->
                                         var completedCount = 0
                                         targets.forEachIndexed { index, target ->
@@ -459,14 +459,14 @@ fun AddEditCardScreen(
                                         }
                                         snackbarHostState.showSnackbar(
                                             if (completedCount > 0) {
-                                                "AI 已補齊 $completedCount 張；原有內容均未覆蓋"
+                                                "AI 已补齐 $completedCount 张；原有内容均未覆盖"
                                             } else {
-                                                "AI 沒有回傳可套用的新資料"
+                                                "AI 没有返回可应用的新数据"
                                             }
                                         )
                                     }.onFailure { error ->
                                         snackbarHostState.showSnackbar(
-                                            "AI 一鍵補齊失敗：${error.localizedMessage ?: "請檢查 API、模型與額度"}"
+                                            "AI 一键补齐失败：${error.localizedMessage ?: "请检查 API、模型与额度"}"
                                         )
                                     }
                                     targets.forEach { it.isAiLoading = false }
@@ -488,7 +488,7 @@ fun AddEditCardScreen(
                         }
                         if (!responsive.isConstrained) {
                             Spacer(Modifier.width(4.dp))
-                            Text("AI 一鍵補齊", fontWeight = FontWeight.Bold)
+                            Text("AI 一键补齐", fontWeight = FontWeight.Bold)
                         }
                     }
                 },
@@ -505,7 +505,7 @@ fun AddEditCardScreen(
                 shape = CircleShape,
                 modifier = Modifier.testTag("add_card_fab")
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "新增單字")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "添加单词")
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -541,7 +541,7 @@ fun AddEditCardScreen(
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "儲存位置",
+                                    text = "保存位置",
                                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.primary
                                 )
@@ -565,7 +565,7 @@ fun AddEditCardScreen(
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = { showAddFolderDialog = true }) {
-                                Icon(Icons.Default.Add, contentDescription = "新增資料夾")
+                                Icon(Icons.Default.Add, contentDescription = "添加文件夹")
                             }
                         }
                     }
@@ -575,7 +575,7 @@ fun AddEditCardScreen(
             // Top Insert Button
             item {
                 InsertCardDivider(
-                    label = "新增到最前面",
+                    label = "添加到最前面",
                     onClick = { insertCardAt(0) }
                 )
             }
@@ -596,18 +596,18 @@ fun AddEditCardScreen(
                                     onFetchAiWordDetails?.invoke(aiCandidate(cardState))
                                 }.onSuccess { aiEntry ->
                                     if (aiEntry != null) {
-                                        if (aiRequiresConfirmation && aiEntry.category == "AI 補充") {
+                                        if (aiRequiresConfirmation && aiEntry.category == "AI 补充") {
                                             pendingAiApply = cardState to aiEntry
                                         } else {
                                             applyAiToBlankFields(cardState, aiEntry)
-                                            snackbarHostState.showSnackbar("已套用${aiEntry.category}資料")
+                                            snackbarHostState.showSnackbar("已应用${aiEntry.category}数据")
                                         }
                                     } else {
-                                        snackbarHostState.showSnackbar("找不到可信資料，未變更任何欄位")
+                                        snackbarHostState.showSnackbar("找不到可信数据，未变更任何字段")
                                     }
                                 }.onFailure { error ->
                                     snackbarHostState.showSnackbar(
-                                        "AI 補齊失敗：${error.localizedMessage ?: "請檢查 API 設定"}"
+                                        "AI 补齐失败：${error.localizedMessage ?: "请检查 API 设置"}"
                                     )
                                 }
                                 cardState.isAiLoading = false
@@ -628,7 +628,7 @@ fun AddEditCardScreen(
 
                 // Plus Insertion Button Between Cards
                 InsertCardDivider(
-                    label = "在此新增",
+                    label = "在此添加",
                     onClick = { insertCardAt(index + 1) }
                 )
             }
@@ -658,21 +658,21 @@ private fun CompactCardEditItem(
     Card(modifier = Modifier.fillMaxWidth().testTag("compact_card_edit_item_$index")) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text("單字卡 #$index", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                Text("单词卡 #$index", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
                 IconButton(onClick = onFetchAiDetails, enabled = !cardState.isAiLoading && cardState.word.isNotBlank()) {
                     if (cardState.isAiLoading) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp)
-                    else Icon(Icons.Default.AutoAwesome, "AI 補齊", tint = MaterialTheme.colorScheme.primary)
+                    else Icon(Icons.Default.AutoAwesome, "AI 补齐", tint = MaterialTheme.colorScheme.primary)
                 }
-                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "刪除", tint = MaterialTheme.colorScheme.error) }
+                IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "删除", tint = MaterialTheme.colorScheme.error) }
             }
-            OutlinedTextField(cardState.word, { cardState.word = it }, label = { Text("英文單字") }, singleLine = true, modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).testTag("compact_word_input_$index"))
+            OutlinedTextField(cardState.word, { cardState.word = it }, label = { Text("英文单词") }, singleLine = true, modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).testTag("compact_word_input_$index"))
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(cardState.partOfSpeech, { cardState.partOfSpeech = it }, label = { Text("詞性") }, singleLine = true, modifier = Modifier.weight(1f))
-                OutlinedTextField(cardState.phonetic, { cardState.phonetic = it }, label = { Text("音標") }, singleLine = true, modifier = Modifier.weight(1.5f))
+                OutlinedTextField(cardState.partOfSpeech, { cardState.partOfSpeech = it }, label = { Text("词性") }, singleLine = true, modifier = Modifier.weight(1f))
+                OutlinedTextField(cardState.phonetic, { cardState.phonetic = it }, label = { Text("音标") }, singleLine = true, modifier = Modifier.weight(1.5f))
             }
-            OutlinedTextField(cardState.definition, { cardState.definition = it }, label = { Text("繁體中文定義") }, minLines = 2, modifier = Modifier.fillMaxWidth().testTag("compact_def_input_$index"))
+            OutlinedTextField(cardState.definition, { cardState.definition = it }, label = { Text("简体中文定义") }, minLines = 2, modifier = Modifier.fillMaxWidth().testTag("compact_def_input_$index"))
             OutlinedTextField(cardState.exampleSentence, { cardState.exampleSentence = it }, label = { Text("英文例句") }, minLines = 2, modifier = Modifier.fillMaxWidth().testTag("compact_sentence_input_$index"))
-            OutlinedTextField(cardState.exampleTranslation, { cardState.exampleTranslation = it }, label = { Text("中文翻譯") }, minLines = 2, modifier = Modifier.fillMaxWidth())
+            OutlinedTextField(cardState.exampleTranslation, { cardState.exampleTranslation = it }, label = { Text("中文翻译") }, minLines = 2, modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -717,8 +717,8 @@ private fun NoFolderForCardEditor(
     var showDialog by remember { mutableStateOf(false) }
     if (showDialog) {
         com.example.ui.components.AddFolderDialog(
-            existingCourses = listOf("通用課程"),
-            defaultCourse = "通用課程",
+            existingCourses = listOf("通用课程"),
+            defaultCourse = "通用课程",
             onDismiss = { showDialog = false },
             onConfirm = { course, folder, description, color ->
                 showDialog = false
@@ -730,7 +730,7 @@ private fun NoFolderForCardEditor(
         topBar = {
             TopAppBar(
                 expandedHeight = 48.dp,
-                title = { Text("手動新增單字") },
+                title = { Text("手动添加单词") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -746,12 +746,12 @@ private fun NoFolderForCardEditor(
         ) {
             CalmEmptyState(
                 icon = Icons.Default.Folder,
-                title = "還沒有資料夾",
-                message = "先建立資料夾，再新增單字。",
+                title = "还没有文件夹",
+                message = "先创建文件夹，再添加单词。",
                 action = {
                     Button(onClick = { showDialog = true }, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.Default.Add, contentDescription = null)
-                        Text("建立資料夾")
+                        Text("创建文件夹")
                     }
                 }
             )

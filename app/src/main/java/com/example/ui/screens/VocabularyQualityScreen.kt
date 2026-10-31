@@ -59,7 +59,7 @@ fun VocabularyQualityScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("單字資料品質", fontWeight = FontWeight.Bold) },
+                title = { Text("单词数据质量", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -79,23 +79,23 @@ fun VocabularyQualityScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("已檢查 ${cards.size} 張單字卡", fontWeight = FontWeight.Bold)
+                        Text("已检查 ${cards.size} 张单词卡", fontWeight = FontWeight.Bold)
                         Text(
-                            if (findings.isEmpty()) "沒有發現可由本機規則確認的問題。"
-                            else "找到 ${findings.size} 個需要確認的項目。",
+                            if (findings.isEmpty()) "没有发现可由本机规则确认的问题。"
+                            else "找到 ${findings.size} 个需要确认的项目。",
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         Button(onClick = onRunAiAudit, modifier = Modifier.fillMaxWidth(), enabled = cards.isNotEmpty() && !aiRunning) {
                             if (aiRunning) CircularProgressIndicator(modifier = Modifier.padding(3.dp))
                             else Icon(Icons.Default.AutoAwesome, contentDescription = null)
-                            Text(if (aiRunning) "檢查中…" else "用 AI 檢查解釋與疑似拼字")
+                            Text(if (aiRunning) "检查中…" else "用 AI 检查解释与疑似拼字")
                         }
                     }
                 }
             }
             item {
                 Text(
-                    "本機會檢查重複、欄位缺漏與詞性格式；中文解釋正確性和拼字建議必須由 AI 分析並由你確認。",
+                    "本机会检查重复、字段缺漏与词性格式；中文解释正确性和拼字建议必须由 AI 分析并由你确认。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -108,11 +108,11 @@ fun VocabularyQualityScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("AI 檢查結果", fontWeight = FontWeight.Bold)
+                            Text("AI 检查结果", fontWeight = FontWeight.Bold)
                             if (aiRunning) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
                                     CircularProgressIndicator()
-                                    Text(aiStatus ?: "AI 正在檢查單字資料…")
+                                    Text(aiStatus ?: "AI 正在检查单词数据…")
                                 }
                             } else Text(aiReport.orEmpty())
                         }
@@ -127,12 +127,12 @@ fun VocabularyQualityScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Text("目前資料完整", modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
+                        Text("目前数据完整", modifier = Modifier.padding(start = 8.dp), fontWeight = FontWeight.Bold)
                     }
                 }
             } else {
                 items(findings) { finding ->
-                    ModernListRow(finding.title, finding.detail, Icons.Default.ErrorOutline, { finding.card?.let(onEditCard) }, trailing = { finding.card?.let { card -> IconButton(onClick = { onEditCard(card) }) { Icon(Icons.Default.Edit, "編輯 ${card.word}") } } })
+                    ModernListRow(finding.title, finding.detail, Icons.Default.ErrorOutline, { finding.card?.let(onEditCard) }, trailing = { finding.card?.let { card -> IconButton(onClick = { onEditCard(card) }) { Icon(Icons.Default.Edit, "编辑 ${card.word}") } } })
                 }
             }
         }
@@ -144,24 +144,24 @@ private fun buildQualityFindings(cards: List<Flashcard>, deckNames: Map<Long, St
     cards.groupBy { it.normalizedWord }.filter { (word, group) -> word.isNotBlank() && group.size > 1 }
         .forEach { (_, group) ->
             findings += QualityFinding(
-                title = "重複單字：${group.first().word}",
-                detail = group.joinToString("、") { deckNames[it.deckId] ?: "未知資料夾" },
+                title = "重复单词：${group.first().word}",
+                detail = group.joinToString("、") { deckNames[it.deckId] ?: "未知文件夹" },
                 card = group.first()
             )
         }
     val acceptedPos = Regex("(?i)^(n|v|vt|vi|adj|adv|prep|pron|conj|interj|det|aux|num|phr|abbr)\\.?([/、, ]+(n|v|vt|vi|adj|adv|prep|pron|conj|interj|det|aux|num|phr|abbr)\\.?)*(\\s*\\[[^]]+])?$")
     cards.forEach { card ->
         val missing = buildList {
-            if (card.phonetic.isBlank()) add("音標")
-            if (card.partOfSpeech.isBlank()) add("詞性")
-            if (card.definition.isBlank()) add("中文解釋")
+            if (card.phonetic.isBlank()) add("音标")
+            if (card.partOfSpeech.isBlank()) add("词性")
+            if (card.definition.isBlank()) add("中文解释")
             if (card.exampleSentence.isBlank()) add("英文例句")
-            if (card.exampleTranslation.isBlank()) add("例句翻譯")
+            if (card.exampleTranslation.isBlank()) add("例句翻译")
         }
         if (missing.isNotEmpty()) {
-            findings += QualityFinding("資料不完整：${card.word}", "缺少${missing.joinToString("、")}", card)
+            findings += QualityFinding("数据不完整：${card.word}", "缺少${missing.joinToString("、")}", card)
         } else if (!acceptedPos.matches(card.partOfSpeech.trim())) {
-            findings += QualityFinding("詞性格式需確認：${card.word}", "目前內容：${card.partOfSpeech}", card)
+            findings += QualityFinding("词性格式需确认：${card.word}", "目前内容：${card.partOfSpeech}", card)
         }
     }
     return findings

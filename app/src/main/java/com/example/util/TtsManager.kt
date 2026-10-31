@@ -82,8 +82,8 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
                 name = voice.name,
                 label = buildString {
                     append(voice.locale.displayName)
-                    append(if (voice.isNetworkConnectionRequired) "・線上高品質" else "・裝置內建")
-                    if (voice.quality >= Voice.QUALITY_HIGH) append("・高品質")
+                    append(if (voice.isNetworkConnectionRequired) "・线上高质量" else "・设备内建")
+                    if (voice.quality >= Voice.QUALITY_HIGH) append("・高质量")
                 },
                 localeTag = voice.locale.toLanguageTag(),
                 requiresNetwork = voice.isNetworkConnectionRequired,

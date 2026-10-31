@@ -33,7 +33,7 @@ class VocabWidgetProvider : AppWidgetProvider() {
                     val views = RemoteViews(context.packageName, R.layout.widget_vocabulary)
                     views.setTextViewText(
                         R.id.widget_progress_text,
-                        "今日 ${snapshot.completedCards} / ${snapshot.goalCards} 張"
+                        "今日 ${snapshot.completedCards} / ${snapshot.goalCards} 张"
                     )
                     views.setProgressBar(
                         R.id.widget_progress,

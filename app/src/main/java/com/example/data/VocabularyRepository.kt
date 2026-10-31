@@ -86,9 +86,9 @@ class VocabularyRepository(
         if (orderedDeckIds.isEmpty()) return@withTransaction
         val all = deckDao.getAllDecksOnce()
         val requestedIds = orderedDeckIds.distinct()
-        require(requestedIds.size == orderedDeckIds.size) { "資料夾排序包含重複項目" }
+        require(requestedIds.size == orderedDeckIds.size) { "文件夹排序包含重复项目" }
         val requestedSet = requestedIds.toSet()
-        require(requestedSet.all { id -> all.any { it.id == id } }) { "找不到要排序的資料夾" }
+        require(requestedSet.all { id -> all.any { it.id == id } }) { "找不到要排序的文件夹" }
         val orderedDecks = requestedIds.map { id ->
             requireNotNull(all.firstOrNull { it.id == id })
         }
@@ -104,7 +104,7 @@ class VocabularyRepository(
     suspend fun renameCourse(oldName: String, newName: String): Int {
         val oldValue = oldName.trim()
         val newValue = newName.trim()
-        require(oldValue.isNotBlank() && newValue.isNotBlank()) { "課程名稱不能空白" }
+        require(oldValue.isNotBlank() && newValue.isNotBlank()) { "课程名称不能空白" }
         if (oldValue == newValue) return 0
         return deckDao.renameCourse(oldValue, newValue)
     }
@@ -173,7 +173,7 @@ class VocabularyRepository(
     suspend fun reorderCards(deckId: Long, orderedCardIds: List<Long>) = database.withTransaction {
         val current = cardDao.getCardsByDeckOnce(deckId)
         require(current.map { it.id }.toSet() == orderedCardIds.toSet()) {
-            "排序內容與資料夾目前的單字不一致，請重新執行"
+            "排序内容与文件夹目前的单词不一致，请重新执行"
         }
         val byId = current.associateBy { it.id }
         val topOrder = maxOf(
@@ -182,7 +182,7 @@ class VocabularyRepository(
         )
         cardDao.updateCards(
             orderedCardIds.mapIndexed { index, id ->
-                requireNotNull(byId[id]) { "找不到要排序的單字卡" }
+                requireNotNull(byId[id]) { "找不到要排序的单词卡" }
                     .copy(sortOrder = topOrder - index)
             }
         )
@@ -190,7 +190,7 @@ class VocabularyRepository(
 
     suspend fun moveCards(cardIds: List<Long>, targetDeckId: Long): MoveCardsResult =
         database.withTransaction {
-            require(deckDao.getDeckById(targetDeckId) != null) { "找不到目標資料夾" }
+            require(deckDao.getDeckById(targetDeckId) != null) { "找不到目标文件夹" }
             val orderedIds = cardIds.distinct()
             val cards = orderedIds.mapNotNull { cardDao.getCardById(it) }
             var movedCount = 0
@@ -250,18 +250,18 @@ class VocabularyRepository(
             val normalizedCards = cardsToSave.map { it.normalizedCopy() }
             require(
                 normalizedCards.map { it.deckId to it.normalizedWord }.distinct().size == normalizedCards.size
-            ) { "同一個資料夾不能有重複單字" }
+            ) { "同一个文件夹不能有重复单词" }
             normalizedCards.map { card ->
                 val duplicate = cardDao.getCardByWord(card.deckId, card.normalizedWord)
                 when {
                     card.id != 0L -> {
                         require(duplicate == null || duplicate.id == card.id) {
-                            "「${card.word}」已存在於此資料夾"
+                            "「${card.word}」已存在于此文件夹"
                         }
                         cardDao.updateCard(card)
                         card.id
                     }
-                    duplicate != null -> error("「${card.word}」已存在於這個資料夾")
+                    duplicate != null -> error("「${card.word}」已存在于这个文件夹")
                     else -> cardDao.insertCard(card)
                 }
             }

@@ -158,7 +158,7 @@ class BackupService(
         val text = context.contentResolver.openInputStream(uri)!!.bufferedReader().use { it.readText() }
         val root = JSONObject(text)
         require(root.optString("format") in setOf("vocab-backup", "vocabpulse-backup")) {
-            "不是 Vocab 備份檔"
+            "不是 Vocab 备份档"
         }
         val deckItems = root.optJSONArray("decks") ?: JSONArray()
         val cardItems = root.optJSONArray("cards") ?: JSONArray()
@@ -260,8 +260,8 @@ class BackupService(
                 val existingNote = existingGrammar.firstOrNull { it.title.equals(title, true) && it.course.equals(course, true) }
                 val newGrammarId = existingNote?.id ?: database.grammarNoteDao().insert(
                     GrammarNote(
-                        course = course, folder = item.optString("folder", "未分類").ifBlank { "未分類" }, title = title, category = item.optString("category", "其他"),
-                        level = item.optString("level", "未分級"), summary = item.optString("summary"),
+                        course = course, folder = item.optString("folder", "未分类").ifBlank { "未分类" }, title = title, category = item.optString("category", "其他"),
+                        level = item.optString("level", "未分级"), summary = item.optString("summary"),
                         structure = item.optString("structure"), usage = item.optString("usage"),
                         exampleSentence = item.optString("exampleSentence"),
                         exampleTranslation = item.optString("exampleTranslation"),
@@ -279,7 +279,7 @@ class BackupService(
                     )
                 )
                 grammarIdMap[item.optLong("id")] = newGrammarId
-                val folder = item.optString("folder", "未分類").ifBlank { "未分類" }
+                val folder = item.optString("folder", "未分类").ifBlank { "未分类" }
                 if (database.grammarLibraryDao().getAllOnce().none { it.course.equals(course, true) && it.name.equals(folder, true) }) {
                     database.grammarLibraryDao().insert(GrammarLibrary(course = course, name = folder))
                 }

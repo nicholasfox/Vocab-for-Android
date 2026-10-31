@@ -95,7 +95,7 @@ internal object QuizletWebViewImporter {
                         exampleSentence = clean(exampleSentence);
                         if (!word || !definition || word === definition || word.length > 500) return;
                         const placeholder = word.toLocaleLowerCase() + "\u0000" + definition.toLocaleLowerCase();
-                        if (["詞語\u0000定義", "正面\u0000背面", "word\u0000definition", "front\u0000back"].includes(placeholder)) return;
+                        if (["词语\u0000定义", "正面\u0000背面", "word\u0000definition", "front\u0000back"].includes(placeholder)) return;
                         const key = word.toLocaleLowerCase();
                         if (seenCards.has(key) || cards.length >= 5000) return;
                         seenCards.add(key);
@@ -193,7 +193,7 @@ internal object QuizletWebViewImporter {
                                     }
                                 }
                             }.distinctBy { "${it.word.lowercase()}\u0000${it.definition.lowercase()}" }
-                            require(cards.isNotEmpty()) { "Quizlet 頁面尚未提供可匯入的公開卡片" }
+                            require(cards.isNotEmpty()) { "Quizlet 页面尚未提供可导入的公开卡片" }
                             ParsedExternalDeck(
                                 title = root.optString("title").ifBlank { "Quizlet" },
                                 sourceName = "Quizlet",
@@ -208,7 +208,7 @@ internal object QuizletWebViewImporter {
                             finish(
                                 Result.failure(
                                     IllegalStateException(
-                                        "Quizlet 沒有回傳公開牌組資料或要求人機驗證，請稍後重試或改用平台匯出文字"
+                                        "Quizlet 没有返回公开牌组数据或要求人机验证，请稍后重试或改用平台导出文字"
                                     )
                                 )
                             )
@@ -246,7 +246,7 @@ internal object QuizletWebViewImporter {
                         error: WebResourceError
                     ) {
                         if (request.isForMainFrame) {
-                            finish(Result.failure(IllegalStateException("Quizlet 頁面載入失敗：${error.description}")))
+                            finish(Result.failure(IllegalStateException("Quizlet 页面加载失败：${error.description}")))
                         }
                     }
                 }
@@ -264,7 +264,7 @@ internal object QuizletWebViewImporter {
                 dialog.window?.setLayout(1, 1)
 
                 val timeout = Runnable {
-                    finish(Result.failure(IllegalStateException("Quizlet 讀取逾時，請確認網路後重試")))
+                    finish(Result.failure(IllegalStateException("Quizlet 读取逾时，请确认网络后重试")))
                 }
                 handler.postDelayed(timeout, TIMEOUT_MS)
                 continuation.invokeOnCancellation {

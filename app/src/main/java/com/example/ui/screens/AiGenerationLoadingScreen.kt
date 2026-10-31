@@ -47,8 +47,8 @@ fun AiGenerationLoadingScreen(
             Surface(Modifier.widthIn(max = 420.dp).fillMaxWidth(), shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surface) {
                 Column(Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     if (error == null) CircularProgressIndicator(Modifier.size(32.dp), strokeWidth = 3.dp)
-                    Text(if (error == null) "正在整理內容" else "未能完成", style = MaterialTheme.typography.titleLarge)
-                    Text(error ?: status ?: "AI 正在產生內容…", style = MaterialTheme.typography.bodyMedium, color = if (error == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error)
+                    Text(if (error == null) "正在整理内容" else "未能完成", style = MaterialTheme.typography.titleLarge)
+                    Text(error ?: status ?: "AI 正在产生内容…", style = MaterialTheme.typography.bodyMedium, color = if (error == null) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error)
                     if (error != null) TextButton(onClick = onBack) { Text("返回修改") }
                 }
             }

@@ -78,7 +78,7 @@ fun StudyCalendarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("學習日曆", fontWeight = FontWeight.Bold) },
+                title = { Text("学习日历", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -97,8 +97,8 @@ fun StudyCalendarScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SummaryCard("目前連續", "${streak.current} 天", Modifier.weight(1f))
-                SummaryCard("最長連續", "${streak.longest} 天", Modifier.weight(1f))
+                SummaryCard("目前连续", "${streak.current} 天", Modifier.weight(1f))
+                SummaryCard("最长连续", "${streak.longest} 天", Modifier.weight(1f))
             }
 
             Card(
@@ -112,11 +112,11 @@ fun StudyCalendarScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = { visibleMonth = visibleMonth.minusMonths(1) }) {
-                            Icon(Icons.Default.ChevronLeft, contentDescription = "上個月")
+                            Icon(Icons.Default.ChevronLeft, contentDescription = "上个月")
                         }
                         Text("${visibleMonth.year} 年 ${visibleMonth.monthValue} 月", fontWeight = FontWeight.Bold)
                         IconButton(onClick = { visibleMonth = visibleMonth.plusMonths(1) }) {
-                            Icon(Icons.Default.ChevronRight, contentDescription = "下個月")
+                            Icon(Icons.Default.ChevronRight, contentDescription = "下个月")
                         }
                     }
                     Row(Modifier.fillMaxWidth()) {
@@ -147,9 +147,9 @@ fun StudyCalendarScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        LegendDot(MaterialTheme.colorScheme.primary, "完成目標")
-                        LegendDot(MaterialTheme.colorScheme.tertiary, "有學習")
-                        LegendDot(MaterialTheme.colorScheme.secondary, "補打卡")
+                        LegendDot(MaterialTheme.colorScheme.primary, "完成目标")
+                        LegendDot(MaterialTheme.colorScheme.tertiary, "有学习")
+                        LegendDot(MaterialTheme.colorScheme.secondary, "补打卡")
                     }
                 }
             }
@@ -159,22 +159,22 @@ fun StudyCalendarScreen(
                     Text("${selectedDate.monthValue} 月 ${selectedDate.dayOfMonth} 日", fontWeight = FontWeight.Bold)
                     Text(
                         when {
-                            selectedCount >= dailyGoalCards -> "已學習 $selectedCount 張，完成每日目標。"
-                            selectedCount > 0 -> "已學習 $selectedCount 張，距離目標還差 ${dailyGoalCards - selectedCount} 張。"
-                            selectedMakeUp -> "這一天沒有學習紀錄，已標記為補打卡。"
-                            else -> "這一天沒有學習紀錄。"
+                            selectedCount >= dailyGoalCards -> "已学习 $selectedCount 张，完成每日目标。"
+                            selectedCount > 0 -> "已学习 $selectedCount 张，距离目标还差 ${dailyGoalCards - selectedCount} 张。"
+                            selectedMakeUp -> "这一天没有学习纪录，已标记为补打卡。"
+                            else -> "这一天没有学习纪录。"
                         },
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (selectedDate <= today && selectedCount == 0) {
                         Button(onClick = { onToggleMakeUp(selectedDate) }, modifier = Modifier.fillMaxWidth()) {
-                            Text(if (selectedMakeUp) "取消補打卡" else "補打卡")
+                            Text(if (selectedMakeUp) "取消补打卡" else "补打卡")
                         }
                     }
                 }
             }
             Text(
-                "補打卡只會補上連續紀錄，不會增加學習張數或偽造答題紀錄。",
+                "补打卡只会补上连续纪录，不会增加学习张数或伪造答题纪录。",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

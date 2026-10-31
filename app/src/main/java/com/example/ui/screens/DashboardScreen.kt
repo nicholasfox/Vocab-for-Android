@@ -126,9 +126,9 @@ fun DashboardScreen(
             title = {
                 Text(
                     text = when (actionType) {
-                        "REVIEW" -> "選擇要複習的資料夾"
-                        "READING" -> "選擇文章使用的資料夾"
-                        else -> "選擇要測驗的資料夾"
+                        "REVIEW" -> "选择要复习的文件夹"
+                        "READING" -> "选择文章使用的文件夹"
+                        else -> "选择要测试的文件夹"
                     },
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
@@ -157,18 +157,18 @@ fun DashboardScreen(
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        "全站所有單字卡",
+                                        "全站所有单词卡",
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Text(
-                                        "包含所有資料夾",
+                                        "包含所有文件夹",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                                     )
                                 }
                                 Text(
-                                    text = "$totalCount 張",
+                                    text = "$totalCount 张",
                                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     modifier = Modifier.padding(start = 12.dp)
@@ -216,7 +216,7 @@ fun DashboardScreen(
                                     color = deckColor.copy(alpha = 0.2f)
                                 ) {
                                     Text(
-                                        text = if (deckCardCount == 0) "空" else "$deckCardCount 張",
+                                        text = if (deckCardCount == 0) "空" else "$deckCardCount 张",
                                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                         color = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -276,7 +276,7 @@ fun DashboardScreen(
                         Box {
                             Icon(
                                 imageVector = Icons.Filled.Settings,
-                                contentDescription = "設定",
+                                contentDescription = "设置",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             if (updateAvailable) {
@@ -303,46 +303,46 @@ fun DashboardScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             item {
-                Text("繼續今天的學習", style = MaterialTheme.typography.headlineSmall)
-                Text("每天一點，讓英文成為習慣。", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("继续今天的学习", style = MaterialTheme.typography.headlineSmall)
+                Text("每天一点，让英文成为习惯。", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             item {
                 Surface(shape = RoundedCornerShape(24.dp), color = MaterialTheme.colorScheme.surface) {
                     Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("今日進度", style = MaterialTheme.typography.titleMedium)
-                            Text("連續 ${streak.current} 天", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("今日进度", style = MaterialTheme.typography.titleMedium)
+                            Text("连续 ${streak.current} 天", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Text("${progress.completedCards} / ${progress.goalCards}", style = MaterialTheme.typography.headlineLarge)
                         LinearProgressIndicator(progress = { progress.goalFraction }, modifier = Modifier.fillMaxWidth().height(5.dp))
-                        Text("待複習 $dueCount 張 · ${progress.dailyXp} XP", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Button(onClick = { pendingFolderAction = "REVIEW" }, enabled = totalCount > 0, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().height(50.dp).testTag("start_review_button")) { Text("開始複習") }
+                        Text("待复习 $dueCount 张 · ${progress.dailyXp} XP", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Button(onClick = { pendingFolderAction = "REVIEW" }, enabled = totalCount > 0, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().height(50.dp).testTag("start_review_button")) { Text("开始复习") }
                     }
                 }
             }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    FilledTonalButton(onClick = onOpenAddCard, modifier = Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text("新增單字") }
-                    FilledTonalButton(onClick = onOpenPhotoOcr, modifier = Modifier.weight(1f).height(50.dp).testTag("tool_photo_ocr"), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(6.dp)); Text("掃描匯入") }
+                    FilledTonalButton(onClick = onOpenAddCard, modifier = Modifier.weight(1f).height(50.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.Add, null); Spacer(Modifier.width(6.dp)); Text("添加单词") }
+                    FilledTonalButton(onClick = onOpenPhotoOcr, modifier = Modifier.weight(1f).height(50.dp).testTag("tool_photo_ocr"), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.DocumentScanner, null); Spacer(Modifier.width(6.dp)); Text("扫描导入") }
                 }
             }
-            item { ModernListRow("匯入單字集", "連結、檔案或貼上文字", Icons.Default.Download, onOpenExternalImport, modifier = Modifier.testTag("tool_external_import")) }
-            item { ModernListRow("測驗", "選擇資料夾，練習記憶與應用", Icons.Default.Extension, { pendingFolderAction = "GAME" }, modifier = Modifier.testTag("tool_quiz_games")) }
-            item { CalmSectionHeader("我的單字庫", action = { IconButton(onClick = { showAddFolderDialog = true }, modifier = Modifier.testTag("dashboard_add_folder_button")) { Icon(Icons.Default.Add, "新增資料夾") } }) }
+            item { ModernListRow("导入单词集", "链接、文件或贴上文字", Icons.Default.Download, onOpenExternalImport, modifier = Modifier.testTag("tool_external_import")) }
+            item { ModernListRow("测试", "选择文件夹，练习记忆与应用", Icons.Default.Extension, { pendingFolderAction = "GAME" }, modifier = Modifier.testTag("tool_quiz_games")) }
+            item { CalmSectionHeader("我的单词库", action = { IconButton(onClick = { showAddFolderDialog = true }, modifier = Modifier.testTag("dashboard_add_folder_button")) { Icon(Icons.Default.Add, "添加文件夹") } }) }
             item {
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     item { FilterChip(selected = selectedCourseFilter == null, onClick = { selectedCourseFilter = null }, label = { Text("全部") }) }
                     items(courses) { course -> FilterChip(selected = selectedCourseFilter == course, onClick = { selectedCourseFilter = course }, label = { Text(course) }) }
                 }
             }
-            item { ModernListRow("所有單字", "$totalCount 張 · 已精通 $masteredCount 張", Icons.Default.CollectionsBookmark, { onSelectDeck(null); onOpenCardList() }) }
+            item { ModernListRow("所有单词", "$totalCount 张 · 已精通 $masteredCount 张", Icons.Default.CollectionsBookmark, { onSelectDeck(null); onOpenCardList() }) }
             items(decks.filter { selectedCourseFilter == null || it.category == selectedCourseFilter }) { deck ->
-                ModernListRow(deck.name, "${deck.category} · ${allCards.count { it.deckId == deck.id }} 張", Icons.Default.Folder, { onSelectDeck(deck.id); onOpenCardList() })
+                ModernListRow(deck.name, "${deck.category} · ${allCards.count { it.deckId == deck.id }} 张", Icons.Default.Folder, { onSelectDeck(deck.id); onOpenCardList() })
             }
-            item { CalmSectionHeader("學習工具") }
-            item { ModernListRow("文章閱讀", "用熟悉的單字練習閱讀", Icons.AutoMirrored.Filled.MenuBook, { pendingFolderAction = "READING" }) }
-            item { ModernListRow("學習日曆", "檢視每日學習紀錄", Icons.Default.CalendarMonth, onOpenStudyCalendar) }
-            item { ModernListRow("資料檢查", "補齊缺漏與修正資料", Icons.AutoMirrored.Filled.FactCheck, onOpenQualityCheck) }
+            item { CalmSectionHeader("学习工具") }
+            item { ModernListRow("文章阅读", "用熟悉的单词练习阅读", Icons.AutoMirrored.Filled.MenuBook, { pendingFolderAction = "READING" }) }
+            item { ModernListRow("学习日历", "查看每日学习纪录", Icons.Default.CalendarMonth, onOpenStudyCalendar) }
+            item { ModernListRow("数据检查", "补齐缺漏与修正数据", Icons.AutoMirrored.Filled.FactCheck, onOpenQualityCheck) }
             item { StatisticsChart(totalCards = totalCount, masteredCards = masteredCount, dueCards = dueCount, logs = logs) }
         }
     }

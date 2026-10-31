@@ -47,7 +47,7 @@ object AiImagePreprocessor {
             do {
                 bytes = ByteArrayOutputStream().use { output ->
                     check(bitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)) {
-                        "無法壓縮圖片"
+                        "无法压缩图片"
                     }
                     output.toByteArray()
                 }
@@ -55,7 +55,7 @@ object AiImagePreprocessor {
             } while (bytes.size > MAX_ENCODED_BYTES && quality >= 50)
 
             require(bytes.size <= MAX_ENCODED_BYTES) {
-                "圖片處理後仍超過 8 MB，請裁切後再試"
+                "图片处理后仍超过 8 MB，请裁切后再试"
             }
             DirectAiService.ImagePayload(bytes = bytes, mimeType = "image/jpeg")
         } finally {
@@ -68,7 +68,7 @@ object AiImagePreprocessor {
         context.contentResolver.openInputStream(uri)?.use {
             BitmapFactory.decodeStream(it, null, bounds)
         }
-        require(bounds.outWidth > 0 && bounds.outHeight > 0) { "圖片格式無法讀取" }
+        require(bounds.outWidth > 0 && bounds.outHeight > 0) { "图片格式无法读取" }
 
         var sampleSize = 1
         while (
@@ -83,7 +83,7 @@ object AiImagePreprocessor {
                 null,
                 BitmapFactory.Options().apply { inSampleSize = sampleSize }
             )
-        } ?: error("圖片內容無法讀取")
+        } ?: error("图片内容无法读取")
 
         val scale = (MAX_DIMENSION.toFloat() / max(decoded.width, decoded.height))
             .coerceAtMost(1f)

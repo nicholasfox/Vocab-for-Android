@@ -124,9 +124,9 @@ fun InteractiveReadingScreen(
 
     if (confirmDelete) AlertDialog(
         onDismissRequest = { confirmDelete = false },
-        title = { Text("刪除文章？") },
-        text = { Text("這篇文章、翻譯與閱讀題目會一併刪除，且無法復原。") },
-        confirmButton = { Button(onClick = { confirmDelete = false; onDelete() }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("刪除") } },
+        title = { Text("删除文章？") },
+        text = { Text("这篇文章、翻译与阅读题目会一并删除，且无法恢复。") },
+        confirmButton = { Button(onClick = { confirmDelete = false; onDelete() }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("删除") } },
         dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("取消") } }
     )
 
@@ -134,7 +134,7 @@ fun InteractiveReadingScreen(
         Dialog(onDismissRequest = { lookupWord = null }) {
             Card(shape = RoundedCornerShape(18.dp)) {
                 Row(Modifier.padding(20.dp), verticalAlignment = Alignment.CenterVertically) {
-                    CircularProgressIndicator(Modifier.size(24.dp)); Spacer(Modifier.width(10.dp)); Text("正在查詢 $word…")
+                    CircularProgressIndicator(Modifier.size(24.dp)); Spacer(Modifier.width(10.dp)); Text("正在查询 $word…")
                 }
             }
         }
@@ -148,7 +148,7 @@ fun InteractiveReadingScreen(
                 onDismiss = { showCreateFolder = false },
                 onConfirm = { course, folder, description, color ->
                     onCreateFolderAndCopyCard(course, folder, description, color, card) { added ->
-                        copyStatus = if (added) "已建立資料夾並加入 ${card.word}" else "沒有新增：請確認資料夾名稱"
+                        copyStatus = if (added) "已创建文件夹并加入 ${card.word}" else "没有添加：请确认文件夹名称"
                     }
                     showCreateFolder = false
                     cardToAdd = null
@@ -157,18 +157,18 @@ fun InteractiveReadingScreen(
         } else {
             AlertDialog(
                 onDismissRequest = { cardToAdd = null },
-                title = { Text("加入資料夾") },
+                title = { Text("加入文件夹") },
                 text = {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         val targets = decks.filter { it.id != card.deckId }
                         if (targets.isEmpty()) item {
-                            Text("目前沒有其他資料夾，可以建立新的資料夾。")
+                            Text("目前没有其他文件夹，可以创建新的文件夹。")
                         }
                         items(targets) { deck ->
                             Surface(
                                 onClick = {
                                     onCopyCardToDeck(card, deck.id) { added ->
-                                        copyStatus = if (added) "已將 ${card.word} 加入「${deck.name}」" else "「${deck.name}」已有 ${card.word}"
+                                        copyStatus = if (added) "已将 ${card.word} 加入「${deck.name}」" else "「${deck.name}」已有 ${card.word}"
                                     }
                                     cardToAdd = null
                                 },
@@ -185,7 +185,7 @@ fun InteractiveReadingScreen(
                     }
                 },
                 confirmButton = {
-                    Button(onClick = { showCreateFolder = true }) { Text("新增資料夾") }
+                    Button(onClick = { showCreateFolder = true }) { Text("添加文件夹") }
                 },
                 dismissButton = { TextButton(onClick = { cardToAdd = null }) { Text("取消") } }
             )
@@ -220,7 +220,7 @@ fun InteractiveReadingScreen(
                             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 14.dp)
                         ) {
                             Icon(Icons.Default.Folder, null)
-                            Text("加入資料夾", modifier = Modifier.padding(start = 8.dp))
+                            Text("加入文件夹", modifier = Modifier.padding(start = 8.dp))
                         }
                     }
                     IconButton(
@@ -228,7 +228,7 @@ fun InteractiveReadingScreen(
                         modifier = Modifier.align(Alignment.TopEnd).padding(end = 2.dp).offset(y = (-42).dp)
                     ) {
                         Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f)) {
-                            Icon(Icons.Default.Close, "關閉", modifier = Modifier.padding(8.dp))
+                            Icon(Icons.Default.Close, "关闭", modifier = Modifier.padding(8.dp))
                         }
                     }
                 }
@@ -239,7 +239,7 @@ fun InteractiveReadingScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (quizMode) "閱讀測驗" else "互動閱讀") },
+                title = { Text(if (quizMode) "阅读测试" else "互动阅读") },
                 navigationIcon = {
                     IconButton(onClick = {
                         onStopSpeaking()
@@ -250,8 +250,8 @@ fun InteractiveReadingScreen(
                 },
                 actions = {
                     if (!quizMode) {
-                        IconButton(onClick = { onSpeak(content.article) }) { Icon(Icons.AutoMirrored.Filled.VolumeUp, "朗讀文章") }
-                        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.Delete, "刪除文章", tint = MaterialTheme.colorScheme.error) }
+                        IconButton(onClick = { onSpeak(content.article) }) { Icon(Icons.AutoMirrored.Filled.VolumeUp, "朗读文章") }
+                        IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.Delete, "删除文章", tint = MaterialTheme.colorScheme.error) }
                     }
                 }
             )
@@ -289,13 +289,13 @@ fun InteractiveReadingScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 item {
-                    Text("點選文章中的重點單字可翻卡、聽發音或練習。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("点选文章中的重点单词可翻卡、听发音或练习。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         FilterChip(selected = !showTranslations, onClick = { showTranslations = false }, label = { Text("文章") })
-                        FilterChip(selected = showTranslations, onClick = { showTranslations = true }, label = { Text("逐句翻譯") })
-                        FilterChip(selected = false, enabled = content.questions.isNotEmpty(), onClick = { quizMode = true }, label = { Text("測驗 ${content.questions.size}") })
+                        FilterChip(selected = showTranslations, onClick = { showTranslations = true }, label = { Text("逐句翻译") })
+                        FilterChip(selected = false, enabled = content.questions.isNotEmpty(), onClick = { quizMode = true }, label = { Text("测试 ${content.questions.size}") })
                     }
                 }
                 if (!showTranslations) item {
@@ -328,7 +328,7 @@ fun InteractiveReadingScreen(
                                                 word = word,
                                                 phonetic = "",
                                                 partOfSpeech = "",
-                                                definition = "查不到完整資料，仍可加入資料夾後使用 AI 補齊。",
+                                                definition = "查不到完整数据，仍可加入文件夹后使用 AI 补齐。",
                                                 exampleSentence = "",
                                                 exampleTranslation = ""
                                             )
@@ -354,13 +354,13 @@ fun InteractiveReadingScreen(
                 item {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick = { showTranslations = !showTranslations }, modifier = Modifier.weight(1f)) {
-                            Text(if (showTranslations) "隱藏翻譯" else "逐句翻譯")
+                            Text(if (showTranslations) "隐藏翻译" else "逐句翻译")
                         }
                         Button(
                             onClick = { quizMode = true },
                             enabled = content.questions.isNotEmpty(),
                             modifier = Modifier.weight(1f)
-                        ) { Text("文章測驗 ${content.questions.size} 題") }
+                        ) { Text("文章测试 ${content.questions.size} 题") }
                     }
                 }
                 if (showTranslations) {
@@ -375,7 +375,7 @@ fun InteractiveReadingScreen(
                             }
                         }
                     } else item {
-                        Text(content.fullTranslation.ifBlank { "這篇舊文章沒有保存翻譯，可請 AI 重新產生互動文章。" })
+                        Text(content.fullTranslation.ifBlank { "这篇旧文章没有保存翻译，可请 AI 重新产生互动文章。" })
                     }
                 }
                 item { Spacer(Modifier.height(24.dp)) }
@@ -398,21 +398,21 @@ private fun ReadingQuiz(
     modifier: Modifier = Modifier
 ) {
     if (questions.isEmpty()) {
-        Column(modifier.fillMaxSize().padding(24.dp)) { Text("這篇文章沒有足夠資料可產生測驗。") }
+        Column(modifier.fillMaxSize().padding(24.dp)) { Text("这篇文章没有足够数据可产生测试。") }
         return
     }
     if (completed) {
         Column(modifier.fillMaxSize().padding(24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-            Text("測驗完成", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-            Text("答對 $correctCount / ${questions.size} 題")
-            if (missedWords.isNotEmpty()) Text("需要再複習：${missedWords.joinToString("、")}")
-            Button(onClick = onRetry) { Text("重新測驗") }
+            Text("测试完成", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text("答对 $correctCount / ${questions.size} 题")
+            if (missedWords.isNotEmpty()) Text("需要再复习：${missedWords.joinToString("、")}")
+            Button(onClick = onRetry) { Text("重新测试") }
         }
         return
     }
     val question = questions[questionIndex]
     LazyColumn(modifier.fillMaxSize().padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text("第 ${questionIndex + 1} / ${questions.size} 題", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
+        item { Text("第 ${questionIndex + 1} / ${questions.size} 题", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
         item { Text(question.prompt, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold) }
         items(question.options.indices.toList()) { index ->
             val selected = selectedOption == index
@@ -425,7 +425,7 @@ private fun ReadingQuiz(
         }
         item {
             Button(onClick = onNext, enabled = selectedOption >= 0, modifier = Modifier.fillMaxWidth()) {
-                Text(if (questionIndex == questions.lastIndex) "完成" else "下一題")
+                Text(if (questionIndex == questions.lastIndex) "完成" else "下一题")
             }
         }
     }

@@ -4,7 +4,9 @@ enum class AiProvider(
     val displayName: String,
     val defaultModel: String,
     val keyUrl: String,
-    val recommendedModels: List<String>
+    val recommendedModels: List<String>,
+    val defaultBaseUrl: String = "",
+    val supportsVision: Boolean = true
 ) {
     GEMINI(
         "Google Gemini",
@@ -15,19 +17,22 @@ enum class AiProvider(
             "gemini-3.5-flash",
             "gemini-3.5-flash-lite",
             "gemini-flash-latest"
-        )
+        ),
+        defaultBaseUrl = "https://generativelanguage.googleapis.com/v1beta"
     ),
     OPENAI(
         "OpenAI",
         "gpt-5.6-luna",
         "https://platform.openai.com/api-keys",
-        listOf("gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6")
+        listOf("gpt-5.6-luna", "gpt-5.6-terra", "gpt-5.6-sol", "gpt-5.6"),
+        defaultBaseUrl = "https://api.openai.com/v1"
     ),
     ANTHROPIC(
         "Anthropic Claude",
         "claude-sonnet-4-6",
         "https://console.anthropic.com/settings/keys",
-        listOf("claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-6")
+        listOf("claude-haiku-4-5-20251001", "claude-sonnet-4-6", "claude-opus-4-6"),
+        defaultBaseUrl = "https://api.anthropic.com/v1"
     ),
     OPENROUTER(
         "OpenRouter",
@@ -37,8 +42,49 @@ enum class AiProvider(
             "openai/gpt-5.6-luna",
             "google/gemini-3.6-flash",
             "anthropic/claude-sonnet-4.6"
-        )
+        ),
+        defaultBaseUrl = "https://openrouter.ai/api/v1"
+    ),
+    DEEPSEEK(
+        "DeepSeek",
+        "deepseek-flash",
+        "https://platform.deepseek.com/api_keys",
+        listOf(
+            "deepseek-flash",
+            "deepseek-v4-pro",
+            "deepseek-chat",
+            "deepseek-reasoner"
+        ),
+        defaultBaseUrl = "https://api.deepseek.com/v1",
+        supportsVision = false
+    ),
+    MIMO(
+        "小米 MiMo",
+        "mimo-v2.6-flash",
+        "https://platform.xiaomimimo.com",
+        listOf("mimo-v2.6-flash", "mimo-v2.6-pro"),
+        defaultBaseUrl = "https://api.xiaomimimo.com/v1"
+    ),
+    AGNES(
+        "Agnes AI",
+        "agnes-2.5-flash",
+        "https://platform.agnes-ai.com",
+        listOf("agnes-2.5-flash"),
+        defaultBaseUrl = "https://apihub.agnes-ai.com/v1",
+        supportsVision = false
+    ),
+    OPENAI_COMPATIBLE(
+        "OpenAI 兼容（自定义）",
+        "",
+        "",
+        emptyList(),
+        defaultBaseUrl = "",
+        supportsVision = true
     );
+
+    /** Providers that speak the OpenAI Chat Completions protocol. */
+    val usesChatCompletions: Boolean
+        get() = this in setOf(DEEPSEEK, MIMO, AGNES, OPENAI_COMPATIBLE)
 
     companion object {
         fun from(value: String): AiProvider =
@@ -50,7 +96,8 @@ data class PersonalAiConfig(
     val credentialId: String,
     val provider: AiProvider,
     val apiKey: String,
-    val model: String
+    val model: String,
+    val baseUrl: String = provider.defaultBaseUrl
 )
 
 data class AiApiProfile(

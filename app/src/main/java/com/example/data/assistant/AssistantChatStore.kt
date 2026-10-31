@@ -15,7 +15,7 @@ class AssistantChatStore(context: Context) {
                 add(
                     AssistantConversation(
                         id = item.optString("id"),
-                        title = item.optString("title", "新對話"),
+                        title = item.optString("title", "新对话"),
                         createdAt = item.optLong("createdAt"),
                         updatedAt = item.optLong("updatedAt"),
                         incognito = false

@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
 
 object DirectAiService {
     private const val SYSTEM_PROMPT =
-        "You are a careful English lexicographer for Traditional Chinese learners. " +
+        "You are a careful English lexicographer for Simplified Chinese learners. " +
             "Return JSON only. Never invent a word or silently substitute another word."
 
     private val client = OkHttpClient.Builder()
@@ -61,7 +61,7 @@ object DirectAiService {
             Look up the exact English word "$normalized".
             Return one JSON object with exactly these string fields:
             word, phonetic, partOfSpeech, definition, exampleSentence, exampleTranslation.
-            definition and exampleTranslation must be Traditional Chinese.
+            definition and exampleTranslation must be Simplified Chinese.
             exampleSentence must be a natural English sentence.
         """.trimIndent()
         val root = generateJson(config, prompt) as? JSONObject ?: return null
@@ -88,7 +88,7 @@ object DirectAiService {
             definition = definition,
             exampleSentence = example,
             exampleTranslation = translation,
-            category = "AI 補充"
+            category = "AI 补充"
         )
     }
 
@@ -116,8 +116,8 @@ object DirectAiService {
                 The Quizlet front is the exact word and the Quizlet back is the authoritative source.
                 Preserve the exact front word and all useful meanings from the back.
                 Do not add, remove, merge, reorder, translate, or substitute input cards.
-                If the back contains an English example and Traditional Chinese translation, extract them.
-                If an example is missing, create one natural English example and its faithful Traditional Chinese translation.
+                If the back contains an English example and Simplified Chinese translation, extract them.
+                If an example is missing, create one natural English example and its faithful Simplified Chinese translation.
 
                 Return exactly one JSON object:
                 {"cards":[{"inputIndex":0,"word":"","phonetic":"","partOfSpeech":"","definition":"","exampleSentence":"","exampleTranslation":""}]}
@@ -126,7 +126,7 @@ object DirectAiService {
                 - one output for every inputIndex
                 - word must exactly match its front
                 - partOfSpeech and definition must not be blank
-                - definition and exampleTranslation must be Traditional Chinese
+                - definition and exampleTranslation must be Simplified Chinese
                 - exampleSentence must be English
                 - do not include markdown or commentary
 
@@ -172,7 +172,7 @@ object DirectAiService {
                     definition = definition,
                     exampleSentence = exampleSentence,
                     exampleTranslation = exampleTranslation,
-                    category = "AI 匯入整理"
+                    category = "AI 导入整理"
                 )
             }
         }
@@ -186,7 +186,7 @@ object DirectAiService {
             Extract at most 80 useful English vocabulary words from the text below.
             Return a JSON array. Every element must contain string fields:
             word, phonetic, partOfSpeech, definition, exampleSentence.
-            Use Traditional Chinese for definition and retain only real English words.
+            Use Simplified Chinese for definition and retain only real English words.
 
             TEXT:
             $normalized
@@ -207,16 +207,16 @@ object DirectAiService {
                     it.bytes.size <= 8 * 1024 * 1024 &&
                     it.mimeType in setOf("image/jpeg", "image/png", "image/webp", "image/gif")
             }
-        require(accepted.isNotEmpty()) { "沒有可傳送給 AI 的圖片" }
+        require(accepted.isNotEmpty()) { "没有可传送给 AI 的图片" }
 
         val prompt = """
             ${customInstructions.trim().take(4_000)}
 
-            本次範圍指令優先：$scopeInstructions
-            依照圖片提供的原始順序輸出 cards。若圖片沒有可辨識的英文單字，回傳 {"cards":[]}。
+            本次范围指令优先：$scopeInstructions
+            依照图片提供的原始顺序输出 cards。若图片没有可识别的英文单词，返回 {"cards":[]}。
         """.trimIndent()
         val root = generateJson(config, prompt, accepted) as? JSONObject
-            ?: error("AI 沒有回傳正確的 JSON 物件")
+            ?: error("AI 没有返回正确的 JSON 对象")
         return root.optJSONArray("cards")
             .toCandidates()
             .filter { candidate ->
@@ -255,7 +255,7 @@ object DirectAiService {
                 Requirements:
                 - Return at most one card for each input word and no other words.
                 - Preserve the exact input word and every non-empty field verbatim.
-                - definition and exampleTranslation use Traditional Chinese.
+                - definition and exampleTranslation use Simplified Chinese.
                 - If exampleSentence is already non-empty and exampleTranslation is empty, translate that exact English sentence faithfully. Never invent a different Chinese sentence and never replace the English sentence.
                 - Only create a new natural exampleSentence when the input exampleSentence is empty; its exampleTranslation must translate that newly created sentence exactly.
                 - phonetic is required and must use reliable American KK notation wrapped in /.../.
@@ -275,11 +275,14 @@ object DirectAiService {
         }
         return candidates.map { original ->
             val item = enriched[original.word.trim().lowercase()] ?: return@map original
-            mergeAiCompletion(original.copy(definition = original.definition.takeUnless { it.contains("待補充") }.orEmpty()), item)
+            mergeAiCompletion(original.copy(definition = original.definition.takeUnless { it.contains("待补充") }.orEmpty()), item)
         }
     }
 
     suspend fun listModels(config: PersonalAiConfig): List<String> = withContext(Dispatchers.IO) {
+        if (config.provider == AiProvider.OPENAI_COMPATIBLE) {
+            require(apiBase(config).isNotBlank()) { "请先填写 API Base URL" }
+        }
         val request = when (config.provider) {
             AiProvider.GEMINI -> Request.Builder()
                 .url("https://generativelanguage.googleapis.com/v1beta/models?key=${config.apiKey}")
@@ -294,6 +297,12 @@ object DirectAiService {
             AiProvider.OPENROUTER -> Request.Builder()
                 .url("https://openrouter.ai/api/v1/models")
                 .header("Authorization", "Bearer ${config.apiKey}").get().build()
+            AiProvider.DEEPSEEK, AiProvider.MIMO, AiProvider.AGNES,
+            AiProvider.OPENAI_COMPATIBLE -> Request.Builder()
+                .url("${apiBase(config)}/models")
+                .header("Authorization", "Bearer ${config.apiKey}")
+                .header("api-key", config.apiKey)
+                .get().build()
         }
         execute(request, config.provider).let { body ->
             val root = JSONObject(body)
@@ -311,21 +320,23 @@ object DirectAiService {
 
     suspend fun test(config: PersonalAiConfig): Result<Unit> = runCatching {
         check(fetchWordDetails(config, "apple") != null) {
-            "API 已回應，但選定模型沒有回傳合格的字典資料"
+            "API 已回应，但选定模型没有返回合格的词典数据"
         }
-        analyzeImages(
-            config = config,
-            images = listOf(
-                ImagePayload(
-                    bytes = Base64.decode(
-                        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
-                        Base64.DEFAULT
-                    ),
-                    mimeType = "image/png"
-                )
-            ),
-            customInstructions = "這是多模態連線測試。圖片若沒有英文單字，必須回傳 {\"cards\":[]}。"
-        )
+        if (config.provider.supportsVision) {
+            analyzeImages(
+                config = config,
+                images = listOf(
+                    ImagePayload(
+                        bytes = Base64.decode(
+                            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=",
+                            Base64.DEFAULT
+                        ),
+                        mimeType = "image/png"
+                    )
+                ),
+                customInstructions = "这是多模态连接测试。图片若没有英文单词，必须返回 {\"cards\":[]}。"
+            )
+        }
     }
 
     suspend fun refreshUsage(config: PersonalAiConfig): AiUsageSnapshot =
@@ -335,10 +346,11 @@ object DirectAiService {
                     config.provider,
                     AiUsageSnapshot(
                         when (config.provider) {
-                            AiProvider.GEMINI -> "Google 未提供 Key 剩餘總額；請至 AI Studio 查看"
-                            AiProvider.OPENAI -> "OpenAI 未提供 Key 剩餘總額；請至用量頁查看"
-                            AiProvider.ANTHROPIC -> "Anthropic 未提供 Key 剩餘總額；請至 Console 查看"
+                            AiProvider.GEMINI -> "Google 未提供 Key 剩余总额；请至 AI Studio 查看"
+                            AiProvider.OPENAI -> "OpenAI 未提供 Key 剩余总额；请至用量页查看"
+                            AiProvider.ANTHROPIC -> "Anthropic 未提供 Key 剩余总额；请至 Console 查看"
                             AiProvider.OPENROUTER -> error("unreachable")
+                            else -> "${config.provider.displayName} 未提供 Key 余额查询；请至控制台查看"
                         }
                     )
                 )
@@ -358,14 +370,14 @@ object DirectAiService {
                 setUsage(
                     config.provider,
                     AiUsageSnapshot(
-                        label = "剩餘 US$ %.4f".format(remaining),
+                        label = "剩余 US$ %.4f".format(remaining),
                         isLimited = remaining <= 0.0
                     )
                 )
             }.getOrElse {
                 setUsage(
                     config.provider,
-                    AiUsageSnapshot("此 Key 無法直接查詢餘額；請至 OpenRouter 查看")
+                    AiUsageSnapshot("此 Key 无法直接查询余额；请至 OpenRouter 查看")
                 )
             }
         }
@@ -381,12 +393,12 @@ object DirectAiService {
         } else {
             buildString(60_000) {
                 append(prompt.take(38_000))
-                append("\n\n［中間過長的 App 卡片內容已省略］\n\n")
+                append("\n\n［中间过长的 App 卡片内容已省略］\n\n")
                 append(prompt.takeLast(21_900))
             }
         }
         return generateJson(config, boundedPrompt, images.take(5)) as? JSONObject
-            ?: error("AI 助手沒有回傳正確的 JSON 物件")
+            ?: error("AI 助手没有返回正确的 JSON 对象")
     }
 
     private suspend fun generateJson(
@@ -400,6 +412,9 @@ object DirectAiService {
                 AiProvider.OPENAI -> openAi(config, userPrompt, images)
                 AiProvider.ANTHROPIC -> anthropic(config, userPrompt, images)
                 AiProvider.OPENROUTER -> openRouter(config, userPrompt, images)
+                AiProvider.DEEPSEEK, AiProvider.MIMO, AiProvider.AGNES,
+                AiProvider.OPENAI_COMPATIBLE ->
+                    openAiCompatible(config, userPrompt, images)
             }
             parseJsonPayload(response)
         }
@@ -479,7 +494,7 @@ object DirectAiService {
                 content.getJSONObject(j).optString("text").takeIf { it.isNotBlank() }?.let { return it }
             }
         }
-        error("OpenAI 未回傳文字")
+        error("OpenAI 未返回文字")
     }
 
     private suspend fun anthropic(
@@ -549,6 +564,68 @@ object DirectAiService {
             .getJSONObject("message").getString("content")
     }
 
+    private fun apiBase(config: PersonalAiConfig): String =
+        config.baseUrl.ifBlank { config.provider.defaultBaseUrl }.trimEnd('/')
+
+    /**
+     * OpenAI Chat Completions compatible path used by DeepSeek, Xiaomi MiMo,
+     * Agnes AI and any user-supplied endpoint.
+     */
+    private suspend fun openAiCompatible(
+        config: PersonalAiConfig,
+        prompt: String,
+        images: List<ImagePayload>
+    ): String {
+        require(config.model.isNotBlank()) { "请先设置模型 ID" }
+        val base = apiBase(config)
+        require(base.isNotBlank()) { "请先填写 API Base URL" }
+        val userContent = JSONArray()
+            .put(JSONObject().put("type", "text").put("text", prompt))
+        if (images.isNotEmpty()) {
+            require(config.provider.supportsVision) {
+                "${config.provider.displayName} 的 ${config.model} 不支持图片输入；请改用文字查询或换用支持视觉的模型"
+            }
+            images.forEach { image ->
+                userContent.put(
+                    JSONObject()
+                        .put("type", "image_url")
+                        .put("image_url", JSONObject().put("url", image.dataUrl()))
+                )
+            }
+        }
+        val body = JSONObject()
+            .put("model", config.model)
+            .put("messages", JSONArray()
+                .put(JSONObject().put("role", "system").put("content", SYSTEM_PROMPT))
+                .put(JSONObject().put("role", "user").put("content", userContent)))
+            .put("temperature", 0.2)
+            .put("max_tokens", 4096)
+        val request = Request.Builder()
+            .url("$base/chat/completions")
+            .header("Authorization", "Bearer ${config.apiKey}")
+            // MiMo authenticates with the api-key header; harmless elsewhere.
+            .header("api-key", config.apiKey)
+            .header("X-Title", "Vocab")
+            .post(jsonBody(body)).build()
+        val root = JSONObject(execute(request, config.provider))
+        val message = root.optJSONArray("choices")?.optJSONObject(0)?.optJSONObject("message")
+            ?: error("${config.provider.displayName} 返回内容缺少 choices")
+        val text = when (val content = message.opt("content")) {
+            is String -> content
+            is JSONArray -> buildString {
+                for (index in 0 until content.length()) {
+                    content.optJSONObject(index)
+                        ?.optString("text")
+                        ?.takeIf(String::isNotBlank)
+                        ?.let { append(it) }
+                }
+            }
+            else -> ""
+        }
+        return text.takeIf(String::isNotBlank)
+            ?: error("${config.provider.displayName} 没有返回文字内容")
+    }
+
     private suspend fun execute(
         request: Request,
         provider: AiProvider
@@ -573,11 +650,11 @@ object DirectAiService {
                     else -> error?.toString().orEmpty()
                 }
             }.getOrDefault("")
-            val message = detail.ifBlank { "AI API 連線失敗（HTTP ${response.code}）" }
+            val message = detail.ifBlank { "AI API 连接失败（HTTP ${response.code}）" }
             if (response.code == 402 || response.code == 429) {
                 setUsage(
                     provider,
-                    AiUsageSnapshot("已達額度或速率限制，將切換下一個 API", true)
+                    AiUsageSnapshot("已达额度或速率限制，将切换下一个 API", true)
                 )
                 throw AiQuotaException(message)
             }
@@ -585,7 +662,7 @@ object DirectAiService {
         }
         updateRateLimitUsage(provider, response.headers)
         if (body.isBlank()) {
-            error("AI API 回傳空白內容，請確認所選模型可用並且帳戶仍有額度")
+            error("AI API 返回空白内容，请确认所选模型可用并且帐户仍有额度")
         }
         return body
     }
@@ -596,7 +673,7 @@ object DirectAiService {
                 val requests = headers["x-ratelimit-remaining-requests"]
                 val tokens = headers["x-ratelimit-remaining-tokens"]
                 if (requests != null || tokens != null) {
-                    "本時段剩餘：${requests ?: "—"} 次請求 · ${tokens ?: "—"} tokens"
+                    "本时段剩余：${requests ?: "—"} 次请求 · ${tokens ?: "—"} tokens"
                 } else null
             }
             AiProvider.ANTHROPIC -> {
@@ -604,7 +681,7 @@ object DirectAiService {
                 val input = headers["anthropic-ratelimit-input-tokens-remaining"]
                 val output = headers["anthropic-ratelimit-output-tokens-remaining"]
                 if (requests != null || input != null || output != null) {
-                    "本時段剩餘：${requests ?: "—"} 次 · 輸入 ${input ?: "—"} · 輸出 ${output ?: "—"}"
+                    "本时段剩余：${requests ?: "—"} 次 · 输入 ${input ?: "—"} · 输出 ${output ?: "—"}"
                 } else null
             }
             else -> null
@@ -638,17 +715,17 @@ object DirectAiService {
         val start = when {
             arrayStart >= 0 && (objectStart < 0 || arrayStart < objectStart) -> arrayStart
             objectStart >= 0 -> objectStart
-            else -> throw IllegalArgumentException("AI 沒有回傳 JSON 格式資料")
+            else -> throw IllegalArgumentException("AI 没有返回 JSON 格式数据")
         }
         val completeJson = findCompleteJson(cleaned, start)
             ?: throw IllegalArgumentException(
-                "AI 回傳內容不完整，可能超過模型輸出上限；請縮小批次或更換模型後再試"
+                "AI 返回内容不完整，可能超过模型输出上限；请缩小批次或更换模型后再试"
             )
         return try {
             if (completeJson.first() == '[') JSONArray(completeJson)
             else JSONObject(completeJson)
         } catch (_: JSONException) {
-            throw IllegalArgumentException("AI 回傳的 JSON 格式錯誤，未套用任何資料")
+            throw IllegalArgumentException("AI 返回的 JSON 格式错误，未应用任何数据")
         }
     }
 

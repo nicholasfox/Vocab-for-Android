@@ -9,11 +9,11 @@ class DirectAiServiceJsonTest {
 
     @Test
     fun completeNestedJsonIsExtractedWithoutTrailingText() {
-        val input = """prefix {"cards":[{"word":"apple","definition":"蘋果"}]} suffix"""
+        val input = """prefix {"cards":[{"word":"apple","definition":"苹果"}]} suffix"""
         val start = input.indexOf('{')
 
         assertEquals(
-            """{"cards":[{"word":"apple","definition":"蘋果"}]}""",
+            """{"cards":[{"word":"apple","definition":"苹果"}]}""",
             DirectAiService.findCompleteJson(input, start)
         )
     }
@@ -27,10 +27,10 @@ class DirectAiServiceJsonTest {
 
     @Test
     fun bracesInsideJsonStringDoNotEndPayloadEarly() {
-        val input = """{"cards":[{"definition":"使用 { } 符號"}]} trailing"""
+        val input = """{"cards":[{"definition":"使用 { } 符号"}]} trailing"""
 
         assertEquals(
-            """{"cards":[{"definition":"使用 { } 符號"}]}""",
+            """{"cards":[{"definition":"使用 { } 符号"}]}""",
             DirectAiService.findCompleteJson(input, 0)
         )
     }

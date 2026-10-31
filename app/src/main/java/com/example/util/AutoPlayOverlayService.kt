@@ -79,7 +79,7 @@ class AutoPlayOverlayService : Service() {
 
     private fun buildNotification() = NotificationCompat.Builder(this, CHANNEL_ID)
         .setSmallIcon(android.R.drawable.ic_media_play)
-        .setContentTitle(if (showingBack) "自動播放 · 背面" else "自動播放 · 正面")
+        .setContentTitle(if (showingBack) "自动播放 · 背面" else "自动播放 · 正面")
         .setContentText(displayText())
         .setStyle(NotificationCompat.BigTextStyle().bigText(displayText()))
         .setContentIntent(
@@ -99,10 +99,10 @@ class AutoPlayOverlayService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "學習卡自動播放",
+                "学习卡自动播放",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "在離開 Vocab 時維持學習卡朗讀"
+                description = "在离开 Vocab 时维持学习卡朗读"
                 setShowBadge(false)
             }
             getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
@@ -137,7 +137,7 @@ class AutoPlayOverlayService : Service() {
                 setStroke((1 * density).toInt().coerceAtLeast(1), if (dark) Color.rgb(70, 70, 70) else Color.rgb(220, 220, 220))
             }
             elevation = 12 * density
-            contentDescription = "Vocab 自動播放浮動視窗"
+            contentDescription = "Vocab 自动播放浮动窗口"
             setOnClickListener {
                 startActivity(
                     Intent(this@AutoPlayOverlayService, MainActivity::class.java)

@@ -152,9 +152,9 @@ fun CardListScreen(
     cardPendingDelete?.let { card ->
         AlertDialog(
             onDismissRequest = { cardPendingDelete = null },
-            title = { Text("刪除單字卡？") },
-            text = { Text("確定要刪除「${card.word}」嗎？這個動作無法復原。") },
-            confirmButton = { Button(onClick = { onDeleteCard(card); cardPendingDelete = null }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("刪除") } },
+            title = { Text("删除单词卡？") },
+            text = { Text("确定要删除「${card.word}」吗？这个动作无法恢复。") },
+            confirmButton = { Button(onClick = { onDeleteCard(card); cardPendingDelete = null }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("删除") } },
             dismissButton = { TextButton(onClick = { cardPendingDelete = null }) { Text("取消") } }
         )
     }
@@ -260,7 +260,7 @@ fun CardListScreen(
             onDismissRequest = { showAddModeDialog = false },
             title = {
                 Text(
-                    text = "新增卡片至「${activeDeck?.name ?: "單字庫"}」",
+                    text = "添加卡片至「${activeDeck?.name ?: "单词库"}」",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                 )
             },
@@ -290,8 +290,8 @@ fun CardListScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("手動輸入單字", fontWeight = FontWeight.Bold)
-                                Text("批次輸入或 AI 補齊", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                                Text("手动输入单词", fontWeight = FontWeight.Bold)
+                                Text("批次输入或 AI 补齐", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                             }
                         }
                     }
@@ -317,9 +317,9 @@ fun CardListScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("匯入線上單字集", fontWeight = FontWeight.Bold)
+                                Text("导入线上单词集", fontWeight = FontWeight.Bold)
                                 Text(
-                                    "網址、搜尋或平台檔案",
+                                    "网址、搜索或平台文件",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.outline
                                 )
@@ -348,8 +348,8 @@ fun CardListScreen(
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("掃描或匯入文件", fontWeight = FontWeight.Bold)
-                                Text("拍照、相片、PDF 或 DOCX", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
+                                Text("扫描或导入文件", fontWeight = FontWeight.Bold)
+                                Text("拍照、照片、PDF 或 DOCX", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.outline)
                             }
                         }
                     }
@@ -366,8 +366,8 @@ fun CardListScreen(
     if (showBulkDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showBulkDeleteConfirm = false },
-            title = { Text("批量刪除單字卡", fontWeight = FontWeight.Bold) },
-            text = { Text("確定要刪除選取的 ${selectedCards.size} 張單字卡嗎？此操作無法復原。") },
+            title = { Text("批量删除单词卡", fontWeight = FontWeight.Bold) },
+            text = { Text("确定要删除选取的 ${selectedCards.size} 张单词卡吗？此操作无法恢复。") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -376,12 +376,12 @@ fun CardListScreen(
                         selectedCards.clear()
                         isMultiSelectMode = false
                         coroutineScope.launch {
-                            snackbarHostState.showSnackbar("已刪除選取的單字卡")
+                            snackbarHostState.showSnackbar("已删除选取的单词卡")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("確定刪除 (${selectedCards.size})", color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
+                    Text("确定删除 (${selectedCards.size})", color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -403,11 +403,11 @@ fun CardListScreen(
         coroutineScope.launch {
             snackbarHostState.showSnackbar(
                 when {
-                    movedCount < 0 -> "移動失敗，單字卡沒有變更"
+                    movedCount < 0 -> "移动失败，单词卡没有变更"
                     mergedCount > 0 ->
-                        "已移動 $movedCount 張，另有 $mergedCount 張與目標資料夾重複並完成合併"
-                    movedCount > 0 -> "已移動 $movedCount 張單字卡"
-                    else -> "選取的單字已在目標資料夾"
+                        "已移动 $movedCount 张，另有 $mergedCount 张与目标文件夹重复并完成合并"
+                    movedCount > 0 -> "已移动 $movedCount 张单词卡"
+                    else -> "选取的单词已在目标文件夹"
                 }
             )
         }
@@ -416,7 +416,7 @@ fun CardListScreen(
     if (showMoveCardsDialog) {
         AlertDialog(
             onDismissRequest = { showMoveCardsDialog = false },
-            title = { Text("移動 ${selectedCards.size} 張單字卡", fontWeight = FontWeight.Bold) },
+            title = { Text("移动 ${selectedCards.size} 张单词卡", fontWeight = FontWeight.Bold) },
             text = {
                 LazyColumn(
                     modifier = Modifier
@@ -439,7 +439,7 @@ fun CardListScreen(
                             Column(modifier = Modifier.padding(12.dp)) {
                                 Text(deck.name, fontWeight = FontWeight.Bold)
                                 Text(
-                                    "${deck.category}・$cardCount 張",
+                                    "${deck.category}・$cardCount 张",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -455,7 +455,7 @@ fun CardListScreen(
                         showCreateMoveFolderDialog = true
                     }
                 ) {
-                    Text("新增資料夾並移入", fontWeight = FontWeight.Bold)
+                    Text("添加文件夹并移入", fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -488,7 +488,7 @@ fun CardListScreen(
         topBar = {
             TopAppBar(
                 expandedHeight = 48.dp,
-                title = { Text("單字卡 · ${deckFilteredCards.size}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)) },
+                title = { Text("单词卡 · ${deckFilteredCards.size}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
@@ -507,7 +507,7 @@ fun CardListScreen(
                     ) {
                         Icon(
                             imageVector = if (isMultiSelectMode) Icons.Default.CheckCircle else Icons.Default.EditNote,
-                            contentDescription = if (isMultiSelectMode) "完成多選" else "多選管理",
+                            contentDescription = if (isMultiSelectMode) "完成多选" else "多选管理",
                             tint = if (isMultiSelectMode) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -525,7 +525,7 @@ fun CardListScreen(
                 shape = CircleShape,
                 modifier = Modifier.testTag("add_card_in_folder_fab")
             ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "新增單字卡")
+                Icon(imageVector = Icons.Filled.Add, contentDescription = "添加单词卡")
             }
             }
         },
@@ -547,13 +547,13 @@ fun CardListScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 CompactSelector(
-                    label = selectedCourseFilter ?: "全部課程",
+                    label = selectedCourseFilter ?: "全部课程",
                     expanded = showCourseMenu,
                     onExpandedChange = { showCourseMenu = it },
                     modifier = Modifier.weight(1f)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("全部課程（${cards.size}）") },
+                        text = { Text("全部课程（${cards.size}）") },
                         onClick = {
                             selectedCourseFilter = null
                             onSelectDeck(null)
@@ -573,13 +573,13 @@ fun CardListScreen(
                     }
                 }
                 CompactSelector(
-                    label = activeDeck?.name ?: if (selectedCourseFilter == null) "全部資料夾" else "課程全部",
+                    label = activeDeck?.name ?: if (selectedCourseFilter == null) "全部文件夹" else "课程全部",
                     expanded = showDeckMenu,
                     onExpandedChange = { showDeckMenu = it },
                     modifier = Modifier.weight(1f)
                 ) {
                     DropdownMenuItem(
-                        text = { Text("${if (selectedCourseFilter == null) "全部資料夾" else "課程全部"}（${deckFilteredCards.size}）") },
+                        text = { Text("${if (selectedCourseFilter == null) "全部文件夹" else "课程全部"}（${deckFilteredCards.size}）") },
                         onClick = {
                             onSelectDeck(null)
                             showDeckMenu = false
@@ -606,7 +606,7 @@ fun CardListScreen(
                 textStyle = MaterialTheme.typography.bodySmall,
                 placeholder = {
                     Text(
-                        "搜尋單字或解釋",
+                        "搜索单词或解释",
                         style = MaterialTheme.typography.bodySmall
                     )
                 },
@@ -614,7 +614,7 @@ fun CardListScreen(
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { searchQuery = "" }) {
-                            Icon(imageVector = Icons.Default.Close, contentDescription = "清除搜尋")
+                            Icon(imageVector = Icons.Default.Close, contentDescription = "清除搜索")
                         }
                     }
                 },
@@ -639,12 +639,12 @@ fun CardListScreen(
                     onClick = { onStartReview(selectedScopeDeckIds) },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f).heightIn(min = 46.dp).testTag("folder_start_review_button")
-                ) { Text("學習", fontWeight = FontWeight.Bold) }
+                ) { Text("学习", fontWeight = FontWeight.Bold) }
                 OutlinedButton(
                     onClick = { onOpenQuizGames(selectedScopeDeckIds) },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.weight(1f).heightIn(min = 46.dp).testTag("folder_open_quiz_button")
-                ) { Text("測驗", fontWeight = FontWeight.Bold) }
+                ) { Text("测试", fontWeight = FontWeight.Bold) }
             }
 
             val dueCount = deckFilteredCards.count {
@@ -657,9 +657,9 @@ fun CardListScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 2.dp)
             ) {
                 item { PlainTab("全部 ${deckFilteredCards.size}", selectedTab == 0, { selectedTab = 0 }, Modifier.width(96.dp)) }
-                item { PlainTab("待複習 $dueCount", selectedTab == 1, { selectedTab = 1 }, Modifier.width(96.dp)) }
+                item { PlainTab("待复习 $dueCount", selectedTab == 1, { selectedTab = 1 }, Modifier.width(96.dp)) }
                 item { PlainTab("收藏 $favoriteCount", selectedTab == 2, { selectedTab = 2 }, Modifier.width(96.dp)) }
-                item { PlainTab("發音弱點 $pronunciationWeakCount", selectedTab == 3, { selectedTab = 3 }, Modifier.width(112.dp)) }
+                item { PlainTab("发音薄薄弱点 $pronunciationWeakCount", selectedTab == 3, { selectedTab = 3 }, Modifier.width(112.dp)) }
             }
 
             if (isMultiSelectMode) {
@@ -677,7 +677,7 @@ fun CardListScreen(
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Text(
-                            text = "已選取 ${selectedCards.size} / ${finalFilteredCards.size}",
+                            text = "已选取 ${selectedCards.size} / ${finalFilteredCards.size}",
                             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
@@ -694,13 +694,13 @@ fun CardListScreen(
                                     selectedCards.addAll(finalFilteredCards)
                                 }
                             ) {
-                                Text("全選", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("全选", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
 
                             TextButton(
                                 onClick = { selectedCards.clear() }
                             ) {
-                                Text("取消全選", fontSize = 12.sp)
+                                Text("取消全选", fontSize = 12.sp)
                             }
 
                             Button(
@@ -713,7 +713,7 @@ fun CardListScreen(
                                     contentDescription = null,
                                     modifier = Modifier.size(18.dp)
                                 )
-                                Text("移動", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("移动", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
 
                             Button(
@@ -728,7 +728,7 @@ fun CardListScreen(
                                     contentDescription = null,
                                     modifier = Modifier.size(18.dp)
                                 )
-                                Text("刪除", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text("删除", fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -740,8 +740,8 @@ fun CardListScreen(
             if (finalFilteredCards.isEmpty()) {
                 CalmEmptyState(
                     icon = Icons.Default.Folder,
-                    title = if (searchQuery.isBlank()) "這裡還沒有單字" else "找不到符合的單字",
-                    message = if (searchQuery.isBlank()) "點右下角新增或匯入。" else "換個關鍵字試試看。",
+                    title = if (searchQuery.isBlank()) "这里还没有单词" else "找不到符合的单词",
+                    message = if (searchQuery.isBlank()) "点右下角添加或导入。" else "换个关键字试试看。",
                     modifier = Modifier.padding(top = 24.dp)
                 )
             } else {
@@ -807,15 +807,15 @@ private fun CardListItem(
                     Text(card.word, style = MaterialTheme.typography.titleLarge)
                     Text(listOf(card.partOfSpeech, card.phonetic).filter(String::isNotBlank).joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                if (showReorder) Icon(Icons.Default.DragHandle, "拖曳調整單字順序", dragHandleModifier.size(32.dp))
-                IconButton(onClick = onSpeak) { Icon(Icons.AutoMirrored.Filled.VolumeUp, "發音") }
+                if (showReorder) Icon(Icons.Default.DragHandle, "拖动调整单词顺序", dragHandleModifier.size(32.dp))
+                IconButton(onClick = onSpeak) { Icon(Icons.AutoMirrored.Filled.VolumeUp, "发音") }
                 Box {
-                    IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "單字操作") }
+                    IconButton(onClick = { menu = true }) { Icon(Icons.Default.MoreVert, "单词操作") }
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                         DropdownMenuItem(text = { Text(if (card.isFavorite) "取消收藏" else "加入收藏") }, onClick = { menu = false; onToggleFavorite() })
-                        DropdownMenuItem(text = { Text("編輯") }, onClick = { menu = false; onEditCard() })
-                        DropdownMenuItem(text = { Text("發音練習") }, onClick = { menu = false; onPracticePronunciation() })
-                        DropdownMenuItem(text = { Text("刪除", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDeleteCard() })
+                        DropdownMenuItem(text = { Text("编辑") }, onClick = { menu = false; onEditCard() })
+                        DropdownMenuItem(text = { Text("发音练习") }, onClick = { menu = false; onPracticePronunciation() })
+                        DropdownMenuItem(text = { Text("删除", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; onDeleteCard() })
                     }
                 }
             }
@@ -851,7 +851,7 @@ private fun CompactSelector(
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     modifier = Modifier.weight(1f)
                 )
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "展開選單")
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = "展开菜单")
             }
         }
         DropdownMenu(

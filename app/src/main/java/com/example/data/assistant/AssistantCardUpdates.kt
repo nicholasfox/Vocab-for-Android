@@ -8,7 +8,7 @@ fun applyAssistantCardUpdate(card: Flashcard, fields: JSONObject): Flashcard {
     fun value(key: String, current: String, limit: Int): String =
         if (fields.has(key) && !fields.isNull(key)) fields.getString(key).trim().take(limit) else current
     val word = value("word", card.word, 100)
-    require(word.isNotBlank()) { "單字不能為空白" }
+    require(word.isNotBlank()) { "单词不能为空白" }
     return card.copy(word = word, normalizedWord = word.lowercase(),
         phonetic = value("phonetic", card.phonetic, 100),
         partOfSpeech = value("partOfSpeech", card.partOfSpeech, 80),

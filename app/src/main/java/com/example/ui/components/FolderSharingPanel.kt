@@ -28,33 +28,33 @@ fun FolderSharingPanel(decks:List<Deck>,cards:List<Flashcard>,course:String?,req
     var mode by remember{mutableStateOf("")};var selected by remember{mutableStateOf(setOf<Long>())};var includeNotes by remember{mutableStateOf(false)}
     var incoming by remember{mutableStateOf<List<SharedFolder>>(emptyList())};var checked by remember{mutableStateOf(setOf<Int>())};var target by remember{mutableStateOf("")};var skip by remember{mutableStateOf(false)};var busy by remember{mutableStateOf(false)};var message by remember{mutableStateOf("")};var undo by remember{mutableStateOf<List<Long>>(emptyList())};var confirmUndo by remember{mutableStateOf(false)}
     LaunchedEffect(externalUndoIds){undo=externalUndoIds}
-    val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->if(uri!=null)scope.launch{busy=true;runCatching{withContext(Dispatchers.IO){context.contentResolver.openInputStream(uri)!!.use{stream->val out=java.io.ByteArrayOutputStream();val buffer=ByteArray(8192);var total=0;while(true){val n=stream.read(buffer);if(n<0)break;total+=n;require(total<=20*1024*1024){"分享檔超過 20 MB"};out.write(buffer,0,n)};FolderShare.parse(out.toString("UTF-8"))}}}.onSuccess{incoming=it;checked=it.indices.toSet();target=course.orEmpty();mode="import"}.onFailure{message=it.message.orEmpty()};busy=false}}
+    val picker=rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()){uri->if(uri!=null)scope.launch{busy=true;runCatching{withContext(Dispatchers.IO){context.contentResolver.openInputStream(uri)!!.use{stream->val out=java.io.ByteArrayOutputStream();val buffer=ByteArray(8192);var total=0;while(true){val n=stream.read(buffer);if(n<0)break;total+=n;require(total<=20*1024*1024){"分享档超过 20 MB"};out.write(buffer,0,n)};FolderShare.parse(out.toString("UTF-8"))}}}.onSuccess{incoming=it;checked=it.indices.toSet();target=course.orEmpty();mode="import"}.onFailure{message=it.message.orEmpty()};busy=false}}
     LaunchedEffect(requestDeckId){if(requestDeckId!=null){selected=setOf(requestDeckId);mode="export";onRequestHandled()}}
     LaunchedEffect(importRequested){if(importRequested){picker.launch(arrayOf("application/json","text/plain","application/octet-stream"));onImportRequestHandled()}}
     Column(verticalArrangement=Arrangement.spacedBy(6.dp)){
-        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(enabled=!busy,onClick={selected=emptySet();mode="export"}){Text("選取／分享")};OutlinedButton(enabled=!busy,onClick={picker.launch(arrayOf("application/json","text/plain","application/octet-stream"))}){Text("匯入分享檔案")}}
-        if(undo.isNotEmpty())TextButton(onClick={confirmUndo=true}){Text("撤回這次匯入")}
+        Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){OutlinedButton(enabled=!busy,onClick={selected=emptySet();mode="export"}){Text("选取／分享")};OutlinedButton(enabled=!busy,onClick={picker.launch(arrayOf("application/json","text/plain","application/octet-stream"))}){Text("导入分享文件")}}
+        if(undo.isNotEmpty())TextButton(onClick={confirmUndo=true}){Text("撤回这次导入")}
         if(message.isNotBlank())Text(message,style=MaterialTheme.typography.bodySmall)
     }
-    if(confirmUndo)AlertDialog(onDismissRequest={if(!busy)confirmUndo=false},title={Text("撤回這次匯入？")},text={Text("僅移除這批新資料夾及之後的修改；原本資料不受影響。")},confirmButton={TextButton(enabled=!busy,onClick={scope.launch{busy=true;onUndo(undo).onSuccess{undo=emptyList();confirmUndo=false;message="已撤回匯入"}.onFailure{message=it.message.orEmpty()};busy=false}}){Text("撤回")}},dismissButton={TextButton(onClick={confirmUndo=false}){Text("取消")}})
-    if(mode.isNotEmpty())AlertDialog(onDismissRequest={if(!busy)mode=""},title={Text(if(mode=="export")"分享資料夾" else "匯入分享資料夾")},text={Column(Modifier.heightIn(max=480.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)){
+    if(confirmUndo)AlertDialog(onDismissRequest={if(!busy)confirmUndo=false},title={Text("撤回这次导入？")},text={Text("仅移除这批新文件夹及之后的修改；原本数据不受影响。")},confirmButton={TextButton(enabled=!busy,onClick={scope.launch{busy=true;onUndo(undo).onSuccess{undo=emptyList();confirmUndo=false;message="已撤回导入"}.onFailure{message=it.message.orEmpty()};busy=false}}){Text("撤回")}},dismissButton={TextButton(onClick={confirmUndo=false}){Text("取消")}})
+    if(mode.isNotEmpty())AlertDialog(onDismissRequest={if(!busy)mode=""},title={Text(if(mode=="export")"分享文件夹" else "导入分享文件夹")},text={Column(Modifier.heightIn(max=480.dp).verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(8.dp)){
         if(mode=="export"){
-            Text("只分享內容，不包含學習狀態、API Key 或聊天紀錄。")
+            Text("只分享内容，不包含学习状态、API Key 或聊天纪录。")
             decks.forEach{deck->Row{Checkbox(checked=deck.id in selected,onCheckedChange={selected=if(it)selected+deck.id else selected-deck.id});Text("${deck.category} · ${deck.name}（${cards.count{it.deckId==deck.id}} 字）")}}
-            Row{Checkbox(checked=includeNotes,onCheckedChange={includeNotes=it});Text("包含個人筆記（可能含私人資訊）")}
-            Text("分享內容預覽：")
+            Row{Checkbox(checked=includeNotes,onCheckedChange={includeNotes=it});Text("包含个人笔记（可能含私人信息）")}
+            Text("分享内容预览：")
             cards.filter{it.deckId in selected}.take(80).forEach{Text("${it.word} — ${it.definition}\n${it.exampleSentence}\n${it.exampleTranslation}",style=MaterialTheme.typography.bodySmall)}
         }else{
-            Text("所有單字視為全新學習。同名資料夾另建，不覆蓋。")
-            OutlinedTextField(value=target,onValueChange={target=it},label={Text("目的課程（空白保留原分類）")},modifier=Modifier.fillMaxWidth())
+            Text("所有单词视为全新学习。同名文件夹另建，不覆盖。")
+            OutlinedTextField(value=target,onValueChange={target=it},label={Text("目的课程（空白保留原分类）")},modifier=Modifier.fillMaxWidth())
             decks.map{it.category}.distinct().forEach{c->TextButton(onClick={target=c}){Text(c)}}
-            Row{Checkbox(checked=skip,onCheckedChange={skip=it});Text("略過詞庫已有單字（否則加入新資料夾）")}
+            Row{Checkbox(checked=skip,onCheckedChange={skip=it});Text("略过词库已有单词（否则加入新文件夹）")}
             incoming.forEachIndexed{index,deck->Row{Checkbox(checked=index in checked,onCheckedChange={checked=if(it)checked+index else checked-index});Text("${deck.course} · ${deck.name}：${deck.cards.size} 字，已有 ${deck.cards.count{c->cards.any{it.normalizedWord==c.normalizedWord}}} 字")};deck.cards.take(40).forEach{Text("${it.word} — ${it.definition}\n${it.exampleSentence}",style=MaterialTheme.typography.bodySmall)}}
         }
     }},confirmButton={TextButton(enabled=!busy&&(if(mode=="export")selected.isNotEmpty() else checked.isNotEmpty()),onClick={scope.launch{busy=true;try{if(mode=="export"){
         val json=withContext(Dispatchers.Default){FolderShare.export(decks.filter{it.id in selected},cards,includeNotes)}
         val file=withContext(Dispatchers.IO){File(context.cacheDir,"Vocab-${System.currentTimeMillis()}.vocab-share.json").apply{writeText(json)}}
         val uri=FileProvider.getUriForFile(context,"${context.packageName}.fileprovider",file)
-        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply{type="application/json";putExtra(Intent.EXTRA_STREAM,uri);clipData=ClipData.newRawUri("Vocab",uri);addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)},"分享 Vocab 資料夾"));mode=""
-    }else{onImport(incoming.filterIndexed{i,_->i in checked},target,skip).onSuccess{undo=it;message="已匯入 ${it.size} 個資料夾，精熟度已重設";mode=""}.onFailure{message=it.message.orEmpty()}}}catch(e:Exception){message=e.message.orEmpty()}finally{busy=false}}}){Text(if(busy)"處理中…" else if(mode=="export")"分享 JSON" else "確認匯入")}},dismissButton={TextButton(enabled=!busy,onClick={mode=""}){Text("取消")}})
+        context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply{type="application/json";putExtra(Intent.EXTRA_STREAM,uri);clipData=ClipData.newRawUri("Vocab",uri);addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)},"分享 Vocab 文件夹"));mode=""
+    }else{onImport(incoming.filterIndexed{i,_->i in checked},target,skip).onSuccess{undo=it;message="已导入 ${it.size} 个文件夹，精熟度已重置";mode=""}.onFailure{message=it.message.orEmpty()}}}catch(e:Exception){message=e.message.orEmpty()}finally{busy=false}}}){Text(if(busy)"处理中…" else if(mode=="export")"分享 JSON" else "确认导入")}},dismissButton={TextButton(enabled=!busy,onClick={mode=""}){Text("取消")}})
 }

@@ -42,9 +42,9 @@ internal suspend fun loadWidgetSnapshot(context: Context): WidgetSnapshot {
             logs,
             extraActiveDays = StudyCheckInStore(context).dates.value
         ).current,
-        dailyWord = dailyCard?.word?.ifBlank { "尚未新增" } ?: "尚未新增",
-        dailyDefinition = dailyCard?.definition?.ifBlank { "尚未填寫解釋" }
-            ?: "新增單字後會顯示在這裡"
+        dailyWord = dailyCard?.word?.ifBlank { "尚未添加" } ?: "尚未添加",
+        dailyDefinition = dailyCard?.definition?.ifBlank { "尚未填写解释" }
+            ?: "添加单词后会显示在这里"
     )
 }
 

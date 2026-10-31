@@ -15,7 +15,7 @@ object WiktionaryLookupService {
 
     suspend fun lookup(rawWord: String): DictionaryEntry = withContext(Dispatchers.IO) {
         val word = rawWord.trim().lowercase()
-        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "維基詞典僅支援英文單字或短語" }
+        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "维基词典仅支持英文单词或短语" }
         val encoded = URLEncoder.encode(word, "UTF-8").replace("+", "%20")
         val request = Request.Builder()
             .url("https://en.wiktionary.org/api/rest_v1/page/definition/$encoded")
@@ -23,10 +23,10 @@ object WiktionaryLookupService {
             .build()
         client.newCall(request).execute().use { response ->
             check(response.isSuccessful) {
-                if (response.code == 404) "維基詞典找不到這個單字" else "維基詞典暫時無法查詢（${response.code}）"
+                if (response.code == 404) "维基词典找不到这个单词" else "维基词典暂时无法查询（${response.code}）"
             }
             val json = JSONObject(response.body?.string().orEmpty())
-            val entries = json.optJSONArray("en") ?: error("維基詞典沒有英文詞條")
+            val entries = json.optJSONArray("en") ?: error("维基词典没有英文词条")
             val parts = mutableListOf<String>()
             val definitions = mutableListOf<String>()
             var example = ""
@@ -44,7 +44,7 @@ object WiktionaryLookupService {
                     }
                 }
             }
-            check(definitions.isNotEmpty()) { "維基詞典沒有可顯示的解釋" }
+            check(definitions.isNotEmpty()) { "维基词典没有可显示的解释" }
             DictionaryEntry(
                 word = word,
                 phonetic = "",

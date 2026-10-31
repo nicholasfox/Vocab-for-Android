@@ -27,12 +27,12 @@ class AssistantChatStoreTest {
 
     @Test
     fun imageAttachmentsSurviveChatReload() {
-        val conversation = AssistantConversation("conversation", "圖片", 1L, 1L)
+        val conversation = AssistantConversation("conversation", "图片", 1L, 1L)
         val message = AssistantMessage(
             id = "message",
             conversationId = conversation.id,
             role = "USER",
-            content = "請分析圖片",
+            content = "请分析图片",
             createdAt = 2L,
             attachmentUris = listOf("file:///data/user/0/example/files/assistant_images/image.jpg")
         )
@@ -43,7 +43,7 @@ class AssistantChatStoreTest {
     }
 
     @Test fun articleLibraryLoadsAllSavedChatsWithoutOpeningOrGeneratingAnArticle() {
-        val chats = listOf(AssistantConversation("a", "舊對話", 1, 1), AssistantConversation("b", "另一對話", 2, 2))
+        val chats = listOf(AssistantConversation("a", "旧对话", 1, 1), AssistantConversation("b", "另一对话", 2, 2))
         val articles = listOf(AssistantMessage("article-a", "a", "ASSISTANT", "old article", 10, "ARTICLE", "{}"),
             AssistantMessage("article-b", "b", "ASSISTANT", "new article", 20, "ARTICLE", "{}"))
         store.save(chats, articles + AssistantMessage("text", "b", "ASSISTANT", "不是文章", 30))

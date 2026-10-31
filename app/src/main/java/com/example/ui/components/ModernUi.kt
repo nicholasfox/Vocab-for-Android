@@ -58,7 +58,7 @@ fun ModernChoiceRow(text: String, selected: Boolean, onClick: () -> Unit, enable
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             label?.let { Text(it, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-            if (selected) Icon(Icons.Default.CheckCircle, "已選擇", tint = MaterialTheme.colorScheme.primary)
+            if (selected) Icon(Icons.Default.CheckCircle, "已选择", tint = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -183,7 +183,7 @@ fun ModernCollectionRow(
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(buildString { append("$count ${if (grammar) "個文法" else "張單字"}"); due?.let { append(" · 待複習 $it") } }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(buildString { append("$count ${if (grammar) "个语法" else "张单词"}"); due?.let { append(" · 待复习 $it") } }, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             progress?.let {
                 Column(Modifier.width(34.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
@@ -191,16 +191,16 @@ fun ModernCollectionRow(
                     LinearProgressIndicator(progress = { it.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(3.dp), trackColor = MaterialTheme.colorScheme.surfaceVariant, drawStopIndicator = {})
                 }
             }
-            dragModifier?.let { Icon(Icons.Default.DragHandle, "拖曳排序", it.size(28.dp).padding(3.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+            dragModifier?.let { Icon(Icons.Default.DragHandle, "拖动排序", it.size(28.dp).padding(3.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant) }
             Box {
                 IconButton(onClick = { menu = true }, modifier = Modifier.size(40.dp)) { Icon(Icons.Default.MoreVert, "更多操作") }
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(text = { Text("管理") }, onClick = { menu = false; onManage() })
-                    DropdownMenuItem(text = { Text("學習") }, enabled = count > 0, onClick = { menu = false; onLearn() })
-                    DropdownMenuItem(text = { Text("測驗") }, enabled = count > 0, onClick = { menu = false; onQuiz() })
-                    onEdit?.let { action -> DropdownMenuItem(text = { Text("編輯") }, onClick = { menu = false; action() }) }
-                    onDelete?.let { action -> DropdownMenuItem(text = { Text("刪除", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; action() }) }
-                    onShare?.let { action -> DropdownMenuItem(text={Text("分享資料夾")},onClick={menu=false;action()}) }
+                    DropdownMenuItem(text = { Text("学习") }, enabled = count > 0, onClick = { menu = false; onLearn() })
+                    DropdownMenuItem(text = { Text("测试") }, enabled = count > 0, onClick = { menu = false; onQuiz() })
+                    onEdit?.let { action -> DropdownMenuItem(text = { Text("编辑") }, onClick = { menu = false; action() }) }
+                    onDelete?.let { action -> DropdownMenuItem(text = { Text("删除", color = MaterialTheme.colorScheme.error) }, onClick = { menu = false; action() }) }
+                    onShare?.let { action -> DropdownMenuItem(text={Text("分享文件夹")},onClick={menu=false;action()}) }
                 }
             }
         }

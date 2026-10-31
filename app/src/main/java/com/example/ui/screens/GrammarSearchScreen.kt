@@ -29,12 +29,12 @@ fun GrammarSearchScreen(notes: List<GrammarNote>, onOpen: (GrammarNote) -> Unit,
                 .any { it.contains(query.trim(), ignoreCase = true) }
         }
     }
-    Scaffold(topBar = { TopAppBar(title = { Text("搜尋已儲存文法") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text("搜索已保存语法") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             OutlinedTextField(query, { query = it }, singleLine = true, shape = RoundedCornerShape(28.dp),
-                placeholder = { Text("搜尋文法、句型、例句或標籤", maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                placeholder = { Text("搜索语法、句型、例句或标签", maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 leadingIcon = { Icon(Icons.Default.Search, null) }, modifier = Modifier.fillMaxWidth())
-            if (query.isNotBlank() && results.isEmpty()) Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) { Text("找不到符合的文法筆記") }
+            if (query.isNotBlank() && results.isEmpty()) Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) { Text("找不到符合的语法笔记") }
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(results, key = { it.id }) { note ->
                     Card(onClick = { onOpen(note) }, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {

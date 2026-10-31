@@ -46,9 +46,9 @@ class GreetingScreenshotTest {
           currentTab = 0,
           onTabSelected = {},
           dashboardContent = { SampleContent() },
-          foldersContent = { Text("資料夾") },
-          studyContent = { Text("學習") },
-          quizContent = { Text("遊戲") }
+          foldersContent = { Text("文件夹") },
+          studyContent = { Text("学习") },
+          quizContent = { Text("游戏") }
         )
       }
     }
@@ -71,11 +71,11 @@ class GreetingScreenshotTest {
         )
       }
     }
-    composeTestRule.onNodeWithText("文法").assertIsDisplayed()
+    composeTestRule.onNodeWithText("语法").assertIsDisplayed()
     composeTestRule.onRoot().captureRoboImage(filePath = "src/test/screenshots/modern-dark.png")
     composeTestRule.onNodeWithTag("nav_tab_folders").performClick()
     composeTestRule.waitForIdle()
-    composeTestRule.onNodeWithText("文法").assertDoesNotExist()
+    composeTestRule.onNodeWithText("语法").assertDoesNotExist()
   }
 
   @androidx.compose.runtime.Composable
@@ -102,7 +102,7 @@ class GreetingScreenshotTest {
     composeTestRule.setContent {
       MyApplicationTheme {
         FlipCard(
-          card = Flashcard(id = 1, deckId = 1, word = "learn", definition = "學習"),
+          card = Flashcard(id = 1, deckId = 1, word = "learn", definition = "学习"),
           isFlipped = false,
           onFlip = {},
           onSpeak = {},

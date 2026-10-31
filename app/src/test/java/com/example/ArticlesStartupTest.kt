@@ -27,7 +27,7 @@ class ArticlesStartupTest {
         val application = ApplicationProvider.getApplicationContext<Application>()
         val store = AssistantChatStore(application)
         store.clear()
-        store.save(listOf(AssistantConversation("old-chat", "舊文章", 1, 2)),
+        store.save(listOf(AssistantConversation("old-chat", "旧文章", 1, 2)),
             listOf(AssistantMessage("old-article", "old-chat", "ASSISTANT", "A saved article.", 2, "ARTICLE", "{}")))
         val owner = ViewModelStore()
         try {

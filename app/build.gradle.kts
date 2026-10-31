@@ -8,6 +8,11 @@ plugins {
 val backendBaseUrl = providers.gradleProperty("BACKEND_BASE_URL")
   .orElse(System.getenv("BACKEND_BASE_URL") ?: "http://10.0.2.2:8787")
   .get()
+// On GitHub Actions, GITHUB_REPOSITORY is the fork that is building this app,
+// so the in-app updater follows the fork instead of the upstream project.
+val githubRepository = providers.gradleProperty("GITHUB_REPOSITORY")
+  .orElse(System.getenv("GITHUB_REPOSITORY") ?: "VocabGroup/Vocab-for-Android")
+  .get()
 val releaseKeystorePath = System.getenv("KEYSTORE_PATH")
 val releaseStorePassword = System.getenv("STORE_PASSWORD")
 val releaseKeyPassword = System.getenv("KEY_PASSWORD")
@@ -30,7 +35,7 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField("String", "BACKEND_BASE_URL", "\"${backendBaseUrl.trimEnd('/')}\"")
-    buildConfigField("String", "GITHUB_REPOSITORY", "\"VocabGroup/Vocab-for-Android\"")
+    buildConfigField("String", "GITHUB_REPOSITORY", "\"${githubRepository}\"")
   }
 
   signingConfigs {
@@ -45,6 +50,11 @@ android {
   }
 
   buildTypes {
+    debug {
+      // Install side by side with the upstream Traditional Chinese build.
+      applicationIdSuffix = ".zh"
+      versionNameSuffix = "-zh"
+    }
     release {
       isCrunchPngs = false
       // ML Kit's document scanner is delivered dynamically by Google Play services.

@@ -112,18 +112,18 @@ fun MainScreen(
     )
     val tabs = if (grammarMode) {
         listOf(
-            MainTabSpec("總覽", Icons.Default.Home, "總覽", "nav_tab_home"),
-            MainTabSpec("文法庫", Icons.Default.MenuBook, "文法庫", "nav_tab_folders"),
-            MainTabSpec("學習", Icons.Default.Style, "學習", "nav_tab_study"),
-            MainTabSpec("測驗", Icons.Default.Quiz, "測驗", "nav_tab_quiz"),
+            MainTabSpec("总览", Icons.Default.Home, "总览", "nav_tab_home"),
+            MainTabSpec("语法库", Icons.Default.MenuBook, "语法库", "nav_tab_folders"),
+            MainTabSpec("学习", Icons.Default.Style, "学习", "nav_tab_study"),
+            MainTabSpec("测试", Icons.Default.Quiz, "测试", "nav_tab_quiz"),
             MainTabSpec("作文", Icons.Default.EditNote, "作文", "nav_tab_library_tool")
         )
     } else {
         listOf(
-            MainTabSpec("主畫面", Icons.Default.Home, "主畫面", "nav_tab_home"),
-            MainTabSpec("資料夾", Icons.Default.Folder, "資料夾", "nav_tab_folders"),
-            MainTabSpec("學習", Icons.Default.Style, "學習", "nav_tab_study"),
-            MainTabSpec("測驗", Icons.Default.Extension, "測驗", "nav_tab_quiz"),
+            MainTabSpec("主画面", Icons.Default.Home, "主画面", "nav_tab_home"),
+            MainTabSpec("文件夹", Icons.Default.Folder, "文件夹", "nav_tab_folders"),
+            MainTabSpec("学习", Icons.Default.Style, "学习", "nav_tab_study"),
+            MainTabSpec("测试", Icons.Default.Extension, "测试", "nav_tab_quiz"),
             MainTabSpec("文章", Icons.Default.Article, "文章", "nav_tab_library_tool")
         )
     }
@@ -162,7 +162,7 @@ fun MainScreen(
                                     color = MaterialTheme.colorScheme.surfaceVariant
                                 ) {
                                     Row(Modifier.padding(3.dp)) {
-                                        listOf(false to "單字", true to "文法").forEach { (mode, label) ->
+                                        listOf(false to "单词", true to "语法").forEach { (mode, label) ->
                                             Surface(
                                                 onClick = { if (grammar != mode) onToggleGrammarMode() },
                                                 shape = CircleShape,
@@ -189,7 +189,7 @@ fun MainScreen(
                     },
                     actions = {
                         IconButton(onClick = onOpenWordSearch) {
-                            Icon(Icons.Default.Search, contentDescription = if (grammarMode) "搜尋文法" else "搜尋英文單字")
+                            Icon(Icons.Default.Search, contentDescription = if (grammarMode) "搜索语法" else "搜索英文单词")
                         }
                         IconButton(onClick = onOpenAssistant) {
                             Icon(
@@ -202,7 +202,7 @@ fun MainScreen(
                             Box {
                                 Icon(
                                     imageVector = Icons.Default.Settings,
-                                    contentDescription = "設定",
+                                    contentDescription = "设置",
                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 if (updateAvailable) {

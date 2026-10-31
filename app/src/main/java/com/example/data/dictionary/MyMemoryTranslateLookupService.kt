@@ -21,17 +21,17 @@ object MyMemoryTranslateLookupService {
 
     private suspend fun lookup(rawText: String, languagePair: String, chineseToEnglish: Boolean): DictionaryEntry = withContext(Dispatchers.IO) {
         val text = rawText.trim()
-        require(text.isNotBlank() && text.length <= 80) { "請輸入要查詢的內容" }
+        require(text.isNotBlank() && text.length <= 80) { "请输入要查询的内容" }
         val url = "https://api.mymemory.translated.net/get".toHttpUrl().newBuilder()
             .addQueryParameter("q", text)
             .addQueryParameter("langpair", languagePair)
             .build()
         val request = Request.Builder().url(url).header("User-Agent", "Vocab/2.8.0 Android").build()
         client.newCall(request).execute().use { response ->
-            check(response.isSuccessful) { "備用翻譯暫時無法查詢（${response.code}）" }
+            check(response.isSuccessful) { "备用翻译暂时无法查询（${response.code}）" }
             val root = JSONObject(response.body?.string().orEmpty())
             val english = root.optJSONObject("responseData")?.optString("translatedText").orEmpty().trim()
-            check(english.isNotBlank() && !english.equals("null", true)) { "備用翻譯找不到對應英文" }
+            check(english.isNotBlank() && !english.equals("null", true)) { "备用翻译找不到对应英文" }
             DictionaryEntry(
                 word = if (chineseToEnglish) english else text,
                 phonetic = "",
@@ -39,7 +39,7 @@ object MyMemoryTranslateLookupService {
                 definition = if (chineseToEnglish) text else english,
                 exampleSentence = "",
                 exampleTranslation = "",
-                category = "備用翻譯"
+                category = "备用翻译"
             )
         }
     }

@@ -11,7 +11,7 @@ object EcdictLookupService {
     fun key(query: String): String {
         val key = query.trim().lowercase(Locale.ROOT).replace('’', '\'').replace('‘', '\'')
         require(key.length in 1..80 && key.matches(Regex("[a-z '-]+"))) {
-            "ECDICT 支援英文單字或短語；中文請選擇 Google 翻譯"
+            "ECDICT 支持英文单词或短语；中文请选择 Google 翻译"
         }
         return key
     }
@@ -25,9 +25,9 @@ object EcdictLookupService {
     suspend fun lookup(context: Context, query: String): DictionaryEntry = withContext(Dispatchers.IO) {
         val key = key(query)
         val data = context.assets.open("ecdict/${shard(key)}.json").bufferedReader(Charsets.UTF_8).use { JSONObject(it.readText()) }
-        val row = data.optJSONArray(key) ?: error("ECDICT 查無此單字；可改用其他來源")
+        val row = data.optJSONArray(key) ?: error("ECDICT 查无此单词；可改用其他来源")
         val phonetic = row.getString(1)
         DictionaryEntry(row.getString(0), if (phonetic.isBlank()) "" else "/$phonetic/",
-            row.getString(2), row.getString(3), "", "", "ECDICT 英漢字典（繁體中文）")
+            row.getString(2), row.getString(3), "", "", "ECDICT 英汉字典（简体中文）")
     }
 }

@@ -14,9 +14,9 @@ class EcdictLookupServiceTest {
     @Test fun definitionsUseTraditionalChinese() = runTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         for ((word, traditional, simplified) in listOf(
-            Triple("apple", "蘋果", "苹果"),
-            Triple("software", "軟體", "软件"),
-            Triple("memory", "記憶", "记忆")
+            Triple("apple", "苹果", "苹果"),
+            Triple("software", "软件", "软件"),
+            Triple("memory", "记忆", "记忆")
         )) {
             val result = EcdictLookupService.lookup(context, word)
             assertTrue(result.definition.contains(traditional))
@@ -34,6 +34,6 @@ class EcdictLookupServiceTest {
         }
         assertTrue(runCatching { EcdictLookupService.lookup(context, "zzzznonexistentword") }.isFailure)
         assertTrue(runCatching { EcdictLookupService.key("../secret") }.isFailure)
-        assertTrue(runCatching { EcdictLookupService.key("蘋果") }.isFailure)
+        assertTrue(runCatching { EcdictLookupService.key("苹果") }.isFailure)
     }
 }

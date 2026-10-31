@@ -56,7 +56,7 @@ class VocabularyRepositoryTest {
     @Test
     fun sameDeckRejectsCaseInsensitiveDuplicateWords() = runTest {
         val deckId = repository.insertDeck(Deck(name = "test"))
-        repository.insertCard(Flashcard(deckId = deckId, word = "Apple", definition = "蘋果"))
+        repository.insertCard(Flashcard(deckId = deckId, word = "Apple", definition = "苹果"))
 
         val duplicateResult = runCatching {
             repository.insertCard(Flashcard(deckId = deckId, word = " apple ", definition = "水果"))
@@ -69,17 +69,17 @@ class VocabularyRepositoryTest {
     @Test
     fun repeatedBatchSaveUpdatesTheInsertedCardInsteadOfCreatingAnother() = runTest {
         val deckId = repository.insertDeck(Deck(name = "test"))
-        val draft = Flashcard(deckId = deckId, word = "stable", definition = "穩定的")
+        val draft = Flashcard(deckId = deckId, word = "stable", definition = "稳定的")
 
         val insertedId = repository.saveBatch(listOf(draft), emptyList()).single()
         repository.saveBatch(
-            listOf(draft.copy(id = insertedId, definition = "穩定；可靠")),
+            listOf(draft.copy(id = insertedId, definition = "稳定；可靠")),
             emptyList()
         )
 
         val savedCards = repository.getCardsByDeck(deckId).first()
         assertEquals(1, savedCards.size)
-        assertEquals("穩定；可靠", savedCards.single().definition)
+        assertEquals("稳定；可靠", savedCards.single().definition)
     }
 
     @Test

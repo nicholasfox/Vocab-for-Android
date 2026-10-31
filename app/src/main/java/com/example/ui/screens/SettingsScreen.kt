@@ -113,6 +113,7 @@ fun SettingsScreen(
     aiConnectionStatus: String?,
     onAiProviderChange: (String) -> Unit,
     onAiModelChange: (String) -> Unit,
+    onAiBaseUrlChange: (String) -> Unit,
     onAiChatStyleChange: (String) -> Unit,
     onAiPromptChange: (String) -> Unit,
     onResetAiPrompt: () -> Unit,
@@ -128,11 +129,11 @@ fun SettingsScreen(
     onClearAllData: () -> Unit,
     onBack: () -> Unit
 ) {
-    var settingsPage by rememberSaveable { mutableStateOf("設定") }
-    androidx.activity.compose.BackHandler(enabled = settingsPage != "設定") { settingsPage = "設定" }
+    var settingsPage by rememberSaveable { mutableStateOf("设置") }
+    androidx.activity.compose.BackHandler(enabled = settingsPage != "设置") { settingsPage = "设置" }
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    var updateStatus by remember { mutableStateOf("尚未檢查更新") }
+    var updateStatus by remember { mutableStateOf("尚未检查更新") }
     var availableRelease by remember { mutableStateOf<GitHubRelease?>(null) }
     var downloadedApk by remember { mutableStateOf<File?>(null) }
     var updateBusy by remember { mutableStateOf(false) }
@@ -149,9 +150,9 @@ fun SettingsScreen(
     ) {
         downloadedApk?.takeIf(File::exists)?.let { apk ->
             when (val launch = GitHubUpdateManager.launchInstaller(context, apk)) {
-                InstallLaunchResult.InstallerOpened -> updateStatus = "已開啟系統安裝畫面"
-                is InstallLaunchResult.PermissionRequired -> updateStatus = "請允許安裝此來源後再按一次安裝"
-                is InstallLaunchResult.Failed -> updateStatus = "安裝失敗：${launch.message}"
+                InstallLaunchResult.InstallerOpened -> updateStatus = "已打开系统安装画面"
+                is InstallLaunchResult.PermissionRequired -> updateStatus = "请允许安装此来源后再按一次安装"
+                is InstallLaunchResult.Failed -> updateStatus = "安装失败：${launch.message}"
             }
         }
     }
@@ -175,7 +176,7 @@ fun SettingsScreen(
         if (granted) {
             onBooleanChange("ttsContinueInBackground", true)
         } else {
-            Toast.makeText(context, "未取得浮動視窗權限，仍可單獨使用背景朗讀", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "未取得浮动窗口权限，仍可单独使用背景朗读", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -203,16 +204,16 @@ fun SettingsScreen(
     fun checkForUpdates() {
         if (updateBusy) return
         updateBusy = true
-        updateStatus = "正在檢查 GitHub 最新版本…"
+        updateStatus = "正在检查 GitHub 最新版本…"
         coroutineScope.launch {
             when (val result = GitHubUpdateManager.checkForUpdate()) {
                 is UpdateCheckResult.Available -> {
                     availableRelease = result.release
                     downloadedApk = GitHubUpdateManager.findDownloadedApk(context, result.release.version)
                     updateStatus = if (downloadedApk != null) {
-                        "Vocab ${result.release.version} 已下載，可直接再次安裝"
+                        "Vocab ${result.release.version} 已下载，可直接再次安装"
                     } else {
-                        "發現 Vocab ${result.release.version}"
+                        "发现 Vocab ${result.release.version}"
                     }
                 }
                 UpdateCheckResult.UpToDate -> {
@@ -232,12 +233,12 @@ fun SettingsScreen(
 
     fun openInstaller(apk: File) {
         when (val launch = GitHubUpdateManager.launchInstaller(context, apk)) {
-            InstallLaunchResult.InstallerOpened -> updateStatus = "已開啟系統安裝畫面；若未完成，可回來再次安裝"
+            InstallLaunchResult.InstallerOpened -> updateStatus = "已打开系统安装画面；若未完成，可回来再次安装"
             is InstallLaunchResult.PermissionRequired -> {
-                updateStatus = "請先允許 Vocab 安裝更新"
+                updateStatus = "请先允许 Vocab 安装更新"
                 installPermissionLauncher.launch(launch.intent)
             }
-            is InstallLaunchResult.Failed -> updateStatus = "安裝失敗：${launch.message}"
+            is InstallLaunchResult.Failed -> updateStatus = "安装失败：${launch.message}"
         }
     }
 
@@ -245,9 +246,9 @@ fun SettingsScreen(
         if (updateBusy) return
         updateBusy = true
         updateStatus = if (forceDownload) {
-            "正在重新下載 Vocab ${release.version}…"
+            "正在重新下载 Vocab ${release.version}…"
         } else {
-            "準備下載 Vocab ${release.version}…"
+            "准备下载 Vocab ${release.version}…"
         }
         coroutineScope.launch {
             GitHubUpdateManager.downloadApk(
@@ -255,31 +256,31 @@ fun SettingsScreen(
                 release = release,
                 wifiOnly = settings.wifiOnlyUpdates,
                 forceDownload = forceDownload,
-                onProgress = { progress -> updateStatus = "正在下載… $progress%" }
+                onProgress = { progress -> updateStatus = "正在下载… $progress%" }
             ).onSuccess { apk ->
                 downloadedApk = apk
                 openInstaller(apk)
             }.onFailure {
-                updateStatus = it.message ?: "下載更新失敗"
+                updateStatus = it.message ?: "下载更新失败"
             }
             updateBusy = false
         }
     }
 
     LaunchedEffect(settings.autoCheckUpdates) {
-        if (settings.autoCheckUpdates && updateStatus == "尚未檢查更新") checkForUpdates()
+        if (settings.autoCheckUpdates && updateStatus == "尚未检查更新") checkForUpdates()
     }
 
     if (showClearDataDialog) {
         AlertDialog(
             onDismissRequest = { showClearDataDialog = false },
-            title = { Text("清空所有資料？") },
-            text = { Text("會刪除所有單字卡、資料夾、學習紀錄、設定及本機 API Key，並回到首次設定。此動作無法復原。") },
+            title = { Text("清空所有数据？") },
+            text = { Text("会删除所有单词卡、文件夹、学习纪录、设置及本机 API Key，并回到首次设置。此动作无法恢复。") },
             confirmButton = {
                 TextButton(onClick = {
                     showClearDataDialog = false
                     onClearAllData()
-                }) { Text("確定全部清空", color = MaterialTheme.colorScheme.error) }
+                }) { Text("确定全部清空", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showClearDataDialog = false }) { Text("取消") }
@@ -290,7 +291,7 @@ fun SettingsScreen(
     if (showAiTutorial) {
         AlertDialog(
             onDismissRequest = { showAiTutorial = false },
-            title = { Text("AI 連線教學", fontWeight = FontWeight.Bold) },
+            title = { Text("AI 连接教程", fontWeight = FontWeight.Bold) },
             text = {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().heightIn(max = 480.dp),
@@ -298,13 +299,13 @@ fun SettingsScreen(
                 ) {
                     item {
                         Text("Google Gemini", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("1. 登入 Google AI Studio。\n2. 建立或選擇專案並產生 API Key。\n3. 回到 Vocab，選擇 Google Gemini、貼上 Key、選模型後儲存。\n4. 在該 Key 卡片按「測試這組」。")
+                        Text("1. 登录 Google AI Studio。\n2. 创建或选择项目并产生 API Key。\n3. 回到 Vocab，选择 Google Gemini、贴上 Key、选模型后保存。\n4. 在该 Key 卡片按「测试这组」。")
                         OutlinedButton(
                             onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://ai.google.dev/gemini-api/docs/api-key"))) },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(Icons.AutoMirrored.Filled.OpenInNew, null)
-                            Text("Gemini 官方教學")
+                            Text("Gemini 官方教程")
                         }
                         Button(
                             onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://aistudio.google.com/app/apikey"))) },
@@ -313,13 +314,13 @@ fun SettingsScreen(
                     }
                     item {
                         Text("OpenRouter", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Text("1. 登入 OpenRouter。\n2. 到 API Keys 建立 Key。\n3. 回到 Vocab，選擇 OpenRouter、貼上 Key。\n4. 更新模型清單並選擇模型，再測試該 Key。")
+                        Text("1. 登录 OpenRouter。\n2. 到 API Keys 创建 Key。\n3. 回到 Vocab，选择 OpenRouter、贴上 Key。\n4. 更新模型清单并选择模型，再测试该 Key。")
                         OutlinedButton(
                             onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://openrouter.ai/docs/quickstart"))) },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(Icons.AutoMirrored.Filled.OpenInNew, null)
-                            Text("OpenRouter 官方教學")
+                            Text("OpenRouter 官方教程")
                         }
                         Button(
                             onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://openrouter.ai/settings/keys"))) },
@@ -328,7 +329,7 @@ fun SettingsScreen(
                     }
                     item {
                         Text(
-                            "安全提醒：API Key 只貼在 Vocab 的設定欄位，不要傳到聊天室、截圖、GitHub 或分享網址。",
+                            "安全提醒：API Key 只贴在 Vocab 的设置字段，不要传到聊天室、截图、GitHub 或分享网址。",
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -345,7 +346,7 @@ fun SettingsScreen(
                 expandedHeight = 48.dp,
                 title = { Text(settingsPage, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
-                    IconButton(onClick = { if (settingsPage == "設定") onBack() else settingsPage = "設定" }) {
+                    IconButton(onClick = { if (settingsPage == "设置") onBack() else settingsPage = "设置" }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 }
@@ -356,16 +357,16 @@ fun SettingsScreen(
             modifier = Modifier.padding(padding).padding(top = 6.dp).padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if (settingsPage == "設定") {
+            if (settingsPage == "设置") {
                 items(listOf(
-                    "外觀" to "跟隨系統、亮色與暗色",
-                    "學習" to "每日目標與複習",
-                    "AI" to "連線、模型與補齊",
-                    "掃描與文件" to "教材辨識與匯入",
-                    "單字查詢" to "辭典與翻譯來源",
-                    "發音與提醒" to "朗讀、自動播放與通知",
-                    "更新" to "版本與下載",
-                    "資料" to "備份、匯出與還原"
+                    "外观" to "跟随系统、亮色与暗色",
+                    "学习" to "每日目标与复习",
+                    "AI" to "连接、模型与补齐",
+                    "扫描与文件" to "教材识别与导入",
+                    "单词查询" to "辞典与翻译来源",
+                    "发音与提醒" to "朗读、自动播放与通知",
+                    "更新" to "版本与下载",
+                    "数据" to "备份、导出与恢复"
                 )) { (title, subtitle) ->
                     Surface(
                         onClick = { settingsPage = title },
@@ -386,36 +387,36 @@ fun SettingsScreen(
                     }
                 }
             }
-            if (settingsPage == "外觀") item {
-                SettingsSection("主題") {
+            if (settingsPage == "外观") item {
+                SettingsSection("主题") {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        listOf("LIGHT" to "亮色", "DARK" to "暗色", "SYSTEM" to "系統").forEach { (value, label) ->
+                        listOf("LIGHT" to "亮色", "DARK" to "暗色", "SYSTEM" to "系统").forEach { (value, label) ->
                             FilterChip(selected = settings.themeMode == value, onClick = { onThemeChange(value) }, label = { Text(label) }, modifier = Modifier.weight(1f))
                         }
                     }
-                    Text("畫面與文字顏色隨主題統一調整。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("画面与文字颜色随主题统一调整。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
-            if (settingsPage == "學習") item {
-                SettingsSection("學習") {
-                    NumberSetting("每日學習目標", settings.dailyGoalCards, 5, 5..100, suffix = " 張") {
+            if (settingsPage == "学习") item {
+                SettingsSection("学习") {
+                    NumberSetting("每日学习目标", settings.dailyGoalCards, 5, 5..100, suffix = " 张") {
                         onIntChange("dailyGoalCards", it)
                     }
                     NumberSetting("每日新卡上限", settings.dailyNewCardLimit, 5, 1..100) {
                         onIntChange("dailyNewCardLimit", it)
                     }
-                    NumberSetting("每日複習上限", settings.dailyReviewLimit, 10, 10..500) {
+                    NumberSetting("每日复习上限", settings.dailyReviewLimit, 10, 10..500) {
                         onIntChange("dailyReviewLimit", it)
                     }
-                    SettingSwitch("測驗錯題加入複習", settings.gameMistakesToReview) {
+                    SettingSwitch("测试错题加入复习", settings.gameMistakesToReview) {
                         onBooleanChange("gameMistakesToReview", it)
                     }
                 }
             }
             if (settingsPage == "AI") item {
-                SettingsSection("AI 補齊") {
-                    SettingSwitch("啟用 AI 補齊", settings.aiEnabled) { onBooleanChange("aiEnabled", it) }
-                    SettingSwitch("AI 結果套用前確認", settings.aiRequiresConfirmation) {
+                SettingsSection("AI 补齐") {
+                    SettingSwitch("启用 AI 补齐", settings.aiEnabled) { onBooleanChange("aiEnabled", it) }
+                    SettingSwitch("AI 结果应用前确认", settings.aiRequiresConfirmation) {
                         onBooleanChange("aiRequiresConfirmation", it)
                     }
                     SettingSwitch("使用我自己的 API Key", settings.usePersonalAiApi) {
@@ -423,9 +424,9 @@ fun SettingsScreen(
                     }
                     Text(
                         if (settings.usePersonalAiApi) {
-                            "${AiProvider.from(settings.aiProvider).displayName} 直連"
+                            "${AiProvider.from(settings.aiProvider).displayName} 直连"
                         } else {
-                            "Vocab Gateway（未部署時無法使用）"
+                            "Vocab Gateway（未部署时无法使用）"
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -433,7 +434,7 @@ fun SettingsScreen(
                     OutlinedTextField(
                         value = promptInput,
                         onValueChange = { promptInput = it.take(4_000) },
-                        label = { Text("自訂 Prompt") },
+                        label = { Text("自定义 Prompt") },
                         minLines = 4,
                         maxLines = 8,
                         modifier = Modifier.fillMaxWidth()
@@ -447,7 +448,7 @@ fun SettingsScreen(
                             enabled = promptInput.isNotBlank(),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("儲存 Prompt")
+                            Text("保存 Prompt")
                         }
                         TextButton(
                             onClick = {
@@ -456,24 +457,28 @@ fun SettingsScreen(
                             }
                         ) {
                             Icon(Icons.Default.Restore, contentDescription = null)
-                            Text("重設")
+                            Text("重置")
                         }
                     }
                 }
             }
             if (settingsPage == "AI") item {
-                SettingsSection("AI 連線") {
+                SettingsSection("AI 连接") {
                     val provider = AiProvider.from(settings.aiProvider)
                     val selectedProviderConfigured =
                         aiApiProfiles.any { it.provider == provider }
                     SettingDropdown(
-                        label = "AI 供應商",
+                        label = "AI 供应商",
                         value = provider.name,
                         options = listOf(
                             AiProvider.GEMINI,
                             AiProvider.OPENROUTER,
                             AiProvider.OPENAI,
-                            AiProvider.ANTHROPIC
+                            AiProvider.ANTHROPIC,
+                            AiProvider.DEEPSEEK,
+                            AiProvider.MIMO,
+                            AiProvider.AGNES,
+                            AiProvider.OPENAI_COMPATIBLE
                         ).map { it.name },
                         optionText = { AiProvider.from(it).displayName },
                         onSelected = {
@@ -484,22 +489,37 @@ fun SettingsScreen(
                     OutlinedButton(
                         onClick = { showAiTutorial = true },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("查看 AI 連線教學") }
-                    Button(
-                        onClick = {
-                            context.startActivity(
-                                Intent(Intent.ACTION_VIEW, Uri.parse(provider.keyUrl))
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
-                        Text("取得 API Key")
+                    ) { Text("查看 AI 连接教程") }
+                    if (provider.keyUrl.isNotBlank()) {
+                        Button(
+                            onClick = {
+                                context.startActivity(
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(provider.keyUrl))
+                                )
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                            Text("取得 API Key")
+                        }
+                    }
+                    if (provider == AiProvider.OPENAI_COMPATIBLE) {
+                        OutlinedTextField(
+                            value = settings.aiBaseUrl,
+                            onValueChange = onAiBaseUrlChange,
+                            label = { Text("API Base URL") },
+                            placeholder = { Text("https://api.example.com/v1") },
+                            supportingText = {
+                                Text("需兼容 OpenAI Chat Completions，例如 https://api.deepseek.com/v1")
+                            },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     OutlinedTextField(
                         value = apiKeyInput,
                         onValueChange = { apiKeyInput = it },
-                        label = { Text(if (selectedProviderConfigured) "貼上新的 API Key" else "貼上 API Key") },
+                        label = { Text(if (selectedProviderConfigured) "贴上新的 API Key" else "贴上 API Key") },
                         leadingIcon = { Icon(Icons.Default.Key, contentDescription = null) },
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
@@ -525,7 +545,7 @@ fun SettingsScreen(
                         value = settings.aiModel,
                         options = modelOptions + CUSTOM_MODEL_OPTION,
                         optionText = {
-                            if (it == CUSTOM_MODEL_OPTION) "自訂模型 ID…" else it
+                            if (it == CUSTOM_MODEL_OPTION) "自定义模型 ID…" else it
                         },
                         onSelected = {
                             if (it == CUSTOM_MODEL_OPTION) {
@@ -537,13 +557,13 @@ fun SettingsScreen(
                         }
                     )
                     SettingDropdown(
-                        label = "聊天風格",
+                        label = "聊天风格",
                         value = settings.aiChatStyle,
                         options = listOf("NORMAL", "RELAXED", "STRICT"),
                         optionText = {
                             when (it) {
-                                "RELAXED" -> "輕鬆"
-                                "STRICT" -> "嚴謹"
+                                "RELAXED" -> "轻松"
+                                "STRICT" -> "严谨"
                                 else -> "一般"
                             }
                         },
@@ -551,9 +571,9 @@ fun SettingsScreen(
                     )
                     Text(
                         when (settings.aiChatStyle) {
-                            "RELAXED" -> "語氣自然輕鬆，也能聊英文學習以外的日常話題。"
-                            "STRICT" -> "只處理英文學習、單字庫與相關知識；不相關話題會禮貌拒絕，回答也會更審慎。"
-                            else -> "一般助理語氣，兼顧清楚、自然與實用性。"
+                            "RELAXED" -> "语气自然轻松，也能聊英文学习以外的日常话题。"
+                            "STRICT" -> "只处理英文学习、单词库与相关知识；不相关话题会礼貌拒绝，回答也会更审慎。"
+                            else -> "一般助理语气，兼顾清楚、自然与实用性。"
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -562,8 +582,8 @@ fun SettingsScreen(
                         OutlinedTextField(
                             value = settings.aiModel,
                             onValueChange = onAiModelChange,
-                            label = { Text("自訂模型 ID") },
-                            supportingText = { Text("僅在清單沒有需要的模型時使用") },
+                            label = { Text("自定义模型 ID") },
+                            supportingText = { Text("仅在清单没有需要的模型时使用") },
                             singleLine = true,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -574,14 +594,14 @@ fun SettingsScreen(
                             Text("更新模型")
                         }
                         Button(onClick = { onTestAiConnection(null) }, enabled = selectedProviderConfigured && settings.aiModel.isNotBlank()) {
-                            Text("測試連線")
+                            Text("测试连接")
                         }
                     }
                     aiConnectionStatus?.let {
                         Text(it, color = MaterialTheme.colorScheme.primary)
                     }
                     if (aiApiProfiles.isNotEmpty()) {
-                        Text("已儲存的 API Key", fontWeight = FontWeight.Bold)
+                        Text("已保存的 API Key", fontWeight = FontWeight.Bold)
                         aiApiProfiles.forEachIndexed { index, profile ->
                             Card(
                                 colors = CardDefaults.cardColors(
@@ -621,30 +641,30 @@ fun SettingsScreen(
                                         onClick = { onTestAiConnection(profile.credentialId) },
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        Text("測試這組 ${profile.provider.displayName} API")
+                                        Text("测试这组 ${profile.provider.displayName} API")
                                     }
                                 }
                             }
                         }
                     }
                     Text(
-                        "同一供應商的 Key 會輪流使用；全部無法使用時才切換下一個供應商。Key 只會加密保存在此裝置，不會放進備份。",
+                        "同一供应商的 Key 会轮流使用；全部无法使用时才切换下一个供应商。Key 只会加密保存在此设备，不会放进备份。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            if (settingsPage == "掃描與文件") item {
-                SettingsSection("掃描與文件") {
+            if (settingsPage == "扫描与文件") item {
+                SettingsSection("扫描与文件") {
                     Text(
-                        "拍照、相片與掃描頁面會直接送到目前選擇的多模態 AI 模型。",
+                        "拍照、照片与扫描页面会直接送到目前选择的多模态 AI 模型。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     OutlinedTextField(
                         value = imagePromptInput,
                         onValueChange = { imagePromptInput = it.take(4_000) },
-                        label = { Text("圖片辨識 Prompt") },
+                        label = { Text("图片识别 Prompt") },
                         minLines = 5,
                         maxLines = 10,
                         modifier = Modifier.fillMaxWidth()
@@ -658,7 +678,7 @@ fun SettingsScreen(
                             enabled = imagePromptInput.isNotBlank(),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("儲存 Prompt")
+                            Text("保存 Prompt")
                         }
                         TextButton(
                             onClick = {
@@ -668,50 +688,50 @@ fun SettingsScreen(
                             }
                         ) {
                             Icon(Icons.Default.Restore, contentDescription = null)
-                            Text("重設")
+                            Text("重置")
                         }
                     }
-                    SettingSwitch("匯入前預覽", settings.ocrPreviewBeforeImport) {
+                    SettingSwitch("导入前预览", settings.ocrPreviewBeforeImport) {
                         onBooleanChange("ocrPreviewBeforeImport", it)
                     }
-                    NumberSetting("PDF 頁數上限", settings.pdfPageLimit, 1, 1..50) {
+                    NumberSetting("PDF 页数上限", settings.pdfPageLimit, 1, 1..50) {
                         onIntChange("pdfPageLimit", it)
                     }
                 }
             }
-            if (settingsPage == "單字查詢") item {
-                SettingsSection("單字查詢") {
+            if (settingsPage == "单词查询") item {
+                SettingsSection("单词查询") {
                     SettingDropdown(
-                        label = "字典來源",
+                        label = "字典来源",
                         value = settings.dictionarySource,
                         options = listOf("AUTO", "ECDICT", "GOOGLE", "CAMBRIDGE", "WIKTIONARY", "FREE"),
                         optionText = {
                             when (it) {
-                                "ECDICT" -> "ECDICT 英漢字典（離線）"
-                                "GOOGLE" -> "Google 翻譯"
-                                "CAMBRIDGE" -> "劍橋英漢辭典"
-                                "WIKTIONARY" -> "維基詞典"
-                                "FREE" -> "Free Dictionary（英文解釋）"
-                                else -> "自動選擇（依序切換可用來源）"
+                                "ECDICT" -> "ECDICT 英汉字典（离线）"
+                                "GOOGLE" -> "Google 翻译"
+                                "CAMBRIDGE" -> "剑桥英汉辞典"
+                                "WIKTIONARY" -> "维基词典"
+                                "FREE" -> "Free Dictionary（英文解释）"
+                                else -> "自动选择（依序切换可用来源）"
                             }
                         },
                         onSelected = onDictionarySourceChange
                     )
                     Text(
-                        "自動模式優先使用離線 ECDICT，查無結果才查詢線上來源。ECDICT 中文釋義已轉為台灣繁體，不提供例句；中文反查請用 Google。ECDICT：github.com/skywind3000/ECDICT（MIT）。",
+                        "自动模式优先使用离线 ECDICT，查无结果才查询线上来源。ECDICT 中文释义已转为简体中文，不提供例句；中文反查请用 Google。ECDICT：github.com/skywind3000/ECDICT（MIT）。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            if (settingsPage == "發音與提醒") item {
-                SettingsSection("發音與提醒") {
-                    SettingSwitch("翻卡後自動朗讀", settings.autoSpeak) { onBooleanChange("autoSpeak", it) }
-                    SettingSwitch("離開 App 後繼續自動朗讀", settings.ttsContinueInBackground) {
+            if (settingsPage == "发音与提醒") item {
+                SettingsSection("发音与提醒") {
+                    SettingSwitch("翻卡后自动朗读", settings.autoSpeak) { onBooleanChange("autoSpeak", it) }
+                    SettingSwitch("离开 App 后继续自动朗读", settings.ttsContinueInBackground) {
                         onBooleanChange("ttsContinueInBackground", it)
                         if (!it) onBooleanChange("ttsFloatingOverlay", false)
                     }
-                    SettingSwitch("背景朗讀時顯示浮動視窗", settings.ttsFloatingOverlay) { enabled ->
+                    SettingSwitch("背景朗读时显示浮动窗口", settings.ttsFloatingOverlay) { enabled ->
                         if (!enabled) {
                             onBooleanChange("ttsFloatingOverlay", false)
                         } else if (AndroidSettings.canDrawOverlays(context)) {
@@ -727,19 +747,19 @@ fun SettingsScreen(
                         }
                     }
                     Text(
-                        "背景朗讀會以低干擾通知維持播放；浮動視窗只在離開 Vocab 時出現，正面顯示英文、背面顯示中文。首次啟用需授予顯示在其他應用程式上層的權限。",
+                        "背景朗读会以低干扰通知维持播放；浮动窗口只在离开 Vocab 时出现，正面显示英文、背面显示中文。首次启用需授予显示在其他应用程序上层的权限。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     SettingDropdown(
-                        label = "聲音風格",
+                        label = "声音风格",
                         value = settings.ttsVoiceStyle,
                         options = listOf("NATURAL", "FEMALE", "MALE"),
                         optionText = {
                             when (it) {
-                                "FEMALE" -> "女聲風格（較明亮）"
-                                "MALE" -> "男聲風格（較低沉）"
-                                else -> "自然原聲"
+                                "FEMALE" -> "女声风格（较明亮）"
+                                "MALE" -> "男声风格（较低沉）"
+                                else -> "自然原声"
                             }
                         },
                         onSelected = onTtsVoiceStyleChange
@@ -748,12 +768,12 @@ fun SettingsScreen(
                         listOf(AUTO_TTS_VOICE) + ttsVoices.map { it.name }
                     }
                     SettingDropdown(
-                        label = "英文語音",
+                        label = "英文语音",
                         value = settings.ttsVoiceName.ifBlank { AUTO_TTS_VOICE },
                         options = voiceNames,
                         optionText = { name ->
                             if (name == AUTO_TTS_VOICE) {
-                                "自動選擇最佳英文語音"
+                                "自动选择最佳英文语音"
                             } else {
                                 ttsVoices.firstOrNull { it.name == name }?.let {
                                     "${it.label}（${it.name}）"
@@ -765,39 +785,39 @@ fun SettingsScreen(
                         }
                     )
                     Text(
-                        "實際可用聲音由手機的語音引擎決定。",
+                        "实际可用声音由手机的语音引擎决定。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Text("學習卡正面自動朗讀", fontWeight = FontWeight.Bold)
+                    Text("学习卡正面自动朗读", fontWeight = FontWeight.Bold)
                     Text(
-                        "自動播放會等正面內容全部念完才翻到背面。",
+                        "自动播放会等正面内容全部念完才翻到背面。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    SettingSwitch("英文單字", settings.ttsFrontReadWord) { onBooleanChange("ttsFrontReadWord", it) }
-                    SettingSwitch("拼音（逐字母拼讀）", settings.ttsFrontSpellWord) { onBooleanChange("ttsFrontSpellWord", it) }
-                    SettingSwitch("詞性", settings.ttsFrontReadPartOfSpeech) { onBooleanChange("ttsFrontReadPartOfSpeech", it) }
-                    NumberSetting("正面朗讀次數", settings.ttsFrontRepetitions, 1, 1..3) {
+                    SettingSwitch("英文单词", settings.ttsFrontReadWord) { onBooleanChange("ttsFrontReadWord", it) }
+                    SettingSwitch("拼音（逐字母拼读）", settings.ttsFrontSpellWord) { onBooleanChange("ttsFrontSpellWord", it) }
+                    SettingSwitch("词性", settings.ttsFrontReadPartOfSpeech) { onBooleanChange("ttsFrontReadPartOfSpeech", it) }
+                    NumberSetting("正面朗读次数", settings.ttsFrontRepetitions, 1, 1..3) {
                         onIntChange("ttsFrontRepetitions", it)
                     }
-                    Text("學習卡背面自動朗讀", fontWeight = FontWeight.Bold)
+                    Text("学习卡背面自动朗读", fontWeight = FontWeight.Bold)
                     Text(
-                        "需先開啟「翻卡後自動朗讀」；下列內容會依順序組成一組播放。",
+                        "需先打开「翻卡后自动朗读」；下列内容会依顺序组成一组播放。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    SettingSwitch("英文單字", settings.ttsReadWord) { onBooleanChange("ttsReadWord", it) }
-                    SettingSwitch("拼音（逐字母拼讀）", settings.ttsSpellWord) { onBooleanChange("ttsSpellWord", it) }
-                    SettingSwitch("中文解釋", settings.ttsReadDefinition) { onBooleanChange("ttsReadDefinition", it) }
-                    SettingSwitch("音標", settings.ttsReadPhonetic) { onBooleanChange("ttsReadPhonetic", it) }
-                    SettingSwitch("詞性", settings.ttsReadPartOfSpeech) { onBooleanChange("ttsReadPartOfSpeech", it) }
+                    SettingSwitch("英文单词", settings.ttsReadWord) { onBooleanChange("ttsReadWord", it) }
+                    SettingSwitch("拼音（逐字母拼读）", settings.ttsSpellWord) { onBooleanChange("ttsSpellWord", it) }
+                    SettingSwitch("中文解释", settings.ttsReadDefinition) { onBooleanChange("ttsReadDefinition", it) }
+                    SettingSwitch("音标", settings.ttsReadPhonetic) { onBooleanChange("ttsReadPhonetic", it) }
+                    SettingSwitch("词性", settings.ttsReadPartOfSpeech) { onBooleanChange("ttsReadPartOfSpeech", it) }
                     SettingSwitch("英文例句", settings.ttsReadExample) { onBooleanChange("ttsReadExample", it) }
                     SettingSwitch("中文例句", settings.ttsReadExampleTranslation) { onBooleanChange("ttsReadExampleTranslation", it) }
-                    NumberSetting("每組朗讀次數", settings.ttsGroupRepetitions, 1, 1..3) {
+                    NumberSetting("每组朗读次数", settings.ttsGroupRepetitions, 1, 1..3) {
                         onIntChange("ttsGroupRepetitions", it)
                     }
-                    Text("朗讀速度 ${"%.1f".format(settings.speechRate)} 倍")
+                    Text("朗读速度 ${"%.1f".format(settings.speechRate)} 倍")
                     Slider(
                         value = settings.speechRate,
                         onValueChange = onSpeechRateChange,
@@ -806,9 +826,9 @@ fun SettingsScreen(
                     )
                     Button(onClick = onPreviewTtsVoice, modifier = Modifier.fillMaxWidth()) {
                         Icon(Icons.AutoMirrored.Filled.VolumeUp, contentDescription = null)
-                        Text(" 試聽目前聲音")
+                        Text(" 试听目前声音")
                     }
-                    SettingSwitch("每日學習提醒", settings.remindersEnabled) {
+                    SettingSwitch("每日学习提醒", settings.remindersEnabled) {
                         if (
                             it &&
                             Build.VERSION.SDK_INT >= 33 &&
@@ -836,7 +856,7 @@ fun SettingsScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                                 IconButton(onClick = { openReminderPicker(index) }) {
-                                    Icon(Icons.Default.Edit, contentDescription = "編輯 ${reminder.displayText()}")
+                                    Icon(Icons.Default.Edit, contentDescription = "编辑 ${reminder.displayText()}")
                                 }
                                 IconButton(
                                     onClick = {
@@ -844,7 +864,7 @@ fun SettingsScreen(
                                     },
                                     enabled = settings.reminderTimes.size > 1
                                 ) {
-                                    Icon(Icons.Default.Delete, contentDescription = "刪除 ${reminder.displayText()}")
+                                    Icon(Icons.Default.Delete, contentDescription = "删除 ${reminder.displayText()}")
                                 }
                             }
                         }
@@ -855,16 +875,16 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null)
-                        Text("新增提醒時間")
+                        Text("添加提醒时间")
                     }
                 }
             }
             if (settingsPage == "更新") item {
                 SettingsSection("更新") {
-                    SettingSwitch("自動檢查更新", settings.autoCheckUpdates) {
+                    SettingSwitch("自动检查更新", settings.autoCheckUpdates) {
                         onBooleanChange("autoCheckUpdates", it)
                     }
-                    SettingSwitch("僅使用 Wi-Fi 更新", settings.wifiOnlyUpdates) {
+                    SettingSwitch("仅使用 Wi-Fi 更新", settings.wifiOnlyUpdates) {
                         onBooleanChange("wifiOnlyUpdates", it)
                     }
                     Text("目前版本 ${BuildConfig.VERSION_NAME}")
@@ -874,7 +894,7 @@ fun SettingsScreen(
                         enabled = !updateBusy,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("檢查更新")
+                        Text("检查更新")
                     }
                     availableRelease?.let { release ->
                         val cachedApk = downloadedApk?.takeIf(File::exists)
@@ -883,21 +903,21 @@ fun SettingsScreen(
                                 onClick = { downloadAndInstall(release) },
                                 enabled = !updateBusy,
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text("下載並安裝 Vocab ${release.version}") }
+                            ) { Text("下载并安装 Vocab ${release.version}") }
                         } else {
                             Button(
                                 onClick = { openInstaller(cachedApk) },
                                 enabled = !updateBusy,
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text("再次安裝 Vocab ${release.version}") }
+                            ) { Text("再次安装 Vocab ${release.version}") }
                             OutlinedButton(
                                 onClick = { downloadAndInstall(release, forceDownload = true) },
                                 enabled = !updateBusy,
                                 modifier = Modifier.fillMaxWidth()
-                            ) { Text("重新下載安裝檔") }
+                            ) { Text("重新下载安装档") }
                         }
                         if (release.notes.isNotBlank()) {
-                            Text("更新日誌", fontWeight = FontWeight.Bold)
+                            Text("更新日志", fontWeight = FontWeight.Bold)
                             Text(
                                 release.notes
                                     .replace(Regex("(?m)^#{1,6}\\s*"), "")
@@ -908,27 +928,27 @@ fun SettingsScreen(
                             )
                         }
                         Text(
-                            "安裝取消或失敗時會保留這份 APK，可直接再次安裝；重新下載或成功升級後會自動清除舊檔。",
+                            "安装取消或失败时会保留这份 APK，可直接再次安装；重新下载或成功升级后会自动清除旧档。",
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
-            if (settingsPage == "資料") item {
-                SettingsSection("資料") {
-                    Text("單字與學習資料預設只儲存在本機。")
+            if (settingsPage == "数据") item {
+                SettingsSection("数据") {
+                    Text("单词与学习数据默认只保存在本机。")
                     Button(
                         onClick = { backupLauncher.launch("vocab-backup.json") },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("建立完整備份") }
+                    ) { Text("创建完整备份") }
                     Button(
                         onClick = { restoreLauncher.launch(arrayOf("application/json")) },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("還原備份") }
+                    ) { Text("恢复备份") }
                     Button(
                         onClick = { csvLauncher.launch("vocab-cards.csv") },
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("匯出 CSV") }
+                    ) { Text("导出 CSV") }
                     Button(
                         onClick = { showClearDataDialog = true },
                         modifier = Modifier.fillMaxWidth(),
@@ -938,7 +958,7 @@ fun SettingsScreen(
                         )
                     ) {
                         Icon(Icons.Default.DeleteForever, contentDescription = null)
-                        Text(" 清空所有資料並從 0 開始")
+                        Text(" 清空所有数据并从 0 开始")
                     }
                     dataMessage?.let { Text(it, color = MaterialTheme.colorScheme.primary) }
                     Spacer(Modifier.padding(bottom = 12.dp))
@@ -1043,7 +1063,7 @@ private fun NumberSetting(
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(label, modifier = Modifier.weight(1f))
         IconButton(onClick = { onChange((value - step).coerceIn(range)) }) {
-            Icon(Icons.Default.Remove, contentDescription = "減少$label")
+            Icon(Icons.Default.Remove, contentDescription = "减少$label")
         }
         Text("$value$suffix", fontWeight = FontWeight.Bold)
         IconButton(onClick = { onChange((value + step).coerceIn(range)) }) {

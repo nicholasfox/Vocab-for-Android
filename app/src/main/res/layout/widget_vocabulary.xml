@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="今日 0 / 20 張"
+        android:text="今日 0 / 20 张"
         android:textColor="#FFFFFFFF"
         android:textSize="16sp"
         android:textStyle="bold" />

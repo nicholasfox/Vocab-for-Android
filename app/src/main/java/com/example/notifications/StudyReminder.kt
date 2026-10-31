@@ -115,7 +115,7 @@ class StudyReminderReceiver : BroadcastReceiver() {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             notificationManager.createNotificationChannel(
-                NotificationChannel("study_reminders", "每日學習提醒", NotificationManager.IMPORTANCE_DEFAULT)
+                NotificationChannel("study_reminders", "每日学习提醒", NotificationManager.IMPORTANCE_DEFAULT)
             )
         }
         val openApp = PendingIntent.getActivity(
@@ -126,8 +126,8 @@ class StudyReminderReceiver : BroadcastReceiver() {
         )
         val notification = NotificationCompat.Builder(context, "study_reminders")
             .setSmallIcon(R.drawable.ic_launcher_monochrome)
-            .setContentTitle("今天還差 $remaining 張就達標")
-            .setContentText("已完成 $completed/${settings.dailyGoalCards} 張，花幾分鐘延續學習紀錄吧！")
+            .setContentTitle("今天还差 $remaining 张就达标")
+            .setContentText("已完成 $completed/${settings.dailyGoalCards} 张，花几分钟延续学习纪录吧！")
             .setContentIntent(openApp)
             .setAutoCancel(true)
             .build()

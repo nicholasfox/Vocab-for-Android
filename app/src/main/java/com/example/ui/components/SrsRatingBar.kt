@@ -54,7 +54,7 @@ fun SrsRatingBar(
 
         if (advancedMode) {
             SrsRatingButton(
-                label = "困難",
+                label = "困难",
                 interval = SrsCalculator.getIntervalText(card, 2),
                 color = MaterialTheme.colorScheme.tertiary,
                 onClick = { onRatingSelected(2) },
@@ -63,7 +63,7 @@ fun SrsRatingBar(
         }
 
         SrsRatingButton(
-            label = if (advancedMode) "良好" else "記得",
+            label = if (advancedMode) "良好" else "记得",
             interval = SrsCalculator.getIntervalText(card, 3),
             color = MaterialTheme.colorScheme.primary,
             onClick = { onRatingSelected(3) },
@@ -72,7 +72,7 @@ fun SrsRatingBar(
 
         if (advancedMode) {
             SrsRatingButton(
-                label = "簡單",
+                label = "简单",
                 interval = SrsCalculator.getIntervalText(card, 4),
                 color = MaterialTheme.colorScheme.secondary,
                 onClick = { onRatingSelected(4) },

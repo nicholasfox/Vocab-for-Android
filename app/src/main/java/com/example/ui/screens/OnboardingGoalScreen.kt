@@ -98,13 +98,13 @@ fun OnboardingGoalScreen(
                     )
                 }
                 Text(
-                    "每天想學幾張？",
+                    "每天想学几张？",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    "先選一個舒服的目標，之後隨時能調整。",
+                    "先选一个舒服的目标，之后随时能调整。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
@@ -124,7 +124,7 @@ fun OnboardingGoalScreen(
                         )
                     }
                 }
-                Text("每日 $goal 張", fontWeight = FontWeight.Bold)
+                Text("每日 $goal 张", fontWeight = FontWeight.Bold)
 
                 Card(
                     colors = CardDefaults.cardColors(
@@ -140,8 +140,8 @@ fun OnboardingGoalScreen(
                     ) {
                         Icon(Icons.Default.NotificationsActive, contentDescription = null)
                         Column(modifier = Modifier.weight(1f).padding(horizontal = 10.dp)) {
-                            Text("晚上 8 點提醒", fontWeight = FontWeight.Bold)
-                            Text("未達標時提醒", style = MaterialTheme.typography.labelSmall)
+                            Text("晚上 8 点提醒", fontWeight = FontWeight.Bold)
+                            Text("未达标时提醒", style = MaterialTheme.typography.labelSmall)
                         }
                         Switch(checked = remindersEnabled, onCheckedChange = { remindersEnabled = it })
                     }
@@ -149,7 +149,7 @@ fun OnboardingGoalScreen(
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.AutoGraph, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                    Text("完成學習可累積 XP 與連續天數")
+                    Text("完成学习可累积 XP 与连续天数")
                 }
 
                 Spacer(Modifier.height(2.dp))
@@ -172,7 +172,7 @@ fun OnboardingGoalScreen(
                     enabled = !pendingComplete,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("開始學習", fontWeight = FontWeight.Bold)
+                    Text("开始学习", fontWeight = FontWeight.Bold)
                 }
             }
         }

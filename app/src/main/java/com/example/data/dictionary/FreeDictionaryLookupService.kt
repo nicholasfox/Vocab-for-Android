@@ -17,19 +17,19 @@ object FreeDictionaryLookupService {
 
     suspend fun lookup(rawWord: String): DictionaryEntry = withContext(Dispatchers.IO) {
         val word = rawWord.trim().lowercase()
-        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "請輸入英文單字或短語" }
+        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "请输入英文单词或短语" }
         val url = "https://api.dictionaryapi.dev/api/v2/entries/en/${java.net.URLEncoder.encode(word, "UTF-8")}".toHttpUrl()
         val request = Request.Builder().url(url).header("User-Agent", "Vocab/2.8.0 Android").build()
         client.newCall(request).execute().use { response ->
             check(response.isSuccessful) {
-                if (response.code == 404) "免費英文字典找不到這個單字" else "免費英文字典暫時無法查詢（${response.code}）"
+                if (response.code == 404) "免费英文字典找不到这个单词" else "免费英文字典暂时无法查询（${response.code}）"
             }
             parse(word, JSONArray(response.body?.string().orEmpty()))
         }
     }
 
     internal fun parse(requestedWord: String, root: JSONArray): DictionaryEntry {
-        val entry = root.optJSONObject(0) ?: error("免費英文字典沒有回傳結果")
+        val entry = root.optJSONObject(0) ?: error("免费英文字典没有返回结果")
         val phonetics = entry.optJSONArray("phonetics")
         val phonetic = entry.optString("phonetic").ifBlank {
             (0 until (phonetics?.length() ?: 0)).firstNotNullOfOrNull { index ->
@@ -50,7 +50,7 @@ object FreeDictionaryLookupService {
                 if (example.isBlank()) example = row.optString("example")
             }
         }
-        check(definitions.isNotEmpty()) { "免費英文字典沒有可顯示的解釋" }
+        check(definitions.isNotEmpty()) { "免费英文字典没有可显示的解释" }
         return DictionaryEntry(
             word = entry.optString("word").ifBlank { requestedWord },
             phonetic = phonetic.takeIf(String::isNotBlank)?.let { if (it.startsWith('/')) it else "/$it/" }.orEmpty(),

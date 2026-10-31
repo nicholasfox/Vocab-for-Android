@@ -27,7 +27,7 @@ object OcrWordParser {
      * Cleans up raw Chinese definition text so it strictly contains only concise definitions.
      */
     fun cleanDefinition(raw: String): String {
-        return raw.replace(Regex("【AI建議解釋】|【AI建議】|【AI】|待補充中文解釋|待補充解釋|待補充|暫無中文解釋"), "")
+        return raw.replace(Regex("【AI建议解释】|【AI建议】|【AI】|待补充中文解释|待补充解释|待补充|暂无中文解释"), "")
             .trim()
     }
 
@@ -143,8 +143,8 @@ object OcrWordParser {
                 partOfSpeech = candidate.partOfSpeech.ifBlank { dictEntry?.partOfSpeech.orEmpty() },
                 definition = if (
                     candidate.definition.isBlank() ||
-                    candidate.definition.contains("待補充") ||
-                    candidate.definition.contains("暫無")
+                    candidate.definition.contains("待补充") ||
+                    candidate.definition.contains("暂无")
                 ) {
                     cleanDefinition(dictEntry?.definition.orEmpty())
                 } else {

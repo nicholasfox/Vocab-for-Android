@@ -76,7 +76,7 @@ fun EditFolderDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "編輯資料夾",
+                text = "编辑文件夹",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
         },
@@ -90,7 +90,7 @@ fun EditFolderDialog(
             ) {
                 // Course Selection or Creation
                 Text(
-                    text = "課程",
+                    text = "课程",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -106,7 +106,7 @@ fun EditFolderDialog(
                             onValueChange = {},
                             readOnly = true,
                             singleLine = true,
-                            label = { Text("選擇課程") },
+                            label = { Text("选择课程") },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isCourseMenuExpanded)
                             },
@@ -129,7 +129,7 @@ fun EditFolderDialog(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("新增課程…") },
+                                text = { Text("添加课程…") },
                                 onClick = {
                                     isCourseMenuExpanded = false
                                     isAddingNewCourse = true
@@ -141,7 +141,7 @@ fun EditFolderDialog(
                     OutlinedTextField(
                         value = newCourseInput,
                         onValueChange = { newCourseInput = it },
-                        label = { Text("課程名稱") },
+                        label = { Text("课程名称") },
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -151,7 +151,7 @@ fun EditFolderDialog(
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("改選現有課程")
+                        Text("改选现有课程")
                     }
                 }
 
@@ -159,14 +159,14 @@ fun EditFolderDialog(
 
                 // Folder Name Input
                 Text(
-                    text = "資料夾",
+                    text = "文件夹",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
                 OutlinedTextField(
                     value = folderName,
                     onValueChange = { folderName = it },
-                    label = { Text("名稱 *") },
+                    label = { Text("名称 *") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -176,7 +176,7 @@ fun EditFolderDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("說明（選填）") },
+                    label = { Text("说明（选填）") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -203,7 +203,7 @@ fun EditFolderDialog(
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("儲存", fontWeight = FontWeight.Bold)
+                Text("保存", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

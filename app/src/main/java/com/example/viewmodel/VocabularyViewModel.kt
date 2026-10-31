@@ -306,15 +306,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     title = note.title.trim(),
                     updatedAt = System.currentTimeMillis()
                 )
-                require(normalized.title.isNotBlank()) { "請輸入文法名稱" }
+                require(normalized.title.isNotBlank()) { "请输入语法名称" }
                 if (normalized.questionTemplate.isNotBlank()) {
-                    require("{{answer}}" in normalized.questionTemplate) { "練習題必須用 {{answer}} 標記挖空位置" }
-                    require(normalized.answer.isNotBlank()) { "練習題必須填寫正確答案" }
+                    require("{{answer}}" in normalized.questionTemplate) { "练习题必须用 {{answer}} 标记挖空位置" }
+                    require(normalized.answer.isNotBlank()) { "练习题必须填写正确答案" }
                     val choices = normalized.options.split(',', '、', '\n')
                         .map { it.trim().lowercase() }
                         .filter(String::isNotBlank)
                     require(choices.isEmpty() || normalized.answer.trim().lowercase() in choices) {
-                        "選項必須包含正確答案"
+                        "选项必须包含正确答案"
                     }
                 }
                 if (normalized.id == 0L) db.grammarNoteDao().insert(normalized)
@@ -323,7 +323,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     normalized.id
                 }
             }.onSuccess(onComplete).onFailure {
-                _dataMessage.value = "儲存文法失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "保存语法失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -339,11 +339,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 db.withTransaction {
                     val normalized = note.copy(
                         course = note.course.trim().ifBlank { "通用" },
-                        folder = note.folder.trim().ifBlank { "未分類" },
+                        folder = note.folder.trim().ifBlank { "未分类" },
                         title = note.title.trim(),
                         updatedAt = System.currentTimeMillis()
                     )
-                    require(normalized.title.isNotBlank()) { "請輸入文法名稱" }
+                    require(normalized.title.isNotBlank()) { "请输入语法名称" }
                     if (db.grammarLibraryDao().getAllOnce().none {
                             it.course.equals(normalized.course, true) && it.name.equals(normalized.folder, true)
                         }) {
@@ -409,7 +409,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     noteId
                 }
             }.onSuccess(onComplete).onFailure {
-                _dataMessage.value = "儲存文法失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "保存语法失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -428,9 +428,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         draft.questions.forEach(::validateGrammarQuestion)
                         val normalizedCourse = course.trim().ifBlank { "通用" }
                         if (db.grammarLibraryDao().getAllOnce().none {
-                                it.course.equals(normalizedCourse, true) && it.name.equals("未分類", true)
+                                it.course.equals(normalizedCourse, true) && it.name.equals("未分类", true)
                             }) {
-                            db.grammarLibraryDao().insert(GrammarLibrary(course = normalizedCourse, name = "未分類"))
+                            db.grammarLibraryDao().insert(GrammarLibrary(course = normalizedCourse, name = "未分类"))
                         }
                         val existing = db.grammarNoteDao().getAllOnce().firstOrNull {
                             it.course.equals(normalizedCourse, true) && it.title.equals(draft.title.trim(), true)
@@ -507,21 +507,21 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     savedIds
                 }
             }.onSuccess(onComplete).onFailure {
-                _dataMessage.value = "匯入文法失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "导入语法失败：${it.message ?: "未知错误"}"
             }
         }
     }
 
     private fun validateGrammarQuestion(question: GrammarQuestionDraft) {
-        require(question.prompt.isNotBlank()) { "題目內容不能空白" }
-        require("{{answer}}" in question.prompt) { "每題必須用 {{answer}} 標記唯一挖空位置" }
+        require(question.prompt.isNotBlank()) { "题目内容不能空白" }
+        require("{{answer}}" in question.prompt) { "每题必须用 {{answer}} 标记唯一挖空位置" }
         require(question.prompt.windowed("{{answer}}".length).count { it == "{{answer}}" } == 1) {
-            "每題只能有一個答案位置"
+            "每题只能有一个答案位置"
         }
-        require(question.answer.isNotBlank()) { "每題都必須填寫正確答案" }
+        require(question.answer.isNotBlank()) { "每题都必须填写正确答案" }
         val choices = question.options.split(',', '、', '\n').map { it.trim().lowercase() }.filter(String::isNotBlank)
-        require(choices.isEmpty() || question.answer.trim().lowercase() in choices) { "題目選項必須包含正確答案" }
-        require(choices.size == choices.distinct().size) { "題目選項不能重複" }
+        require(choices.isEmpty() || question.answer.trim().lowercase() in choices) { "题目选项必须包含正确答案" }
+        require(choices.size == choices.distinct().size) { "题目选项不能重复" }
     }
 
     private fun GrammarNote.toLegacyPatternDrafts(): List<GrammarPatternDraft> {
@@ -553,7 +553,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 }
             }
                 .onSuccess { onComplete() }
-                .onFailure { _dataMessage.value = "刪除文法失敗：${it.message ?: "未知錯誤"}" }
+                .onFailure { _dataMessage.value = "删除语法失败：${it.message ?: "未知错误"}" }
         }
     }
 
@@ -621,43 +621,43 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     suspend fun generateGrammarDraft(request: String): GrammarDraft {
-        require(settings.value.aiEnabled) { "請先在設定中啟用 AI" }
+        require(settings.value.aiEnabled) { "请先在设置中启用 AI" }
         val result = GeminiService.runAssistant(
             """
-            你是嚴謹的英文文法教材編輯。請根據使用者要求建立一篇繁體中文文法筆記。
-            一篇筆記代表一個可獨立學習與測驗的「文法類型」；同一類型可包含多組句型，每組句型再包含多個例句。
-            只回傳一個 JSON 物件，不要 Markdown。欄位：
-            title, category, level, summary, commonMistakes, comparison, tags、patterns 與 questions。
-            patterns 每組包含 title, formula, meaning, usage, notes, examples；examples 每筆包含 sentence, translation, highlightedText。
-            每個獨立句型必須分成一組 pattern，不可把全部公式塞進同一字串。
-            structure、usage、commonMistakes、comparison 可用換行分隔；tags、acceptedAnswers、options 用逗號分隔。
-            questions 每題格式：grammarPatternIndex, type, prompt, translation, answer, acceptedAnswers, options, explanation, difficulty。
-            prompt 必須用 {{answer}} 標記唯一挖空位置，答案填回後必須成為自然完整的英文句子。
-            options 必須包含 answer、不得重複，最多四個，且正確答案不可固定放第一個。
-            全篇合計必須剛好 6 個例句與 10 題。前 2 題是基本概念選擇題，其餘 8 題以句子應用為主，包含動詞形式（V-ing、to V 等）、挖空、改錯、翻譯或重組；grammarPatternIndex 必須正確指向所屬句型。
-            不確定的內容留空，不可捏造來源。
+            你是严谨的英文语法教材编辑。请根据用户要求创建一篇简体中文语法笔记。
+            一篇笔记代表一个可独立学习与测试的「语法类型」；同一类型可包含多组句型，每组句型再包含多个例句。
+            只返回一个 JSON 对象，不要 Markdown。字段：
+            title, category, level, summary, commonMistakes, comparison, tags、patterns 与 questions。
+            patterns 每组包含 title, formula, meaning, usage, notes, examples；examples 每笔包含 sentence, translation, highlightedText。
+            每个独立句型必须分成一组 pattern，不可把全部公式塞进同一字符串。
+            structure、usage、commonMistakes、comparison 可用换行分隔；tags、acceptedAnswers、options 用逗号分隔。
+            questions 每题格式：grammarPatternIndex, type, prompt, translation, answer, acceptedAnswers, options, explanation, difficulty。
+            prompt 必须用 {{answer}} 标记唯一挖空位置，答案填回后必须成为自然完整的英文句子。
+            options 必须包含 answer、不得重复，最多四个，且正确答案不可固定放第一个。
+            全篇合计必须刚好 6 个例句与 10 题。前 2 题是基本概念选择题，其余 8 题以句子应用为主，包含动词形式（V-ing、to V 等）、挖空、改错、翻译或重组；grammarPatternIndex 必须正确指向所属句型。
+            不确定的内容留空，不可捏造来源。
 
-            使用者要求：${request.trim()}
+            用户要求：${request.trim()}
             """.trimIndent()
         )
         return parseGrammarDraft(result)
     }
 
     suspend fun generateGrammarDraftFromText(text: String, mode: String): GrammarDraft {
-        require(text.isNotBlank()) { "請先貼上文法內容" }
+        require(text.isNotBlank()) { "请先贴上语法内容" }
         val rule = when (mode) {
-            "ENRICH" -> "保留原文內容，並補充自然例句、常見錯誤與 6～12 題練習。"
-            "ORGANIZE" -> "不可改變原意，將內容整理成結構清楚的筆記與練習題。"
-            else -> "只能擷取文字中確實存在的內容，不得補充或猜測；原文沒有題目就不要建立題目。"
+            "ENRICH" -> "保留原文内容，并补充自然例句、常见错误与 6～12 题练习。"
+            "ORGANIZE" -> "不可改变原意，将内容整理成结构清楚的笔记与练习题。"
+            else -> "只能提取文字中确实存在的内容，不得补充或猜测；原文没有题目就不要创建题目。"
         }
-        return generateGrammarDraft("$rule\n\n待匯入內容：\n${text.trim()}")
+        return generateGrammarDraft("$rule\n\n待导入内容：\n${text.trim()}")
     }
 
     suspend fun readGrammarShare(uri: Uri): List<GrammarDraft> {
         val text = getApplication<Application>().contentResolver.openInputStream(uri)
-            ?.bufferedReader()?.use { it.readText() } ?: error("無法讀取分享檔")
+            ?.bufferedReader()?.use { it.readText() } ?: error("无法读取分享档")
         val root = JSONObject(text)
-        require(root.optString("format") == "vocabshare") { "不是有效的 .vocabshare 檔案" }
+        require(root.optString("format") == "vocabshare") { "不是有效的 .vocabshare 文件" }
         val items = root.optJSONArray("grammar") ?: root.optJSONArray("items") ?: JSONArray()
         return buildList {
             for (i in 0 until items.length()) {
@@ -699,7 +699,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 }
                 val draft = GrammarDraft(
                     title = item.optString("title"), category = item.optString("category", "其他"),
-                    level = item.optString("level", "未分級"), summary = item.optString("summary"),
+                    level = item.optString("level", "未分级"), summary = item.optString("summary"),
                     structure = item.optString("structure"), usage = item.optString("usage"),
                     exampleSentence = item.optString("exampleSentence"), exampleTranslation = item.optString("exampleTranslation"),
                     commonMistakes = item.optString("commonMistakes"), comparison = item.optString("comparison"),
@@ -707,7 +707,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 )
                 if (draft.title.isNotBlank()) add(draft)
             }
-        }.also { require(it.isNotEmpty()) { "分享檔沒有可匯入的文法" } }
+        }.also { require(it.isNotEmpty()) { "分享档没有可导入的语法" } }
     }
 
     suspend fun generateGrammarDraftFromImages(uris: List<Uri>): GrammarDraft = generateGrammarDraftsFromSources(uris, "ENRICH").first()
@@ -716,8 +716,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         generateGrammarDraftsFromSources(uris, mode).first()
 
     suspend fun generateGrammarDraftsFromSources(uris: List<Uri>, mode: String = "ENRICH"): List<GrammarDraft> {
-        require(settings.value.aiEnabled) { "請先在設定中啟用 AI" }
-        require(uris.isNotEmpty()) { "請先選擇圖片或檔案" }
+        require(settings.value.aiEnabled) { "请先在设置中启用 AI" }
+        require(uris.isNotEmpty()) { "请先选择图片或文件" }
         val context = getApplication<Application>()
         val payloads = buildList {
             uris.take(5).forEach { uri ->
@@ -731,21 +731,21 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             if (mime.startsWith("image/") || mime.contains("pdf", true)) null
             else runCatching { DocumentParser.extractTextFromUri(context, uri, settings.value.pdfPageLimit) }.getOrNull()
         }.filter(String::isNotBlank).joinToString("\n\n")
-        require(payloads.isNotEmpty() || extractedText.isNotBlank()) { "檔案沒有可辨識的內容" }
+        require(payloads.isNotEmpty() || extractedText.isNotBlank()) { "文件没有可识别的内容" }
         val result = GeminiService.runAssistant(
             """
-            你是嚴謹的英文文法教材圖片辨識與整理助手。先忠實讀取圖片或文件，再補齊成可學習的文法資料。
-            資料階層固定為：課程由 App 另行選擇；每篇 note 是一個文法類型；類型內有多組 patterns；每組 pattern 有多個 examples；questions 必須涵蓋這個類型的每一個例句。
-            依照圖片由上到下、由左到右整理。不同且可獨立學習的文法觀念必須拆成不同筆記。
-            只回傳 JSON 物件 {"notes":[...]}，不要 Markdown。每篇欄位：title, category, level, summary, commonMistakes, comparison, tags, patterns, questions。
-            patterns 每組包含 title, formula, meaning, usage, notes, examples；examples 包含 sentence, translation, highlightedText。
-            questions 每題包含 grammarPatternIndex, type, prompt, translation, answer, acceptedAnswers, options, explanation, difficulty；題目中以 {{answer}} 標記唯一答案位置。
-            教材已有的規則、句型與例句必須優先保留；看不清楚的內容留空，不可猜測原文。
-            每篇完成稿必須補齊為剛好 6 個例句與 10 題。前 2 題為基本概念選擇題，後 8 題為應用題，依內容加入 V-ing、to V、時態、介系詞挖空、改錯、翻譯或重組。options 必須包含答案但不可固定把答案放第一個。
-            辨識模式：${when (mode) {
-                "ENRICH" -> "AI 補充：忠實保留原文，補齊自然例句、常見錯誤與練習題。每個例句至少要有一題，題目需涵蓋整個文法類型；補充題 sourceType 設為 AI。"
-                "ORGANIZE" -> "AI 整理：不可改變原意，可重整段落與欄位，並依原文建立題目。"
-                else -> "AI 補齊：先忠實保留文件內容，再補齊缺少的句型、例句、補充說明與題目。"
+            你是严谨的英文语法教材图片识别与整理助手。先忠实读取图片或文件，再补齐成可学习的语法数据。
+            数据阶层固定为：课程由 App 另行选择；每篇 note 是一个语法类型；类型内有多组 patterns；每组 pattern 有多个 examples；questions 必须涵盖这个类型的每一个例句。
+            依照图片由上到下、由左到右整理。不同且可独立学习的语法观念必须拆成不同笔记。
+            只返回 JSON 对象 {"notes":[...]}，不要 Markdown。每篇字段：title, category, level, summary, commonMistakes, comparison, tags, patterns, questions。
+            patterns 每组包含 title, formula, meaning, usage, notes, examples；examples 包含 sentence, translation, highlightedText。
+            questions 每题包含 grammarPatternIndex, type, prompt, translation, answer, acceptedAnswers, options, explanation, difficulty；题目中以 {{answer}} 标记唯一答案位置。
+            教材已有的规则、句型与例句必须优先保留；看不清楚的内容留空，不可猜测原文。
+            每篇完成稿必须补齐为刚好 6 个例句与 10 题。前 2 题为基本概念选择题，后 8 题为应用题，依内容加入 V-ing、to V、时态、介系词挖空、改错、翻译或重组。options 必须包含答案但不可固定把答案放第一个。
+            识别模式：${when (mode) {
+                "ENRICH" -> "AI 补充：忠实保留原文，补齐自然例句、常见错误与练习题。每个例句至少要有一题，题目需涵盖整个语法类型；补充题 sourceType 设为 AI。"
+                "ORGANIZE" -> "AI 整理：不可改变原意，可重整段落与字段，并依原文创建题目。"
+                else -> "AI 补齐：先忠实保留文件内容，再补齐缺少的句型、例句、补充说明与题目。"
             }}
             """.trimIndent() + if (extractedText.isBlank()) "" else "\n\n文件文字：\n$extractedText",
             payloads
@@ -757,7 +757,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 runCatching { parseGrammarDraft(item) }.getOrNull()?.let(::add)
             }
         }
-        require(drafts.isNotEmpty()) { "AI 沒有辨識到可匯入的文法" }
+        require(drafts.isNotEmpty()) { "AI 没有识别到可导入的语法" }
         return drafts
     }
 
@@ -818,7 +818,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val draft = GrammarDraft(
             title = value("title"),
             category = value("category").ifBlank { "其他" },
-            level = value("level").ifBlank { "未分級" },
+            level = value("level").ifBlank { "未分级" },
             summary = value("summary"),
             structure = value("structure"),
             usage = value("usage"),
@@ -834,17 +834,17 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             explanation = value("explanation"), patterns = patterns,
             questions = questions
         )
-        require(draft.title.isNotBlank()) { "AI 沒有回傳文法名稱" }
+        require(draft.title.isNotBlank()) { "AI 没有返回语法名称" }
         if (draft.questionTemplate.isNotBlank()) {
-            require("{{answer}}" in draft.questionTemplate) { "AI 題目缺少答案位置" }
-            require(draft.answer.isNotBlank()) { "AI 題目缺少答案" }
+            require("{{answer}}" in draft.questionTemplate) { "AI 题目缺少答案位置" }
+            require(draft.answer.isNotBlank()) { "AI 题目缺少答案" }
         }
         return draft
     }
 
     suspend fun recognizeGrammarWritingSources(uris: List<Uri>): GrammarWritingScanResult {
-        require(settings.value.aiEnabled) { "請先在設定中啟用 AI" }
-        require(uris.isNotEmpty()) { "請先選擇圖片或文件" }
+        require(settings.value.aiEnabled) { "请先在设置中启用 AI" }
+        require(uris.isNotEmpty()) { "请先选择图片或文件" }
         val context = getApplication<Application>()
         val payloads = buildList {
             uris.take(10).forEach { uri ->
@@ -858,13 +858,13 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             if (mime.startsWith("image/") || mime.contains("pdf", true)) null
             else runCatching { DocumentParser.extractTextFromUri(context, uri, settings.value.pdfPageLimit) }.getOrNull()
         }.filter(String::isNotBlank).joinToString("\n\n")
-        require(payloads.isNotEmpty() || documentText.isNotBlank()) { "檔案沒有可辨識的作文內容" }
+        require(payloads.isNotEmpty() || documentText.isNotBlank()) { "文件没有可识别的作文内容" }
         val result = GeminiService.runAssistant(
             """
-            你是嚴謹的英文作文辨識助手。依圖片或文件原始順序逐字擷取英文作文，保留段落、大小寫、拼字、標點與原本錯誤，不可先修正文法，不可猜測看不清楚的字。
-            只回傳 JSON：{"recognizedText":"完整原文","uncertainParts":["無法確定的原始片段"]}。
-            看不清楚處在 recognizedText 中以 [看不清楚] 標示。多張圖片依收到的順序合併。
-            """.trimIndent() + if (documentText.isBlank()) "" else "\n\n文件內容：\n$documentText",
+            你是严谨的英文作文识别助手。依图片或文件原始顺序逐字提取英文作文，保留段落、大小写、拼字、标点与原本错误，不可先修正语法，不可猜测看不清楚的字。
+            只返回 JSON：{"recognizedText":"完整原文","uncertainParts":["无法确定的原始片段"]}。
+            看不清楚处在 recognizedText 中以 [看不清楚] 标示。多张图片依收到的顺序合并。
+            """.trimIndent() + if (documentText.isBlank()) "" else "\n\n文件内容：\n$documentText",
             payloads
         )
         return GrammarWritingScanResult(
@@ -872,19 +872,19 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             uncertainParts = result.optJSONArray("uncertainParts")?.let { array ->
                 (0 until array.length()).mapNotNull { array.optString(it).trim().takeIf(String::isNotBlank) }
             }.orEmpty()
-        ).also { require(it.recognizedText.isNotBlank()) { "AI 沒有辨識到英文作文" } }
+        ).also { require(it.recognizedText.isNotBlank()) { "AI 没有识别到英文作文" } }
     }
 
     suspend fun checkGrammarWriting(text: String): List<GrammarWritingIssue> {
-        require(text.isNotBlank()) { "請先輸入英文內容" }
-        require(settings.value.aiEnabled) { "請先在設定中啟用 AI" }
+        require(text.isNotBlank()) { "请先输入英文内容" }
+        require(settings.value.aiEnabled) { "请先在设置中启用 AI" }
         val result = GeminiService.runAssistant(
             """
-            你是嚴謹的英文文法檢查助手。分析下方英文，只回報確定存在的文法錯誤；風格偏好或可接受變體不要當成錯誤。
-            只回傳 JSON 物件：{"issues":[{"ruleKey":"穩定的英文規則代碼","title":"繁體中文文法名稱","originalSentence":"原句","correctedSentence":"完整修正句","originalText":"錯誤片段","correctedText":"替換片段","explanation":"繁體中文原因"}]}。
-            originalText 必須逐字存在於 originalSentence；correctedText 必須逐字存在於 correctedSentence。沒有可靠錯誤就回傳空陣列。
+            你是严谨的英文语法检查助手。分析下方英文，只回报确定存在的语法错误；风格偏好或可接受变体不要当成错误。
+            只返回 JSON 对象：{"issues":[{"ruleKey":"稳定的英文规则代码","title":"简体中文语法名称","originalSentence":"原句","correctedSentence":"完整修正句","originalText":"错误片段","correctedText":"替换片段","explanation":"简体中文原因"}]}。
+            originalText 必须逐字存在于 originalSentence；correctedText 必须逐字存在于 correctedSentence。没有可靠错误就返回空数组。
 
-            待檢查內容：
+            待检查内容：
             $text
             """.trimIndent()
         )
@@ -915,19 +915,19 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     }
                     val noteId = existingNote?.id ?: db.grammarNoteDao().insert(
                         GrammarNote(
-                            course = "寫作弱點", folder = "寫作弱點", title = issue.title,
+                            course = "写作薄薄弱点", folder = "写作薄薄弱点", title = issue.title,
                             summary = issue.explanation, commonMistakes = "${issue.originalText} → ${issue.correctedText}",
                             sourceType = "WRITING_CHECK"
                         )
                     )
                     if (db.grammarLibraryDao().getAllOnce().none {
-                            it.course == "寫作弱點" && it.name == "寫作弱點"
+                            it.course == "写作薄薄弱点" && it.name == "写作薄薄弱点"
                         }) {
                         db.grammarLibraryDao().insert(
                             GrammarLibrary(
-                                course = "寫作弱點",
-                                name = "寫作弱點",
-                                description = "由作文批改自動整理的文法弱點"
+                                course = "写作薄薄弱点",
+                                name = "写作薄薄弱点",
+                                description = "由作文批改自动整理的语法薄薄弱点"
                             )
                         )
                     }
@@ -959,7 +959,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     noteId
                 }
             }.onSuccess(onComplete).onFailure {
-                _dataMessage.value = "建立弱點練習失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "创建薄薄弱点练习失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -1040,9 +1040,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 db.withTransaction {
                     val all = db.grammarNoteDao().getAllOnce()
                     val requestedIds = orderedNoteIds.distinct()
-                    require(requestedIds.size == orderedNoteIds.size) { "文法排序包含重複項目" }
+                    require(requestedIds.size == orderedNoteIds.size) { "语法排序包含重复项目" }
                     val requestedSet = requestedIds.toSet()
-                    require(requestedSet.all { id -> all.any { it.id == id } }) { "找不到要排序的文法" }
+                    require(requestedSet.all { id -> all.any { it.id == id } }) { "找不到要排序的语法" }
                     val reordered = requestedIds.map { id -> requireNotNull(all.firstOrNull { it.id == id }) }
                     var reorderedIndex = 0
                     val merged = all.map { note ->
@@ -1053,7 +1053,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     )
                 }
             }.onFailure {
-                _dataMessage.value = "調整文法順序失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "调整语法顺序失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -1067,7 +1067,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 it.course.equals(cleanCourse, true) && it.name.equals(cleanName, true)
             }
             if (duplicate) {
-                _dataMessage.value = "這個課程已有同名文法庫"
+                _dataMessage.value = "这个课程已有同名语法库"
             } else {
                 db.grammarLibraryDao().insert(
                     GrammarLibrary(course = cleanCourse, name = cleanName, description = description.trim(), colorHex = colorHex)
@@ -1145,7 +1145,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             }.onSuccess { result ->
                 onComplete(result.movedCount, result.mergedDuplicateCount)
             }.onFailure {
-                _dataMessage.value = "移動失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "移动失败：${it.message ?: "未知错误"}"
                 onComplete(-1, 0)
             }
         }
@@ -1173,7 +1173,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             }.onSuccess { result ->
                 onComplete(result.movedCount, result.mergedDuplicateCount)
             }.onFailure {
-                _dataMessage.value = "建立資料夾並移動失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "创建文件夹并移动失败：${it.message ?: "未知错误"}"
                 onComplete(-1, 0)
             }
         }
@@ -1203,7 +1203,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 )
             }.onSuccess { onComplete(it > 0) }
                 .onFailure {
-                    _dataMessage.value = "加入資料夾失敗：${it.message ?: "未知錯誤"}"
+                    _dataMessage.value = "加入文件夹失败：${it.message ?: "未知错误"}"
                     onComplete(false)
                 }
         }
@@ -1221,11 +1221,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             runCatching {
                 val safeCourse = courseName.trim()
                 val safeName = folderName.trim()
-                require(safeCourse.isNotBlank() && safeName.isNotBlank()) { "課程與資料夾名稱不能空白" }
+                require(safeCourse.isNotBlank() && safeName.isNotBlank()) { "课程与文件夹名称不能空白" }
                 require(allDecks.value.none {
                     it.category.equals(safeCourse, ignoreCase = true) &&
                         it.name.equals(safeName, ignoreCase = true)
-                }) { "同一課程中已經有同名資料夾" }
+                }) { "同一课程中已经有同名文件夹" }
                 val deckId = repository.insertDeck(
                     Deck(
                         category = safeCourse,
@@ -1251,7 +1251,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 repository.insertCardsDeduplicating(listOf(copied)) > 0
             }.onSuccess(onComplete)
                 .onFailure {
-                    _dataMessage.value = "建立資料夾失敗：${it.message ?: "未知錯誤"}"
+                    _dataMessage.value = "创建文件夹失败：${it.message ?: "未知错误"}"
                     onComplete(false)
                 }
         }
@@ -1288,7 +1288,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         fetchAiCardDetailsBatch(listOf(candidate))[0]
 
     suspend fun fetchAiCardDetailsBatch(candidates: List<OcrCardCandidate>): Map<Int, DictionaryEntry> {
-        check(settings.value.aiEnabled) { "請先在設定中啟用 AI 功能" }
+        check(settings.value.aiEnabled) { "请先在设置中启用 AI 功能" }
         val grouped = candidates.take(80).withIndex().filter { it.value.word.isNotBlank() }
             .groupBy { it.value.word.trim().lowercase() }.values
         val results = mutableMapOf<Int, DictionaryEntry>()
@@ -1303,7 +1303,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 if (item != indexed.value) results[indexed.index] = DictionaryEntry(
                     word = item.word, phonetic = item.phonetic, partOfSpeech = item.partOfSpeech,
                     definition = item.definition, exampleSentence = item.exampleSentence,
-                    exampleTranslation = item.exampleTranslation, category = "AI 補充"
+                    exampleTranslation = item.exampleTranslation, category = "AI 补充"
                 )
             }
         }
@@ -1312,7 +1312,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     suspend fun fetchAiWordDetailsBatch(words: List<String>): Map<String, DictionaryEntry> {
-        if (!settings.value.aiEnabled) error("請先在設定中啟用 AI 功能")
+        if (!settings.value.aiEnabled) error("请先在设置中启用 AI 功能")
         val uniqueWords = words
             .map(String::trim)
             .filter(String::isNotBlank)
@@ -1346,7 +1346,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     definition = item.definition,
                     exampleSentence = item.exampleSentence,
                     exampleTranslation = item.exampleTranslation,
-                    category = "AI 補充"
+                    category = "AI 补充"
                 )
             }
         }.toMap().toMutableMap()
@@ -1368,11 +1368,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     ): AiExternalFormattingResult {
         val selected = candidates.filter { it.selected }
         if (selected.isEmpty()) {
-            return AiExternalFormattingResult(candidates, 0, 0, "沒有選取需要整理的卡片")
+            return AiExternalFormattingResult(candidates, 0, 0, "没有选取需要整理的卡片")
         }
         val pending = selected.filterNot { it.aiFormatted }
         if (pending.isEmpty()) {
-            return AiExternalFormattingResult(candidates, selected.size, 0, "已選卡片都已完成 AI 格式整理")
+            return AiExternalFormattingResult(candidates, selected.size, 0, "已选卡片都已完成 AI 格式整理")
         }
         val currentSettings = settings.value
         if (
@@ -1384,7 +1384,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 cards = candidates,
                 formattedCount = 0,
                 fallbackCount = pending.size,
-                message = "尚未設定可用的個人 AI API"
+                message = "尚未设置可用的个人 AI API"
             )
         }
 
@@ -1417,9 +1417,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             formattedCount = formattedCount,
             fallbackCount = fallbackCount,
             message = if (fallbackCount == 0) {
-                "AI 已完成 ${pending.size} 張卡片的格式整理"
+                "AI 已完成 ${pending.size} 张卡片的格式整理"
             } else {
-                "AI 完成 $formattedCount 張，$fallbackCount 張保留原始正背面"
+                "AI 完成 $formattedCount 张，$fallbackCount 张保留原始正背面"
             }
         )
     }
@@ -1569,6 +1569,14 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         }
     }
 
+    fun updateAiBaseUrl(baseUrl: String) {
+        viewModelScope.launch {
+            settingsRepository.setAiBaseUrl(baseUrl)
+            _availableAiModels.value = emptyList()
+            _aiConnectionStatus.value = null
+        }
+    }
+
     fun updateAiChatStyle(style: String) {
         viewModelScope.launch { settingsRepository.setAiChatStyle(style) }
     }
@@ -1584,9 +1592,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 _apiKeyConfigured.value = aiCredentialsStore.hasApiKey()
                 configurePersonalAi(settings.value.copy(usePersonalAiApi = true))
                 refreshAiProfiles(settings.value)
-                _aiConnectionStatus.value = "已加密儲存，可繼續加入其他供應商"
+                _aiConnectionStatus.value = "已加密保存，可继续加入其他供应商"
             }.onFailure {
-                _aiConnectionStatus.value = "儲存失敗：${it.message ?: "未知錯誤"}"
+                _aiConnectionStatus.value = "保存失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -1606,18 +1614,18 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     fun refreshAiModels() {
         val config = selectedAiConfig(settings.value)
         if (config == null) {
-            _aiConnectionStatus.value = "請先儲存 API Key"
+            _aiConnectionStatus.value = "请先保存 API Key"
             return
         }
         viewModelScope.launch {
-            _aiConnectionStatus.value = "正在讀取可用模型..."
+            _aiConnectionStatus.value = "正在读取可用模型..."
             runCatching { DirectAiService.listModels(config) }
                 .onSuccess {
                     _availableAiModels.value = it
-                    _aiConnectionStatus.value = "已取得 ${it.size} 個可用模型"
+                    _aiConnectionStatus.value = "已取得 ${it.size} 个可用模型"
                 }
                 .onFailure {
-                    _aiConnectionStatus.value = "讀取模型失敗：${it.message ?: "請檢查 Key"}"
+                    _aiConnectionStatus.value = "读取模型失败：${it.message ?: "请检查 Key"}"
                 }
         }
     }
@@ -1629,20 +1637,20 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             personalAiConfigs(settings.value).firstOrNull { it.credentialId == credentialId }
         }
         if (config == null) {
-            _aiConnectionStatus.value = "找不到這組 API Key，請重新加入"
+            _aiConnectionStatus.value = "找不到这组 API Key，请重新加入"
             return
         }
         viewModelScope.launch {
-            _aiConnectionStatus.value = "正在測試 ${config.provider.displayName}..."
+            _aiConnectionStatus.value = "正在测试 ${config.provider.displayName}..."
             val result = DirectAiService.test(config)
             if (result.isSuccess) {
-                _aiConnectionStatus.value = "連線測試成功，${config.model} 可以使用"
+                _aiConnectionStatus.value = "连接测试成功，${config.model} 可以使用"
                 DirectAiService.refreshUsage(config)
                 refreshAiProfiles(settings.value)
             } else {
                 val error = result.exceptionOrNull()
                 _aiConnectionStatus.value =
-                    "連線失敗：${error?.message ?: "請檢查 Key、模型與額度"}"
+                    "连接失败：${error?.message ?: "请检查 Key、模型与额度"}"
             }
         }
     }
@@ -1686,9 +1694,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 StudyReminderScheduler.cancelAll(getApplication(), settings.value.reminderTimes)
                 _selectedDeckId.value = null
             }.onSuccess {
-                _dataMessage.value = "所有資料已清空，現在可從 0 開始"
+                _dataMessage.value = "所有数据已清空，现在可从 0 开始"
             }.onFailure {
-                _dataMessage.value = "清空失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "清空失败：${it.message ?: "未知错误"}"
             }
         }
     }
@@ -1712,10 +1720,17 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun personalAiConfigs(value: AppSettings): List<PersonalAiConfig> {
         val provider = AiProvider.from(value.aiProvider)
+        val customBaseUrl = value.aiBaseUrl.trim()
         return aiCredentialsStore.readConfigs(
             preferredProvider = provider,
             preferredModel = value.aiModel.ifBlank { provider.defaultModel }
-        )
+        ).map { config ->
+            if (config.provider == AiProvider.OPENAI_COMPATIBLE && customBaseUrl.isNotBlank()) {
+                config.copy(baseUrl = customBaseUrl)
+            } else {
+                config
+            }
+        }
     }
 
     private fun selectedAiConfig(value: AppSettings): PersonalAiConfig? =
@@ -1738,8 +1753,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             _dataMessage.value = runCatching {
                 val count = backupService.exportJson(uri)
-                "已備份 $count 張單字卡"
-            }.getOrElse { "備份失敗：${it.message ?: "無法寫入檔案"}" }
+                "已备份 $count 张单词卡"
+            }.getOrElse { "备份失败：${it.message ?: "无法写入文件"}" }
         }
     }
 
@@ -1747,8 +1762,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         viewModelScope.launch {
             _dataMessage.value = runCatching {
                 val count = backupService.exportCsv(uri)
-                "已匯出 $count 張單字卡"
-            }.getOrElse { "CSV 匯出失敗：${it.message ?: "無法寫入檔案"}" }
+                "已导出 $count 张单词卡"
+            }.getOrElse { "CSV 导出失败：${it.message ?: "无法写入文件"}" }
         }
     }
 
@@ -1757,8 +1772,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             _dataMessage.value = runCatching {
                 val count = backupService.importJson(uri)
                 studyCheckInStore.reload()
-                "備份還原完成，新增 $count 張單字卡"
-            }.getOrElse { "還原失敗：${it.message ?: "檔案格式錯誤"}" }
+                "备份恢复完成，添加 $count 张单词卡"
+            }.getOrElse { "恢复失败：${it.message ?: "文件格式错误"}" }
         }
     }
 
@@ -1866,7 +1881,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             chineseQuery -> runCatching { GoogleTranslateLookupService.lookup(word) }
                 .getOrElse { googleError ->
                     runCatching { MyMemoryTranslateLookupService.lookupChinese(word) }
-                        .getOrElse { backupError -> error("Google：${googleError.message}\n備用翻譯：${backupError.message}") }
+                        .getOrElse { backupError -> error("Google：${googleError.message}\n备用翻译：${backupError.message}") }
                 }
             settings.value.dictionarySource == "GOOGLE" -> GoogleTranslateLookupService.lookup(word).let { GoogleTranslateLookupService.translateExample(it) }
             settings.value.dictionarySource == "CAMBRIDGE" -> runCatching { CambridgeDictionaryLookupService.lookup(word) }
@@ -1880,7 +1895,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     runCatching { WiktionaryLookupService.lookup(word) }.getOrElse { wiktionaryError ->
                         runCatching { FreeDictionaryLookupService.lookup(word) }.getOrElse { freeError ->
                             runCatching { MyMemoryTranslateLookupService.lookupEnglish(word) }.getOrElse { translateError ->
-                                error("Google：${googleError.message}\n劍橋：${cambridgeError.message}\n維基：${wiktionaryError.message}\n免費字典：${freeError.message}\n備用翻譯：${translateError.message}")
+                                error("Google：${googleError.message}\n剑桥：${cambridgeError.message}\n维基：${wiktionaryError.message}\n免费字典：${freeError.message}\n备用翻译：${translateError.message}")
                             }
                         }
                     }
@@ -1910,10 +1925,10 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     )
                 ) > 0
             }.onSuccess {
-                _dataMessage.value = if (it) "已加入資料夾" else "這個資料夾已有相同單字"
+                _dataMessage.value = if (it) "已加入文件夹" else "这个文件夹已有相同单词"
                 onComplete(it)
             }.onFailure {
-                _dataMessage.value = "加入失敗：${it.message ?: "未知錯誤"}"
+                _dataMessage.value = "加入失败：${it.message ?: "未知错误"}"
                 onComplete(false)
             }
         }
@@ -2057,7 +2072,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 _importUiState.value = ImportUiState.Success(candidates.size)
                 onComplete(candidates)
             } catch (error: Exception) {
-                _importUiState.value = ImportUiState.Error(error.localizedMessage ?: "檔案讀取失敗")
+                _importUiState.value = ImportUiState.Error(error.localizedMessage ?: "文件读取失败")
                 onComplete(emptyList())
             }
         }
@@ -2077,15 +2092,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 _ocrCandidates.value = enriched
                 _importUiState.value = ImportUiState.Success(enriched.size)
             } catch (error: Exception) {
-                _importUiState.value = ImportUiState.Error(error.localizedMessage ?: "AI 補齊暫時無法使用")
+                _importUiState.value = ImportUiState.Error(error.localizedMessage ?: "AI 补齐暂时无法使用")
             }
         }
     }
 
     fun importOcrToNewFolder(candidates:List<OcrCardCandidate>,sourceId:Long,onComplete:(Boolean)->Unit={}){
         val source=allDecks.value.firstOrNull{it.id==sourceId}?:return
-        val cards=candidates.filter{it.isSelected&&it.word.isNotBlank()}.map{Flashcard(deckId=0,word=it.word,definition=it.definition.ifBlank{"待補齊"},phonetic=it.phonetic,partOfSpeech=it.partOfSpeech,exampleSentence=it.exampleSentence,exampleTranslation=it.exampleTranslation)}
-        viewModelScope.launch{importSharedFolders(listOf(com.example.data.importer.SharedFolder(source.name+"（辨識匯入）",source.category,source.description,source.colorHex,cards)),source.category,false).onSuccess{_dataMessage.value="已匯入新資料夾，精熟度已重設；可在資料夾頁撤回";onComplete(true)}.onFailure{_dataMessage.value="匯入失敗：${it.localizedMessage}";onComplete(false)}}
+        val cards=candidates.filter{it.isSelected&&it.word.isNotBlank()}.map{Flashcard(deckId=0,word=it.word,definition=it.definition.ifBlank{"待补齐"},phonetic=it.phonetic,partOfSpeech=it.partOfSpeech,exampleSentence=it.exampleSentence,exampleTranslation=it.exampleTranslation)}
+        viewModelScope.launch{importSharedFolders(listOf(com.example.data.importer.SharedFolder(source.name+"（识别导入）",source.category,source.description,source.colorHex,cards)),source.category,false).onSuccess{_dataMessage.value="已导入新文件夹，精熟度已重置；可在文件夹页撤回";onComplete(true)}.onFailure{_dataMessage.value="导入失败：${it.localizedMessage}";onComplete(false)}}
     }
     fun importOcrCandidates(candidates: List<OcrCardCandidate>, targetDeckId: Long,onComplete:(Boolean)->Unit={}) {
         val selectedCandidates = candidates
@@ -2134,11 +2149,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             _ocrCandidates.value = emptyList()
             _importUiState.value = ImportUiState.Success(insertedCount)
             _dataMessage.value = if (duplicateCount > 0) {
-                "已依畫面順序匯入 $insertedCount 張，略過 $duplicateCount 張重複單字"
+                "已依画面顺序导入 $insertedCount 张，略过 $duplicateCount 张重复单词"
             } else {
-                "已依畫面順序匯入 $insertedCount 張單字卡"
+                "已依画面顺序导入 $insertedCount 张单词卡"
             }
-            }.onSuccess{onComplete(true)}.onFailure{_ocrCandidates.value=selectedCandidates;_dataMessage.value="匯入失敗：${it.localizedMessage}，辨識結果保留";onComplete(false)}
+            }.onSuccess{onComplete(true)}.onFailure{_ocrCandidates.value=selectedCandidates;_dataMessage.value="导入失败：${it.localizedMessage}，识别结果保留";onComplete(false)}
         }
     }
 
@@ -2168,16 +2183,16 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     exampleTranslation = candidate.exampleTranslation.ifBlank {
                         dictionary?.exampleTranslation.orEmpty()
                     },
-                    notes = candidate.sourceName.takeIf { it.isNotBlank() }?.let { "匯入來源：$it" }.orEmpty(),
+                    notes = candidate.sourceName.takeIf { it.isNotBlank() }?.let { "导入来源：$it" }.orEmpty(),
                     sortOrder = topSortOrder - index
                 )
             }
             val insertedCount = repository.insertCardsDeduplicating(cards)
             val duplicateCount = cards.size - insertedCount
             _dataMessage.value = if (duplicateCount > 0) {
-                "已匯入 $insertedCount 張，略過或更新 $duplicateCount 張同資料夾重複單字"
+                "已导入 $insertedCount 张，略过或更新 $duplicateCount 张同文件夹重复单词"
             } else {
-                "已依原始順序匯入 $insertedCount 張單字卡"
+                "已依原始顺序导入 $insertedCount 张单词卡"
             }
             onComplete(insertedCount)
         }
@@ -2217,7 +2232,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val now = System.currentTimeMillis()
         val conversation = AssistantConversation(
             id = UUID.randomUUID().toString(),
-            title = if (incognito) "無痕對話" else "新對話",
+            title = if (incognito) "无痕对话" else "新对话",
             createdAt = now,
             updatedAt = now,
             incognito = incognito
@@ -2291,9 +2306,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     val folderShareUndoIds:StateFlow<List<Long>> = _folderShareUndoIds.asStateFlow()
     private val _scanImportUndoIds=MutableStateFlow<List<Long>>(emptyList())
     val scanImportUndoIds:StateFlow<List<Long>> = _scanImportUndoIds.asStateFlow()
-    fun undoLastScanImport(){val ids=_scanImportUndoIds.value;if(ids.isEmpty())return;viewModelScope.launch{runCatching{db.withTransaction{ids.forEach{id->db.flashcardDao().getCardById(id)?.let{db.flashcardDao().deleteCard(it)}}}}.onSuccess{_scanImportUndoIds.value=emptyList();_dataMessage.value="已撤回上次單字匯入，原有字卡保留"}.onFailure{_dataMessage.value="撤回失敗：${it.localizedMessage}"}}}
+    fun undoLastScanImport(){val ids=_scanImportUndoIds.value;if(ids.isEmpty())return;viewModelScope.launch{runCatching{db.withTransaction{ids.forEach{id->db.flashcardDao().getCardById(id)?.let{db.flashcardDao().deleteCard(it)}}}}.onSuccess{_scanImportUndoIds.value=emptyList();_dataMessage.value="已撤回上次单词导入，原有卡片保留"}.onFailure{_dataMessage.value="撤回失败：${it.localizedMessage}"}}}
     suspend fun importSharedFolders(folders:List<com.example.data.importer.SharedFolder>,course:String,skipDuplicates:Boolean):Result<List<Long>> = runCatching {
-        require(folders.isNotEmpty()) { "請選擇資料夾" }
+        require(folders.isNotEmpty()) { "请选择文件夹" }
         val createdCardIds=mutableSetOf<Long>()
         withContext(Dispatchers.IO){db.withTransaction {
             val existing=db.deckDao().getAllDecksOnce().toMutableList()
@@ -2301,7 +2316,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             val ids=mutableListOf<Long>()
             folders.forEach{source->
                 val category=course.trim().ifBlank{source.course};var name=source.name;var suffix=1
-                while(existing.any{it.category==category&&it.name==name}){name="${source.name}（匯入${if(suffix==1)"" else suffix}）";suffix++}
+                while(existing.any{it.category==category&&it.name==name}){name="${source.name}（导入${if(suffix==1)"" else suffix}）";suffix++}
                 val now=System.currentTimeMillis();val deck=Deck(name=name,category=category,description=source.description,colorHex=source.color,sortOrder=(existing.maxOfOrNull{it.sortOrder}?:now)+1)
                 val id=db.deckDao().insertDeck(deck);existing.add(deck.copy(id=id));ids.add(id)
                 val seen=hashSetOf<String>();val safe=source.cards.filter{seen.add(it.normalizedWord)&&(!skipDuplicates||it.normalizedWord !in known)}
@@ -2311,9 +2326,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         }}.also{sharedImportIds=it;sharedImportCardIds=createdCardIds;_folderShareUndoIds.value=it}
     }
     suspend fun undoSharedFolders(ids:List<Long>):Result<Unit> = runCatching {
-        require(ids.isNotEmpty()&&ids.toSet()==sharedImportIds.toSet()){ "找不到可撤回的匯入批次" }
+        require(ids.isNotEmpty()&&ids.toSet()==sharedImportIds.toSet()){ "找不到可撤回的导入批次" }
         withContext(Dispatchers.IO){db.withTransaction{
-            require(ids.all{id->db.flashcardDao().getCardsByDeckOnce(id).all{it.id in sharedImportCardIds}}){"資料夾已加入其他字卡，請先移出它們再撤回，避免刪除原有資料"}
+            require(ids.all{id->db.flashcardDao().getCardsByDeckOnce(id).all{it.id in sharedImportCardIds}}){"文件夹已加入其他卡片，请先移出它们再撤回，避免删除原有数据"}
             sharedImportCardIds.forEach{id->db.flashcardDao().getCardById(id)?.let{db.flashcardDao().deleteCard(it)}}
             ids.forEach{id->db.deckDao().getDeckById(id)?.let{db.deckDao().deleteDeck(it)}}
         }}
@@ -2328,7 +2343,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             assistantAttachmentLabel(uri, index)
         }
         val request = text.trim().take(4_000).ifBlank {
-            if (safeAttachments.isNotEmpty()) "請分析我附加的檔案。" else ""
+            if (safeAttachments.isNotEmpty()) "请分析我附加的文件。" else ""
         }
         if ((request.isBlank() && safeAttachments.isEmpty()) || _assistantBusy.value) return
         if (_assistantCurrentConversationId.value == null) newAssistantConversation(false)
@@ -2341,21 +2356,21 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         updateAssistantConversationTitle(conversationId, request)
 
         val targetDeck = resolveAssistantDeck(request)
-        if(safeAttachments.isEmpty() && (Regex("(?:寫|生成|建立|產生|撰寫).*(?:文章|故事|閱讀)|(?:文章|故事).*(?:生成|撰寫)").containsMatchIn(request)||request.contains("繼續補齊文章"))){
-            generateFullFolderArticle(request,targetDeck,request.contains("繼續補齊文章"));return
+        if(safeAttachments.isEmpty() && (Regex("(?:写|生成|创建|产生|撰写).*(?:文章|故事|阅读)|(?:文章|故事).*(?:生成|撰写)").containsMatchIn(request)||request.contains("继续补齐文章"))){
+            generateFullFolderArticle(request,targetDeck,request.contains("继续补齐文章"));return
         }
         val asksForSort = request.contains("排序") || request.contains("排列")
         val mentionsAlphabet = request.contains("字母") ||
-            request.contains("A-Z", ignoreCase = true) || request.contains("英文順序")
+            request.contains("A-Z", ignoreCase = true) || request.contains("英文顺序")
         if (safeAttachments.isEmpty() && asksForSort && mentionsAlphabet) {
             if (targetDeck == null) {
-                appendAssistantMessage("ASSISTANT", "請先進入一個資料夾，或在訊息中告訴我要整理哪個資料夾。")
+                appendAssistantMessage("ASSISTANT", "请先进入一个文件夹，或在消息中告诉我要整理哪个文件夹。")
                 return
             }
             if (targetDeck.id !in _assistantSelectedDeckIds.value) {
                 appendAssistantMessage(
                     "ASSISTANT",
-                    "我可以讀取「${targetDeck.name}」的內容，但它不在目前允許編輯的範圍內。請先在輸入框上方勾選它，才能修改排序。"
+                    "我可以读取「${targetDeck.name}」的内容，但它不在目前允许编辑的范围内。请先在输入框上方勾选它，才能修改排序。"
                 )
                 return
             }
@@ -2367,7 +2382,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         assistantRequestJob = viewModelScope.launch {
             _assistantBusy.value = true
             _assistantSendOutcome.value = null
-            _assistantStatus.value = if (safeAttachments.isEmpty()) null else "正在準備附件…"
+            _assistantStatus.value = if (safeAttachments.isEmpty()) null else "正在准备附件…"
             runCatching {
                 if (safeAttachments.isNotEmpty()) {
                     val persistedUris = withContext(Dispatchers.IO) {
@@ -2376,7 +2391,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     updateAssistantMessageAttachments(userMessageId, persistedUris)
                 }
                 if (!settings.value.aiEnabled || !settings.value.usePersonalAiApi) {
-                    error("請先在設定中啟用 AI，並加入至少一組可用的 API Key")
+                    error("请先在设置中启用 AI，并加入至少一组可用的 API Key")
                 }
                 val imageAttachments = mutableListOf<DirectAiService.ImagePayload>()
                 val textAttachments = StringBuilder()
@@ -2390,28 +2405,28 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     val isKnownImage = mimeType.startsWith("image/") ||
                         listOf(".jpg", ".jpeg", ".png", ".webp", ".gif", ".heic", ".heif")
                             .any(lowerLabel::endsWith)
-                    _assistantStatus.value = "正在讀取附件 ${index + 1}/${safeAttachments.size}：$label"
+                    _assistantStatus.value = "正在读取附件 ${index + 1}/${safeAttachments.size}：$label"
 
                     if (isPdf) {
                         val remainingImageSlots = 5 - imageAttachments.size
-                        require(remainingImageSlots > 0) { "圖片與 PDF 頁面合計最多 5 張" }
+                        require(remainingImageSlots > 0) { "图片与 PDF 页面合计最多 5 张" }
                         val pages = DocumentParser.renderPdfPagesForAi(
                             getApplication(),
                             uri,
                             minOf(settings.value.pdfPageLimit, remainingImageSlots)
                         )
-                        require(pages.isNotEmpty()) { "$label 沒有可讀取的頁面" }
+                        require(pages.isNotEmpty()) { "$label 没有可读取的页面" }
                         imageAttachments += pages
-                        attachmentSummary += "$label：${pages.size} 頁 PDF 圖片"
+                        attachmentSummary += "$label：${pages.size} 页 PDF 图片"
                     } else if (isKnownImage) {
-                        require(imageAttachments.size < 5) { "圖片與 PDF 頁面合計最多 5 張" }
+                        require(imageAttachments.size < 5) { "图片与 PDF 页面合计最多 5 张" }
                         imageAttachments += AiImagePreprocessor.prepare(getApplication(), uri)
-                        attachmentSummary += "$label：圖片"
+                        attachmentSummary += "$label：图片"
                     } else {
                         val extracted = DocumentParser.extractTextFromUri(
                             getApplication(), uri, settings.value.pdfPageLimit
                         ).trim().take(20_000 - textAttachments.length.coerceAtMost(20_000))
-                        require(extracted.isNotBlank()) { "$label 沒有讀取到可傳給 AI 的文字" }
+                        require(extracted.isNotBlank()) { "$label 没有读取到可传给 AI 的文字" }
                         textAttachments.append("\n\n--- 附件：$label ---\n").append(extracted)
                         attachmentSummary += "$label：${extracted.length} 字"
                     }
@@ -2431,9 +2446,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         buildString {
                             append(request)
                             if (attachmentSummary.isNotEmpty()) {
-                                append("\n\n附件讀取摘要：\n")
+                                append("\n\n附件读取摘要：\n")
                                 append(attachmentSummary.joinToString("\n"))
-                                append("\n請確實閱讀附件內容後再回答，不可聲稱沒有收到附件。")
+                                append("\n请确实阅读附件内容后再回答，不可声称没有收到附件。")
                             }
                             append(textAttachments)
                         },
@@ -2452,12 +2467,12 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     if (safeAttachments.isNotEmpty()) {
                         _assistantSendOutcome.value = AssistantSendOutcome(
                             succeeded = false,
-                            errorMessage = error.localizedMessage ?: "附件無法讀取或傳送"
+                            errorMessage = error.localizedMessage ?: "附件无法读取或传送"
                         )
                     }
                     appendAssistantMessage(
                         "ASSISTANT",
-                        "這次沒有完成：${error.localizedMessage ?: "AI 服務暫時無法使用"}"
+                        "这次没有完成：${error.localizedMessage ?: "AI 服务暂时无法使用"}"
                     )
                 }
             }
@@ -2495,7 +2510,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 val target = File(imageDirectory, "${UUID.randomUUID()}.$extension")
                 resolver.openInputStream(uri)?.use { input ->
                     target.outputStream().use(input::copyTo)
-                } ?: error("無法保存圖片附件")
+                } ?: error("无法保存图片附件")
                 Uri.fromFile(target).toString()
             }.getOrDefault(uri.toString())
         }
@@ -2505,33 +2520,33 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val saved=if(resume)assistantAllMessages.lastOrNull{it.kind=="ARTICLE"&&it.conversationId==_assistantCurrentConversationId.value} else null
         val savedPayload=saved?.let{runCatching{JSONObject(it.payload)}.getOrNull()}
         val words=if(savedPayload?.has("targetWords")==true){val array=savedPayload.getJSONArray("targetWords");(0 until array.length()).map{array.getString(it)}} else allCards.value.filter{if(deck!=null)it.deckId==deck.id else it.deckId in _assistantSelectedDeckIds.value}.map{it.word}.distinctBy{it.lowercase()}
-        if(words.isEmpty()){appendAssistantMessage("ASSISTANT","所選資料夾沒有單字，請先選擇資料夾。");return}
-        val id=saved?.id?:appendAssistantMessage("ASSISTANT","正在規劃包含全部 ${words.size} 個單字的文章…",kind="ARTICLE")
+        if(words.isEmpty()){appendAssistantMessage("ASSISTANT","所选文件夹没有单词，请先选择文件夹。");return}
+        val id=saved?.id?:appendAssistantMessage("ASSISTANT","正在规划包含全部 ${words.size} 个单词的文章…",kind="ARTICLE")
         var article=if(resume)savedPayload?.optString("article").orEmpty() else ""
         var translation=if(resume)savedPayload?.optString("articleTranslation").orEmpty() else ""
         fun save(){
             val missing=com.example.util.ArticleCoverage.missing(article,words)
             val payload=JSONObject().put("type","ARTICLE").put("article",article).put("articleTranslation",translation).put("targetWords",JSONArray(words)).put("targetCardIds",JSONArray(allCards.value.filter{it.word in words && (if(deck!=null)it.deckId==deck.id else it.deckId in _assistantSelectedDeckIds.value)}.map{it.id})).put("missingWords",JSONArray(missing)).put("coverage","${words.size-missing.size}/${words.size}").put("complete",missing.isEmpty())
-            val index=assistantAllMessages.indexOfFirst{it.id==id};if(index>=0){assistantAllMessages[index]=assistantAllMessages[index].copy(content="${if(missing.isEmpty())"文章已完成" else "文章草稿／尚未完成"} · 涵蓋 ${words.size-missing.size}/${words.size} 字\n\n$article${if(missing.isNotEmpty())"\n\n尚缺：${missing.joinToString()}\n可在聊天室輸入「繼續補齊文章」。" else ""}",payload=payload.toString());refreshAssistantMessages();persistAssistantState()}
+            val index=assistantAllMessages.indexOfFirst{it.id==id};if(index>=0){assistantAllMessages[index]=assistantAllMessages[index].copy(content="${if(missing.isEmpty())"文章已完成" else "文章草稿／尚未完成"} · 涵盖 ${words.size-missing.size}/${words.size} 字\n\n$article${if(missing.isNotEmpty())"\n\n尚缺：${missing.joinToString()}\n可在聊天室输入「继续补齐文章」。" else ""}",payload=payload.toString());refreshAssistantMessages();persistAssistantState()}
         }
         val requestGeneration=++assistantRequestGeneration
         assistantRequestJob=viewModelScope.launch{
             _assistantBusy.value=true
             try{
-                check(settings.value.aiEnabled&&settings.value.usePersonalAiApi){"請先啟用個人 AI API"}
+                check(settings.value.aiEnabled&&settings.value.usePersonalAiApi){"请先启用个人 AI API"}
                 save()
                 com.example.util.ArticleCoverage.missing(article,words).chunked(35).forEach{batch->
                     for(attempt in 0..2){
                         val missing=com.example.util.ArticleCoverage.missing(article,batch);if(missing.isEmpty())break
-                        _assistantStatus.value="文章涵蓋 ${words.size-com.example.util.ArticleCoverage.missing(article,words).size}/${words.size} 字；正在撰寫下一章…"
-                        val result=GeminiService.runAssistant("""請接續同一篇自然英文故事的一個章節，在英文正文使用目標清單每個完整單字／片語，允許合理詞形變化。不可只列單字，也不可省略。只輸出 JSON：{"article":"英文正文","articleTranslation":"繁體中文翻譯"}。使用者要求：$request。目標單字：${JSONArray(missing)}。前文最後一段：${article.takeLast(2500)}""")
-                        val chapter=result.optString("article").trim();check(chapter.isNotBlank()){"AI 未回傳有效文章，已完成內容保留"}
+                        _assistantStatus.value="文章涵盖 ${words.size-com.example.util.ArticleCoverage.missing(article,words).size}/${words.size} 字；正在撰写下一章…"
+                        val result=GeminiService.runAssistant("""请接续同一篇自然英文故事的一个章节，在英文正文使用目标清单每个完整单词／短语，允许合理词形变化。不可只列单词，也不可省略。只输出 JSON：{"article":"英文正文","articleTranslation":"简体中文翻译"}。用户要求：$request。目标单词：${JSONArray(missing)}。前文最后一段：${article.takeLast(2500)}""")
+                        val chapter=result.optString("article").trim();check(chapter.isNotBlank()){"AI 未返回有效文章，已完成内容保留"}
                         article+=(if(article.isBlank())"" else "\n\n")+chapter
                         translation+=(if(translation.isBlank())"" else "\n\n")+result.optString("articleTranslation")
                         save()
                     }
                 }
-            }catch(error:Exception){save();if(error !is CancellationException)appendAssistantMessage("ASSISTANT","文章尚未完成：${error.localizedMessage}。草稿已保留，可輸入「繼續補齊文章」。")}
+            }catch(error:Exception){save();if(error !is CancellationException)appendAssistantMessage("ASSISTANT","文章尚未完成：${error.localizedMessage}。草稿已保留，可输入「继续补齐文章」。")}
             finally{if(requestGeneration==assistantRequestGeneration){_assistantBusy.value=false;_assistantStatus.value=null;assistantRequestJob=null}}
         }
     }
@@ -2554,7 +2569,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
 
     fun cancelAssistantAction() {
         _assistantPendingAction.value = null
-        appendAssistantMessage("ASSISTANT", "已取消，沒有修改任何資料。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已取消，没有修改任何数据。", kind = "STATUS")
     }
 
     fun completeAssistantQuiz(messageId: String, correctCount: Int, totalCount: Int) {
@@ -2622,7 +2637,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         _assistantPendingAction.value = null
         viewModelScope.launch {
             _assistantBusy.value = true
-            _assistantStatus.value = "正在執行：${action.title}"
+            _assistantStatus.value = "正在执行：${action.title}"
             runCatching {
                 when (action.type) {
                     "SORT" -> {
@@ -2633,8 +2648,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             id = UUID.randomUUID().toString(),
                             type = "RESTORE_ORDER",
                             deckId = action.deckId,
-                            title = "復原排序",
-                            description = "恢復執行 AI 排序前的單字順序",
+                            title = "恢复排序",
+                            description = "恢复执行 AI 排序前的单词顺序",
                             payload = JSONObject()
                                 .put("order", payload.getJSONArray("oldOrder"))
                                 .toString()
@@ -2655,8 +2670,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             id = UUID.randomUUID().toString(),
                             type = "RESTORE_POS",
                             deckId = action.deckId,
-                            title = "復原詞性修改",
-                            description = "恢復 AI 補充可數性前的詞性",
+                            title = "恢复词性修改",
+                            description = "恢复 AI 补充可数性前的词性",
                             payload = action.payload
                         )
                     }
@@ -2668,7 +2683,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             it.name.equals(name, ignoreCase = true) &&
                                 it.category.equals(category, ignoreCase = true)
                         }
-                        check(!duplicate) { "「$category」課程中已經有同名資料夾" }
+                        check(!duplicate) { "「$category」课程中已经有同名文件夹" }
                         val newId = repository.insertDeck(
                             Deck(
                                 name = name,
@@ -2683,26 +2698,26 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             id = UUID.randomUUID().toString(),
                             type = "DELETE_CREATED_FOLDER",
                             deckId = newId,
-                            title = "復原新增資料夾",
-                            description = "刪除剛建立的「$name」",
+                            title = "恢复添加文件夹",
+                            description = "删除刚创建的「$name」",
                             payload = ""
                         )
                     }
                     "UPDATE_FOLDER" -> {
                         val payload = JSONObject(action.payload)
                         val current = allDecks.value.firstOrNull { it.id == action.deckId }
-                            ?: error("找不到要修改的資料夾")
+                            ?: error("找不到要修改的文件夹")
                         val newName = payload.getString("name").trim().take(60)
                         val newCategory = payload.getString("category").trim().take(40)
-                        require(newName.isNotBlank() && newCategory.isNotBlank()) { "名稱與課程不能空白" }
+                        require(newName.isNotBlank() && newCategory.isNotBlank()) { "名称与课程不能空白" }
                         check(allDecks.value.none {
                             it.id != current.id && it.name.equals(newName, true) && it.category.equals(newCategory, true)
-                        }) { "目標課程中已經有同名資料夾" }
+                        }) { "目标课程中已经有同名文件夹" }
                         repository.updateDeck(current.copy(name = newName, category = newCategory))
                         AssistantPendingAction(
                             id = UUID.randomUUID().toString(), type = "RESTORE_FOLDER",
-                            deckId = current.id, title = "復原資料夾名稱與課程",
-                            description = "恢復為「${current.name}」／${current.category}",
+                            deckId = current.id, title = "恢复文件夹名称与课程",
+                            description = "恢复为「${current.name}」／${current.category}",
                             payload = JSONObject().put("name", current.name).put("category", current.category).toString()
                         )
                     }
@@ -2714,13 +2729,13 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             id to assistantGrammarSnapshot(db, id)
                         }
                         AssistantPendingAction(UUID.randomUUID().toString(), "DELETE_CREATED_GRAMMAR", id,
-                            "復原新增文法", "移除剛新增的「${draft.title}」；若已有後續修改或學習則不會刪除。",
+                            "恢复添加语法", "移除刚添加的「${draft.title}」；若已有后续修改或学习则不会删除。",
                             JSONObject().put("snapshot", snapshot).toString())
                     }
                     "UPDATE_GRAMMAR" -> {
                         val payload = JSONObject(action.payload)
                         val current = db.grammarNoteDao().getById(action.deckId)
-                            ?: error("找不到要修改的文法")
+                            ?: error("找不到要修改的语法")
                         val updated = current.copy(
                             course = payload.optString("course", current.course).trim().ifBlank { current.course },
                             folder = payload.optString("folder", current.folder).trim().ifBlank { current.folder },
@@ -2734,7 +2749,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         db.grammarNoteDao().update(updated)
                         AssistantPendingAction(
                             id = UUID.randomUUID().toString(), type = "RESTORE_GRAMMAR", deckId = current.id,
-                            title = "復原文法修改", description = "恢復「${current.title}」修改前的基本資料",
+                            title = "恢复语法修改", description = "恢复「${current.title}」修改前的基本数据",
                             payload = JSONObject().put("course", current.course).put("folder", current.folder)
                                 .put("title", current.title).put("category", current.category).put("level", current.level)
                                 .put("summary", current.summary).put("tags", current.tags).toString()
@@ -2760,11 +2775,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         VocabWidgetProvider.requestUpdate(getApplication())
                         AssistantPendingAction(
                             id = UUID.randomUUID().toString(), type = "RESTORE_DAILY_PLAN", deckId = -1,
-                            title = "復原每日學習計畫", description = "恢復修改前的每日目標與上限",
+                            title = "恢复每日学习计划", description = "恢复修改前的每日目标与上限",
                             payload = old.toString()
                         )
                     }
-                    else -> error("不支援的操作")
+                    else -> error("不支持的操作")
                 }
             }.onSuccess { undo ->
                 if (undo.type == "NONE") {
@@ -2779,7 +2794,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             }.onFailure { error ->
                 appendAssistantMessage(
                     "ASSISTANT",
-                    "操作失敗，沒有套用資料：${error.localizedMessage ?: "未知錯誤"}",
+                    "操作失败，没有应用数据：${error.localizedMessage ?: "未知错误"}",
                     kind = "STATUS"
                 )
             }
@@ -2814,20 +2829,20 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     }
                     "DELETE_CREATED_FOLDER" -> {
                         val deck = allDecks.value.firstOrNull { it.id == action.deckId }
-                            ?: error("找不到剛建立的資料夾")
+                            ?: error("找不到刚创建的文件夹")
                         check(allCards.value.none { it.deckId == deck.id }) {
-                            "資料夾已經加入單字，為避免遺失資料，無法直接復原刪除"
+                            "文件夹已经加入单词，为避免遗失数据，无法直接恢复删除"
                         }
                         repository.deleteDeck(deck)
                     }
                     "RESTORE_FOLDER" -> {
                         val deck = allDecks.value.firstOrNull { it.id == action.deckId }
-                            ?: error("找不到資料夾")
+                            ?: error("找不到文件夹")
                         val payload = JSONObject(action.payload)
                         repository.updateDeck(deck.copy(name = payload.getString("name"), category = payload.getString("category")))
                     }
                     "RESTORE_GRAMMAR" -> {
-                        val current = db.grammarNoteDao().getById(action.deckId) ?: error("找不到文法")
+                        val current = db.grammarNoteDao().getById(action.deckId) ?: error("找不到语法")
                         val payload = JSONObject(action.payload)
                         db.grammarNoteDao().update(current.copy(
                             course = payload.getString("course"), folder = payload.getString("folder"),
@@ -2879,9 +2894,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     }
                 }
             }.onSuccess {
-                appendAssistantMessage("ASSISTANT", "已復原上一個 AI 操作。", kind = "ACTION_UNDONE")
+                appendAssistantMessage("ASSISTANT", "已恢复上一个 AI 操作。", kind = "ACTION_UNDONE")
             }.onFailure { error ->
-                appendAssistantMessage("ASSISTANT", "復原失敗：${error.localizedMessage}", kind = "STATUS")
+                appendAssistantMessage("ASSISTANT", "恢复失败：${error.localizedMessage}", kind = "STATUS")
             }
             _assistantStatus.value = null
             _assistantBusy.value = false
@@ -2895,24 +2910,24 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val actual = allCards.value.filter { it.id in ids }.filter { it.deckId != targetId }
         val mode = if (result.optString("mode").equals("COPY", true)) "COPY" else "MOVE"
         if (target == null || target.id !in _assistantSelectedDeckIds.value || actual.isEmpty()) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n找不到可安全${if (mode == "COPY") "複製" else "移動"}的目標或卡片。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n找不到可安全${if (mode == "COPY") "复制" else "移动"}的目标或卡片。")
             return
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "TRANSFER_CARDS", deckId = target.id,
-            title = "${if (mode == "COPY") "複製" else "移動"} ${actual.size} 張單字卡",
-            description = "目標：${target.name}\n同名單字會跳過，不會產生重複卡片。",
+            title = "${if (mode == "COPY") "复制" else "移动"} ${actual.size} 张单词卡",
+            description = "目标：${target.name}\n同名单词会跳过，不会产生重复卡片。",
             payload = JSONObject().put("targetDeckId", target.id).put("mode", mode)
                 .put("cardIds", JSONArray(actual.map { it.id })).toString()
         )
-        appendAssistantMessage("ASSISTANT", "已核對 ${actual.size} 張真實卡片，請確認操作。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已核对 ${actual.size} 张真实卡片，请确认操作。", kind = "STATUS")
     }
 
     private fun prepareAssistantAddCards(result: JSONObject, message: String) {
         val target = allDecks.value.firstOrNull { it.id == result.optLong("targetDeckId") }
         val cards = result.optJSONArray("cards") ?: JSONArray()
         if (target == null || target.id !in _assistantSelectedDeckIds.value || cards.length() == 0) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n請指定允許編輯的目標資料夾，並提供要加入的單字。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n请指定允许编辑的目标文件夹，并提供要加入的单词。")
             return
         }
         val existing = allCards.value.filter { it.deckId == target.id }.mapTo(hashSetOf()) { it.normalizedWord }
@@ -2924,15 +2939,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             if (normalized.isNotBlank() && normalized !in existing && seen.add(normalized)) safe.put(item)
         }
         if (safe.length() == 0) {
-            appendAssistantMessage("ASSISTANT", "推薦單字都已存在，沒有建立重複卡片。")
+            appendAssistantMessage("ASSISTANT", "推荐单词都已存在，没有创建重复卡片。")
             return
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "ADD_CARDS", deckId = target.id,
-            title = "加入 ${safe.length()} 個 AI 推薦單字", description = "目標：${target.name}\n只會加入預覽中的非重複單字。",
+            title = "加入 ${safe.length()} 个 AI 推荐单词", description = "目标：${target.name}\n只会加入预览中的非重复单词。",
             payload = JSONObject().put("cards", safe).toString()
         )
-        appendAssistantMessage("ASSISTANT", "已準備 ${safe.length()} 個模型知識補充單字，請確認後加入。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已准备 ${safe.length()} 个模型知识补充单词，请确认后加入。", kind = "STATUS")
     }
 
     private fun prepareAssistantEnrichment(result: JSONObject, message: String) {
@@ -2947,15 +2962,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 card.exampleSentence.isBlank() || card.exampleTranslation.isBlank()) safe.put(item)
         }
         if (safe.length() == 0) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n沒有可安全補齊的空白欄位。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n没有可安全补齐的空白字段。")
             return
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "ENRICH_CARDS", deckId = 0,
-            title = "補齊 ${safe.length()} 張單字卡", description = "只填入原本空白的欄位，不會覆蓋既有內容。",
+            title = "补齐 ${safe.length()} 张单词卡", description = "只填入原本空白的字段，不会覆盖既有内容。",
             payload = JSONObject().put("updates", safe).toString()
         )
-        appendAssistantMessage("ASSISTANT", "已核對空白欄位，請確認批次補齊。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已核对空白字段，请确认批次补齐。", kind = "STATUS")
     }
 
     private fun prepareAssistantChineseNormalization(result: JSONObject, message: String) {
@@ -2981,7 +2996,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             )
         }
         if (safe.length() == 0) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n沒有找到需要轉換，或可安全套用的繁體中文修改。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n没有找到需要转换，或可安全应用的简体中文修改。")
             return
         }
         val deckNames = allDecks.value
@@ -2991,18 +3006,18 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             id = UUID.randomUUID().toString(),
             type = "NORMALIZE_CHINESE",
             deckId = 0,
-            title = "統一 ${safe.length()} 張單字卡為繁體中文",
-            description = "範圍：${deckNames.ifBlank { "已選資料夾" }}\n只修改中文解釋與例句翻譯；英文、詞性和例句不會變動。",
+            title = "统一 ${safe.length()} 张单词卡为简体中文",
+            description = "范围：${deckNames.ifBlank { "已选文件夹" }}\n只修改中文解释与例句翻译；英文、词性和例句不会变动。",
             payload = safe.toString()
         )
-        appendAssistantMessage("ASSISTANT", "已檢查所選資料夾並準備繁體中文修改，確認後才會套用。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已检查所选文件夹并准备简体中文修改，确认后才会应用。", kind = "STATUS")
     }
 
     private fun prepareAssistantSplit(result: JSONObject, fallbackDeck: Deck?, message: String) {
         val source = allDecks.value.firstOrNull { it.id == result.optLong("sourceDeckId") } ?: fallbackDeck
         val groups = result.optJSONArray("groups") ?: JSONArray()
         if (source == null || source.id !in _assistantSelectedDeckIds.value || groups.length() < 2) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n需要一個可編輯的來源資料夾與至少兩個有效分類。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n需要一个可编辑的来源文件夹与至少两个有效分类。")
             return
         }
         val validIds = allCards.value.filter { it.deckId == source.id }.mapTo(hashSetOf()) { it.id }
@@ -3011,15 +3026,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             count += groups.optJSONObject(index)?.optJSONArray("cardIds")?.longValues()?.count { it in validIds } ?: 0
         }
         if (count == 0) {
-            appendAssistantMessage("ASSISTANT", "AI 沒有回傳可驗證的卡片分類，因此不會拆分。")
+            appendAssistantMessage("ASSISTANT", "AI 没有返回可验证的卡片分类，因此不会拆分。")
             return
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "SPLIT_FOLDER", deckId = source.id,
-            title = "拆分資料夾「${source.name}」", description = "建立 ${groups.length()} 個分類並移動約 $count 張卡片；未分類卡片留在原處。",
+            title = "拆分文件夹「${source.name}」", description = "创建 ${groups.length()} 个分类并移动约 $count 张卡片；未分类卡片留在原处。",
             payload = JSONObject().put("groups", groups).toString()
         )
-        appendAssistantMessage("ASSISTANT", "分類結果已和真實卡片核對，請確認拆分。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "分类结果已和真实卡片核对，请确认拆分。", kind = "STATUS")
     }
 
     private fun prepareAssistantMerge(result: JSONObject, message: String) {
@@ -3027,39 +3042,39 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val sourceIds = result.optJSONArray("sourceDeckIds")?.longValues().orEmpty().filter { it != targetId }.distinct()
         val target = allDecks.value.firstOrNull { it.id == targetId }
         if (target == null || sourceIds.isEmpty() || (sourceIds + targetId).any { it !in _assistantSelectedDeckIds.value }) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n請指定至少兩個允許編輯的資料夾。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n请指定至少两个允许编辑的文件夹。")
             return
         }
         val affected = allCards.value.count { it.deckId in sourceIds }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "MERGE_FOLDERS", deckId = target.id,
-            title = "合併 ${sourceIds.size + 1} 個資料夾", description =
-                "目標：${target.name}\n移動 $affected 張卡片並刪除來源資料夾。重複字與學習紀錄會整合，此操作無法完整復原。",
+            title = "合并 ${sourceIds.size + 1} 个文件夹", description =
+                "目标：${target.name}\n移动 $affected 张卡片并删除来源文件夹。重复字与学习纪录会整合，此操作无法完整恢复。",
             payload = JSONObject().put("targetDeckId", target.id).put("sourceDeckIds", JSONArray(sourceIds)).toString()
         )
-        appendAssistantMessage("ASSISTANT", "已準備合併；請特別確認不可完整復原的影響。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已准备合并；请特别确认不可完整恢复的影响。", kind = "STATUS")
     }
 
     private fun prepareAssistantWeaknessFolder(result: JSONObject, message: String) {
-        val name = result.optString("name", "弱點複習").trim().take(60).ifBlank { "弱點複習" }
+        val name = result.optString("name", "薄薄弱点复习").trim().take(60).ifBlank { "薄薄弱点复习" }
         val category = result.optString("category").trim().take(40)
         if (category.isBlank()) {
-            appendAssistantMessage("ASSISTANT", "「$name」要放在哪個課程？")
+            appendAssistantMessage("ASSISTANT", "「$name」要放在哪个课程？")
             return
         }
         val weakLogIds = recentStudyLogs.value.filter { it.rating <= 2 }.mapTo(hashSetOf()) { it.cardId }
         val requested = result.optJSONArray("cardIds")?.longValues().orEmpty().toSet()
         val safeIds = allCards.value.filter { it.id in requested && (it.mistakeCount > 0 || it.id in weakLogIds) }.map { it.id }
         if (safeIds.isEmpty()) {
-            appendAssistantMessage("ASSISTANT", "$message\n\n目前沒有可由真實錯題紀錄驗證的卡片。")
+            appendAssistantMessage("ASSISTANT", "$message\n\n目前没有可由真实错题纪录验证的卡片。")
             return
         }
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "CREATE_WEAKNESS_FOLDER", deckId = 0,
-            title = "建立弱點資料夾「$name」", description = "課程：$category\n複製 ${safeIds.size} 張真實錯題卡，原卡片不會移動。",
+            title = "创建薄薄弱点文件夹「$name」", description = "课程：$category\n复制 ${safeIds.size} 张真实错题卡，原卡片不会移动。",
             payload = JSONObject().put("name", name).put("category", category).put("cardIds", JSONArray(safeIds)).toString()
         )
-        appendAssistantMessage("ASSISTANT", "已依錯題次數與低評分紀錄選出 ${safeIds.size} 張卡片。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "已依错题次数与低评分纪录选出 ${safeIds.size} 张卡片。", kind = "STATUS")
     }
 
     private fun prepareAssistantDailyPlan(result: JSONObject, message: String) {
@@ -3068,10 +3083,10 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val reviewLimit = result.optInt("dailyReviewLimit", settings.value.dailyReviewLimit).coerceIn(10, 500)
         _assistantPendingAction.value = AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "UPDATE_DAILY_PLAN", deckId = -1,
-            title = "調整每日學習計畫", description = "每日目標：$goal 張\n新卡上限：$newLimit 張\n複習上限：$reviewLimit 張",
+            title = "调整每日学习计划", description = "每日目标：$goal 张\n新卡上限：$newLimit 张\n复习上限：$reviewLimit 张",
             payload = JSONObject().put("dailyGoalCards", goal).put("dailyNewCardLimit", newLimit).put("dailyReviewLimit", reviewLimit).toString()
         )
-        appendAssistantMessage("ASSISTANT", "$message\n\n計畫已準備好，確認後才會更新設定。", kind = "STATUS")
+        appendAssistantMessage("ASSISTANT", "$message\n\n计划已准备好，确认后才会更新设置。", kind = "STATUS")
     }
 
     private fun buildVerifiedAuditReport(result: JSONObject): String {
@@ -3095,29 +3110,29 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             }
         }.take(20)
         return buildString {
-            append("單字庫檢查結果\n\n")
-            append("跨資料夾同字：${duplicates.size} 組")
+            append("单词库检查结果\n\n")
+            append("跨文件夹同字：${duplicates.size} 组")
             if (duplicates.isNotEmpty()) append("\n" + duplicates.joinToString("\n") { group ->
-                "• ${group.first().word}（${group.size} 張）"
+                "• ${group.first().word}（${group.size} 张）"
             })
-            append("\n\n資料不完整：${incomplete.size} 張")
+            append("\n\n数据不完整：${incomplete.size} 张")
             if (incomplete.isNotEmpty()) append("\n" + incomplete.joinToString("\n") { card ->
                 val missing = buildList {
-                    if (card.partOfSpeech.isBlank()) add("詞性")
-                    if (card.definition.isBlank()) add("解釋")
+                    if (card.partOfSpeech.isBlank()) add("词性")
+                    if (card.definition.isBlank()) add("解释")
                     if (card.exampleSentence.isBlank()) add("例句")
-                    if (card.exampleTranslation.isBlank()) add("例句翻譯")
+                    if (card.exampleTranslation.isBlank()) add("例句翻译")
                 }
                 "• ${card.word}：缺少${missing.joinToString("、")}"
             })
-            append("\n\n疑似拼字問題：${typoLines.size} 張（AI 建議，修改前仍需確認）")
+            append("\n\n疑似拼字问题：${typoLines.size} 张（AI 建议，修改前仍需确认）")
             if (typoLines.isNotEmpty()) append("\n" + typoLines.joinToString("\n"))
         }
     }
 
     private fun buildVerifiedLearningAnalysis(result: JSONObject): String {
         val logs = recentStudyLogs.value
-        if (logs.isEmpty()) return "目前還沒有真實學習紀錄可以分析。"
+        if (logs.isEmpty()) return "目前还没有真实学习纪录可以分析。"
         val byId = allCards.value.associateBy { it.id }
         val lowLogs = logs.filter { it.rating <= 2 }
         val hardCards = lowLogs.groupingBy { it.cardId }.eachCount().entries
@@ -3125,38 +3140,38 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val partStats = lowLogs.mapNotNull { byId[it.cardId]?.partOfSpeech?.takeIf(String::isNotBlank) }
             .groupingBy { it }.eachCount().entries.sortedByDescending { it.value }.take(6)
         val verified = buildString {
-            append("真實學習紀錄分析\n\n")
-            append("總複習紀錄：${logs.size} 次\n")
+            append("真实学习纪录分析\n\n")
+            append("总复习纪录：${logs.size} 次\n")
             append("Again／Hard：${lowLogs.size} 次\n")
             append("Good／Easy：${logs.size - lowLogs.size} 次")
-            if (hardCards.isNotEmpty()) append("\n\n最常答錯：\n" + hardCards.joinToString("\n") {
+            if (hardCards.isNotEmpty()) append("\n\n最常答错：\n" + hardCards.joinToString("\n") {
                 "• ${byId[it.key]?.word ?: "卡片 #${it.key}"}：${it.value} 次"
             })
-            if (partStats.isNotEmpty()) append("\n\n較弱詞性：\n" + partStats.joinToString("\n") {
-                "• ${it.key}：${it.value} 次低評分"
+            if (partStats.isNotEmpty()) append("\n\n较弱词性：\n" + partStats.joinToString("\n") {
+                "• ${it.key}：${it.value} 次低评分"
             })
         }
         val interpretation = formatAssistantDisplayText(result.optString("analysis"))
-        return if (interpretation.isBlank()) verified else "$verified\n\nAI 學習建議\n$interpretation"
+        return if (interpretation.isBlank()) verified else "$verified\n\nAI 学习建议\n$interpretation"
     }
 
     private suspend fun executeAssistantCardTransfer(action: AssistantPendingAction): AssistantPendingAction {
         val payload = JSONObject(action.payload)
         val targetDeckId = payload.getLong("targetDeckId")
-        val target = allDecks.value.firstOrNull { it.id == targetDeckId } ?: error("找不到目標資料夾")
-        check(target.id in _assistantSelectedDeckIds.value) { "目標資料夾不在可編輯範圍" }
+        val target = allDecks.value.firstOrNull { it.id == targetDeckId } ?: error("找不到目标文件夹")
+        check(target.id in _assistantSelectedDeckIds.value) { "目标文件夹不在可编辑范围" }
         val requested = payload.getJSONArray("cardIds").longValues().distinct()
         val currentById = allCards.value.associateBy { it.id }
         val cards = requested.mapNotNull(currentById::get).filter { it.deckId != targetDeckId }
-        require(cards.isNotEmpty()) { "沒有可處理的單字" }
+        require(cards.isNotEmpty()) { "没有可处理的单词" }
         val existingWords = allCards.value.filter { it.deckId == targetDeckId }.mapTo(hashSetOf()) { it.normalizedWord }
         val safeCards = cards.filter { it.normalizedWord !in existingWords }.distinctBy { it.normalizedWord }
-        require(safeCards.isNotEmpty()) { "目標資料夾已經包含這些單字" }
+        require(safeCards.isNotEmpty()) { "目标文件夹已经包含这些单词" }
         return if (payload.optString("mode").equals("COPY", true)) {
             val insertedIds = safeCards.map { repository.insertCard(it.copyForAssistantDeck(targetDeckId)) }
             AssistantPendingAction(
                 id = UUID.randomUUID().toString(), type = "DELETE_CREATED_CARDS", deckId = targetDeckId,
-                title = "復原複製單字", description = "刪除剛複製的 ${insertedIds.size} 張卡片",
+                title = "恢复复制单词", description = "删除刚复制的 ${insertedIds.size} 张卡片",
                 payload = JSONArray(insertedIds).toString()
             )
         } else {
@@ -3164,20 +3179,20 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 JSONObject().put("deckId", deckId).put("cardIds", JSONArray(values.map { it.id }))
             }
             check(original.all { item -> item.getLong("deckId") in _assistantSelectedDeckIds.value }) {
-                "部分來源資料夾不在可編輯範圍"
+                "部分来源文件夹不在可编辑范围"
             }
             repository.moveCards(safeCards.map { it.id }, targetDeckId)
             AssistantPendingAction(
                 id = UUID.randomUUID().toString(), type = "RESTORE_CARD_LOCATIONS", deckId = targetDeckId,
-                title = "復原移動單字", description = "將 ${safeCards.size} 張卡片移回原資料夾",
+                title = "恢复移动单词", description = "将 ${safeCards.size} 张卡片移回原文件夹",
                 payload = JSONArray(original).toString()
             )
         }
     }
 
     private suspend fun executeAssistantAddCards(action: AssistantPendingAction): AssistantPendingAction {
-        val target = allDecks.value.firstOrNull { it.id == action.deckId } ?: error("找不到目標資料夾")
-        check(target.id in _assistantSelectedDeckIds.value) { "目標資料夾不在可編輯範圍" }
+        val target = allDecks.value.firstOrNull { it.id == action.deckId } ?: error("找不到目标文件夹")
+        check(target.id in _assistantSelectedDeckIds.value) { "目标文件夹不在可编辑范围" }
         val source = JSONObject(action.payload).getJSONArray("cards")
         val existing = allCards.value.filter { it.deckId == target.id }.mapTo(hashSetOf()) { it.normalizedWord }
         val inserted = mutableListOf<Long>()
@@ -3195,14 +3210,14 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     definition = item.optString("definition").trim().take(500),
                     exampleSentence = item.optString("exampleSentence").trim().take(600),
                     exampleTranslation = item.optString("exampleTranslation").trim().take(600),
-                    notes = "AI 知識補充"
+                    notes = "AI 知识补充"
                 )
             )
         }
-        require(inserted.isNotEmpty()) { "沒有可新增的非重複單字" }
+        require(inserted.isNotEmpty()) { "没有可添加的非重复单词" }
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "DELETE_CREATED_CARDS", deckId = target.id,
-            title = "復原加入推薦單字", description = "刪除剛加入的 ${inserted.size} 張卡片",
+            title = "恢复加入推荐单词", description = "删除刚加入的 ${inserted.size} 张卡片",
             payload = JSONArray(inserted).toString()
         )
     }
@@ -3229,11 +3244,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 ))
             }
         }.filter { updated -> currentById[updated.id] != updated }
-        require(changed.isNotEmpty()) { "沒有找到需要補齊的空白欄位" }
+        require(changed.isNotEmpty()) { "没有找到需要补齐的空白字段" }
         repository.updateCards(changed)
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "RESTORE_CARD_FIELDS", deckId = action.deckId,
-            title = "復原批次補齊", description = "恢復 ${changed.size} 張卡片原本的空白欄位",
+            title = "恢复批次补齐", description = "恢复 ${changed.size} 张卡片原本的空白字段",
             payload = old.toString()
         )
     }
@@ -3245,18 +3260,18 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             val cards = db.flashcardDao().getAllCards().first()
             val changed = (0 until updates.length()).map { index ->
                 val fields = updates.getJSONObject(index)
-                val card = cards.firstOrNull { it.id == fields.getLong("cardId") } ?: error("找不到要修改的單字卡")
-                check(card.deckId in _assistantSelectedDeckIds.value) { "單字卡不在允許編輯的資料夾" }
+                val card = cards.firstOrNull { it.id == fields.getLong("cardId") } ?: error("找不到要修改的单词卡")
+                check(card.deckId in _assistantSelectedDeckIds.value) { "单词卡不在允许编辑的文件夹" }
                 old.put(card.assistantEditableFields())
                 applyAssistantCardUpdate(card, fields)
             }.distinctBy { it.id }
             val finalCards = cards.map { current -> changed.firstOrNull { it.id == current.id } ?: current }
-            require(finalCards.groupBy { it.deckId to it.word.trim().lowercase() }.values.none { it.size > 1 }) { "修改會造成資料夾內的重複單字" }
-            require(changed.any { it != cards.firstOrNull { original -> original.id == it.id } }) { "沒有需要修改的欄位" }
+            require(finalCards.groupBy { it.deckId to it.word.trim().lowercase() }.values.none { it.size > 1 }) { "修改会造成文件夹内的重复单词" }
+            require(changed.any { it != cards.firstOrNull { original -> original.id == it.id } }) { "没有需要修改的字段" }
             repository.updateCards(changed)
         }
         return AssistantPendingAction(UUID.randomUUID().toString(), "RESTORE_CARD_FIELDS", 0,
-            "復原單字修改", "恢復 ${old.length()} 張卡片修改前的資料", old.toString())
+            "恢复单词修改", "恢复 ${old.length()} 张卡片修改前的数据", old.toString())
     }
 
     private suspend fun executeAssistantChineseNormalization(action: AssistantPendingAction): AssistantPendingAction {
@@ -3290,22 +3305,22 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 add(updated)
             }
         }
-        require(changed.isNotEmpty()) { "沒有找到需要轉換的中文內容" }
+        require(changed.isNotEmpty()) { "没有找到需要转换的中文内容" }
         repository.updateCards(changed)
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(),
             type = "RESTORE_CARD_FIELDS",
             deckId = 0,
-            title = "復原繁體中文統一",
-            description = "恢復 ${changed.size} 張卡片修改前的中文內容",
+            title = "恢复简体中文统一",
+            description = "恢复 ${changed.size} 张卡片修改前的中文内容",
             payload = old.toString()
         )
     }
 
     private suspend fun executeAssistantSplitFolder(action: AssistantPendingAction): AssistantPendingAction {
         val payload = JSONObject(action.payload)
-        val sourceDeck = allDecks.value.firstOrNull { it.id == action.deckId } ?: error("找不到來源資料夾")
-        check(sourceDeck.id in _assistantSelectedDeckIds.value) { "來源資料夾不在可編輯範圍" }
+        val sourceDeck = allDecks.value.firstOrNull { it.id == action.deckId } ?: error("找不到来源文件夹")
+        check(sourceDeck.id in _assistantSelectedDeckIds.value) { "来源文件夹不在可编辑范围" }
         val sourceCardIds = allCards.value.filter { it.deckId == sourceDeck.id }.mapTo(hashSetOf()) { it.id }
         val groups = payload.getJSONArray("groups")
         val planned = buildList {
@@ -3319,21 +3334,21 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 if (name.isNotBlank() && ids.isNotEmpty()) add(Triple(name, category, ids))
             }
         }
-        require(planned.size >= 2) { "至少需要兩個有效分類才能拆分" }
+        require(planned.size >= 2) { "至少需要两个有效分类才能拆分" }
         planned.forEach { (name, category, _) ->
             check(allDecks.value.none { it.name.equals(name, true) && it.category.equals(category, true) }) {
-                "「$category」已有名為「$name」的資料夾"
+                "「$category」已有名为「$name」的文件夹"
             }
         }
         val created = JSONArray()
         for ((name, category, ids) in planned) {
-            val newId = repository.insertDeck(Deck(name = name, category = category, description = "由 AI 從「${sourceDeck.name}」拆分"))
+            val newId = repository.insertDeck(Deck(name = name, category = category, description = "由 AI 从「${sourceDeck.name}」拆分"))
             repository.moveCards(ids, newId)
             created.put(JSONObject().put("deckId", newId).put("cardIds", JSONArray(ids)))
         }
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "UNDO_SPLIT", deckId = sourceDeck.id,
-            title = "復原資料夾拆分", description = "把卡片移回「${sourceDeck.name}」並刪除新分類",
+            title = "恢复文件夹拆分", description = "把卡片移回「${sourceDeck.name}」并删除新分类",
             payload = JSONObject().put("sourceDeckId", sourceDeck.id).put("created", created).toString()
         )
     }
@@ -3342,9 +3357,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val payload = JSONObject(action.payload)
         val targetId = payload.getLong("targetDeckId")
         val sourceIds = payload.getJSONArray("sourceDeckIds").longValues().filter { it != targetId }.distinct()
-        val target = allDecks.value.firstOrNull { it.id == targetId } ?: error("找不到合併目標")
-        check((sourceIds + targetId).all { it in _assistantSelectedDeckIds.value }) { "部分資料夾不在可編輯範圍" }
-        require(sourceIds.isNotEmpty()) { "沒有可合併的來源資料夾" }
+        val target = allDecks.value.firstOrNull { it.id == targetId } ?: error("找不到合并目标")
+        check((sourceIds + targetId).all { it in _assistantSelectedDeckIds.value }) { "部分文件夹不在可编辑范围" }
+        require(sourceIds.isNotEmpty()) { "没有可合并的来源文件夹" }
         sourceIds.forEach { sourceId ->
             val source = allDecks.value.firstOrNull { it.id == sourceId } ?: return@forEach
             repository.moveCards(allCards.value.filter { it.deckId == sourceId }.map { it.id }, target.id)
@@ -3352,7 +3367,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         }
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "NONE", deckId = target.id,
-            title = "", description = "合併包含學習紀錄整合，無法完整復原", payload = ""
+            title = "", description = "合并包含学习纪录整合，无法完整恢复", payload = ""
         )
     }
 
@@ -3360,18 +3375,18 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val payload = JSONObject(action.payload)
         val name = payload.getString("name").trim().take(60)
         val category = payload.getString("category").trim().take(40)
-        require(name.isNotBlank() && category.isNotBlank()) { "資料夾名稱與課程不能空白" }
-        check(allDecks.value.none { it.name.equals(name, true) && it.category.equals(category, true) }) { "已有同名弱點資料夾" }
+        require(name.isNotBlank() && category.isNotBlank()) { "文件夹名称与课程不能空白" }
+        check(allDecks.value.none { it.name.equals(name, true) && it.category.equals(category, true) }) { "已有同名薄薄弱点文件夹" }
         val weakFromLogs = recentStudyLogs.value.filter { it.rating <= 2 }.mapTo(hashSetOf()) { it.cardId }
         val requested = payload.getJSONArray("cardIds").longValues().toSet()
         val weakCards = allCards.value.filter { it.id in requested && (it.mistakeCount > 0 || it.id in weakFromLogs) }
             .distinctBy { it.normalizedWord }
-        require(weakCards.isNotEmpty()) { "目前沒有符合條件的真實錯題" }
-        val newId = repository.insertDeck(Deck(name = name, category = category, description = "依真實錯題與低評分紀錄建立"))
+        require(weakCards.isNotEmpty()) { "目前没有符合条件的真实错题" }
+        val newId = repository.insertDeck(Deck(name = name, category = category, description = "依真实错题与低评分纪录创建"))
         val inserted = weakCards.map { repository.insertCard(it.copyForAssistantDeck(newId)) }
         return AssistantPendingAction(
             id = UUID.randomUUID().toString(), type = "UNDO_WEAKNESS_FOLDER", deckId = newId,
-            title = "復原弱點資料夾", description = "刪除剛建立的「$name」與其中副本",
+            title = "恢复薄薄弱点文件夹", description = "删除刚创建的「$name」与其中副本",
             payload = JSONObject().put("deckId", newId).put("cardIds", JSONArray(inserted)).toString()
         )
     }
@@ -3402,7 +3417,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
     private fun prepareAlphabeticalSort(deck: Deck, descending: Boolean) {
         val cards = allCards.value.filter { it.deckId == deck.id }
         if (cards.isEmpty()) {
-            appendAssistantMessage("ASSISTANT", "「${deck.name}」目前沒有單字可以排序。")
+            appendAssistantMessage("ASSISTANT", "「${deck.name}」目前没有单词可以排序。")
             return
         }
         val sorted = if (descending) {
@@ -3419,12 +3434,12 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             type = "SORT",
             deckId = deck.id,
             title = "依英文${if (descending) " Z–A" else " A–Z"} 排序",
-            description = "資料夾：${deck.name}\n影響 ${cards.size} 張卡片；確認後才會儲存。",
+            description = "文件夹：${deck.name}\n影响 ${cards.size} 张卡片；确认后才会保存。",
             payload = payload
         )
         appendAssistantMessage(
             "ASSISTANT",
-            "已讀取「${deck.name}」的 ${cards.size} 張卡片，準備好排序，請先確認操作。",
+            "已读取「${deck.name}」的 ${cards.size} 张卡片，准备好排序，请先确认操作。",
             kind = "STATUS"
         )
     }
@@ -3437,22 +3452,22 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 val library = grammarLibraries.value.firstOrNull { it.id == result.optLong("libraryId") }
                     ?: grammarLibraries.value.singleOrNull { it.course.equals(result.optString("course"), true) && it.name.equals(result.optString("folder"), true) }
                 if (library == null) {
-                    appendAssistantMessage("ASSISTANT", "請指定要新增到哪一個既有文法庫（課程及文法庫名稱），沒有寫入任何資料。")
+                    appendAssistantMessage("ASSISTANT", "请指定要添加到哪一个既有语法库（课程及语法库名称），没有写入任何数据。")
                 } else {
                     val grammar = result.optJSONObject("grammar") ?: result
                     val draft = runCatching { parseGrammarDraft(grammar) }.getOrNull()
-                    if (draft == null) appendAssistantMessage("ASSISTANT", "AI 文法資料未通過檢查，沒有新增。請補上完整內容。")
+                    if (draft == null) appendAssistantMessage("ASSISTANT", "AI 语法数据未通过检查，没有添加。请补上完整内容。")
                     else {
                         _assistantPendingAction.value = AssistantPendingAction(UUID.randomUUID().toString(), "CREATE_GRAMMAR", library.id,
-                            "新增文法「${draft.title}」", "課程：${library.course}\n文法庫：${library.name}\n${draft.summary}\n${draft.structure}\n${draft.exampleSentence}\n${draft.exampleTranslation}\n句型 ${draft.patterns.size} 個 · 題目 ${draft.questions.size} 題\n確認後才會新增，不會覆蓋既有文法。",
+                            "添加语法「${draft.title}」", "课程：${library.course}\n语法库：${library.name}\n${draft.summary}\n${draft.structure}\n${draft.exampleSentence}\n${draft.exampleTranslation}\n句型 ${draft.patterns.size} 个 · 题目 ${draft.questions.size} 题\n确认后才会添加，不会覆盖既有语法。",
                             JSONObject().put("libraryId", library.id).put("grammar", grammar).toString())
-                        appendAssistantMessage("ASSISTANT", "已準備好文法與目標文法庫，請確認後新增。", kind = "STATUS")
+                        appendAssistantMessage("ASSISTANT", "已准备好语法与目标语法库，请确认后添加。", kind = "STATUS")
                     }
                 }
             }
             "UPDATE_GRAMMAR" -> {
                 val note = allGrammarNotes.value.firstOrNull { it.id == result.optLong("grammarId") }
-                if (note == null) appendAssistantMessage("ASSISTANT", "找不到要編輯的文法筆記。")
+                if (note == null) appendAssistantMessage("ASSISTANT", "找不到要编辑的语法笔记。")
                 else {
                     val payload = JSONObject()
                         .put("course", result.optString("course", note.course))
@@ -3464,27 +3479,27 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         .put("tags", result.optString("tags", note.tags))
                     _assistantPendingAction.value = AssistantPendingAction(
                         id = UUID.randomUUID().toString(), type = "UPDATE_GRAMMAR", deckId = note.id,
-                        title = "更新文法「${note.title}」",
-                        description = "課程：${payload.optString("course")}\n資料夾：${payload.optString("folder")}\n標題：${payload.optString("title")}\n確認後才會套用。",
+                        title = "更新语法「${note.title}」",
+                        description = "课程：${payload.optString("course")}\n文件夹：${payload.optString("folder")}\n标题：${payload.optString("title")}\n确认后才会应用。",
                         payload = payload.toString()
                     )
-                    appendAssistantMessage("ASSISTANT", "文法修改內容已準備好，請先確認。", kind = "STATUS")
+                    appendAssistantMessage("ASSISTANT", "语法修改内容已准备好，请先确认。", kind = "STATUS")
                 }
             }
             "UPDATE_FOLDER" -> {
                 val deck = allDecks.value.firstOrNull { it.id == result.optLong("deckId") } ?: fallbackDeck
                 if (deck == null || deck.id !in _assistantSelectedDeckIds.value) {
-                    appendAssistantMessage("ASSISTANT", "找不到可編輯的資料夾。")
+                    appendAssistantMessage("ASSISTANT", "找不到可编辑的文件夹。")
                 } else {
                     val name = result.optString("name", deck.name).trim().take(60).ifBlank { deck.name }
                     val category = result.optString("category", deck.category).trim().take(40).ifBlank { deck.category }
                     _assistantPendingAction.value = AssistantPendingAction(
                         id = UUID.randomUUID().toString(), type = "UPDATE_FOLDER", deckId = deck.id,
-                        title = "更新資料夾「${deck.name}」",
-                        description = "名稱：${deck.name} → $name\n課程：${deck.category} → $category",
+                        title = "更新文件夹「${deck.name}」",
+                        description = "名称：${deck.name} → $name\n课程：${deck.category} → $category",
                         payload = JSONObject().put("name", name).put("category", category).toString()
                     )
-                    appendAssistantMessage("ASSISTANT", "修改內容已準備好，確認後才會套用。", kind = "STATUS")
+                    appendAssistantMessage("ASSISTANT", "修改内容已准备好，确认后才会应用。", kind = "STATUS")
                 }
             }
             "TRANSFER_CARDS" -> prepareAssistantTransfer(result, message)
@@ -3508,11 +3523,11 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         .joinToString("\n") { "$it：${before.optString(it)} → ${after.optString(it)}" }
                     preview += "${card.word}\n$changes"
                 }
-                if (safe.length() == 0) appendAssistantMessage("ASSISTANT", "$message\n沒有找到允許修改的單字欄位。")
+                if (safe.length() == 0) appendAssistantMessage("ASSISTANT", "$message\n没有找到允许修改的单词字段。")
                 else {
                     _assistantPendingAction.value = AssistantPendingAction(UUID.randomUUID().toString(), "UPDATE_CARDS", 0,
-                        "修改 ${safe.length()} 張單字卡", preview.joinToString("\n\n"), JSONObject().put("updates", safe).toString())
-                    appendAssistantMessage("ASSISTANT", "依指令修改的內容已準備好，請確認前後差異；原有內容只在確認後才會更新。", kind = "STATUS")
+                        "修改 ${safe.length()} 张单词卡", preview.joinToString("\n\n"), JSONObject().put("updates", safe).toString())
+                    appendAssistantMessage("ASSISTANT", "依指令修改的内容已准备好，请确认前后差异；原有内容只在确认后才会更新。", kind = "STATUS")
                 }
             }
             "NORMALIZE_CHINESE" -> prepareAssistantChineseNormalization(result, message)
@@ -3527,21 +3542,21 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 val category = result.optString("category")
                     .trim().replace("\n", " ").take(40)
                 if (name.isBlank()) {
-                    appendAssistantMessage("ASSISTANT", "請告訴我新資料夾的名稱。")
+                    appendAssistantMessage("ASSISTANT", "请告诉我新文件夹的名称。")
                 } else if (category.isBlank()) {
                     val courses = allDecks.value.map { it.category }.filter { it.isNotBlank() }.distinct()
                     appendAssistantMessage(
                         "ASSISTANT",
                         buildString {
-                            append("「$name」要放在哪個課程？")
-                            if (courses.isNotEmpty()) append("\n目前課程：${courses.joinToString("、")}")
+                            append("「$name」要放在哪个课程？")
+                            if (courses.isNotEmpty()) append("\n目前课程：${courses.joinToString("、")}")
                         }
                     )
                 } else if (allDecks.value.any {
                         it.name.equals(name, ignoreCase = true) &&
                             it.category.equals(category, ignoreCase = true)
                     }) {
-                    appendAssistantMessage("ASSISTANT", "「$category」課程中已經有名為「$name」的資料夾，因此沒有重複建立。")
+                    appendAssistantMessage("ASSISTANT", "「$category」课程中已经有名为「$name」的文件夹，因此没有重复创建。")
                 } else {
                     val payload = JSONObject()
                         .put("name", name)
@@ -3552,18 +3567,18 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                         id = UUID.randomUUID().toString(),
                         type = "CREATE_FOLDER",
                         deckId = 0L,
-                        title = "建立資料夾「$name」",
-                        description = "課程：$category\n確認後才會寫入單字庫。",
+                        title = "创建文件夹「$name」",
+                        description = "课程：$category\n确认后才会写入单词库。",
                         payload = payload.toString()
                     )
-                    appendAssistantMessage("ASSISTANT", "資料夾資料已準備好，請確認是否建立。", kind = "STATUS")
+                    appendAssistantMessage("ASSISTANT", "文件夹数据已准备好，请确认是否创建。", kind = "STATUS")
                 }
             }
             "SORT" -> {
                 val deck = allDecks.value.firstOrNull { it.id == result.optLong("deckId") }
                     ?: fallbackDeck
                 if (deck == null || deck.id !in _assistantSelectedDeckIds.value) {
-                    appendAssistantMessage("ASSISTANT", "我找不到可編輯的目標資料夾，請在輸入框上方調整資料夾範圍。")
+                    appendAssistantMessage("ASSISTANT", "我找不到可编辑的目标文件夹，请在输入框上方调整文件夹范围。")
                 }
                 else prepareAlphabeticalSort(deck, result.optString("direction").equals("ZA", true))
             }
@@ -3591,14 +3606,14 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                     )
                 }
                 if (deck == null || deck.id !in _assistantSelectedDeckIds.value || validated.length() == 0) {
-                    appendAssistantMessage("ASSISTANT", "$message\n\n沒有找到可安全套用的詞性修改。")
+                    appendAssistantMessage("ASSISTANT", "$message\n\n没有找到可安全应用的词性修改。")
                 } else {
                     _assistantPendingAction.value = AssistantPendingAction(
                         id = UUID.randomUUID().toString(),
                         type = "COUNTABILITY",
                         deckId = deck.id,
-                        title = "補充名詞可數性",
-                        description = "資料夾：${deck.name}\n預計修改 ${validated.length()} 張卡片；原有詞性會保留並可復原。",
+                        title = "补充名词可数性",
+                        description = "文件夹：${deck.name}\n预计修改 ${validated.length()} 张卡片；原有词性会保留并可恢复。",
                         payload = validated.toString()
                     )
                     appendAssistantMessage("ASSISTANT", message, kind = "STATUS")
@@ -3677,93 +3692,93 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         val selectedDecks = allDecks.value.filter { it.id in selectedIds }
         val chatStyleInstruction = when (settings.value.aiChatStyle) {
             "RELAXED" -> """
-                目前聊天風格是「輕鬆」。用自然、親切、像熟悉朋友般的繁體中文交談，可以適度幽默；
-                使用者可以聊生活、興趣或其他日常話題，不必強行把內容拉回英文，但事實仍須可靠，不能捏造。
+                目前聊天风格是「轻松」。用自然、亲切、像熟悉朋友般的简体中文交谈，可以适度幽默；
+                用户可以聊生活、兴趣或其他日常话题，不必强行把内容拉回英文，但事实仍须可靠，不能捏造。
             """.trimIndent()
             "STRICT" -> """
-                目前聊天風格是「嚴謹」。只回答英文學習、語言知識、單字卡、學習規劃與 Vocab App 操作相關內容；
-                對無關的閒聊或其他領域要求要簡短、禮貌拒絕。回答前要審慎辨別不確定性，沒有可靠依據就明確說明，禁止猜測。
+                目前聊天风格是「严谨」。只回答英文学习、语言知识、单词卡、学习规划与 Vocab App 操作相关内容；
+                对无关的闲聊或其他领域要求要简短、礼貌拒绝。回答前要审慎辨别不确定性，没有可靠依据就明确说明，禁止猜测。
             """.trimIndent()
             else -> """
-                目前聊天風格是「一般」。使用清楚、自然、友善的繁體中文回答，資訊不足時先詢問，避免武斷或過度冗長。
+                目前聊天风格是「一般」。使用清楚、自然、友善的简体中文回答，信息不足时先询问，避免武断或过度冗长。
             """.trimIndent()
         }
         return """
-            你是 Vocab App 內的繁體中文 AI 助手。一般英文學習與知識問題可以使用你的可靠知識回答；
-            涉及使用者 App 內實際有哪些資料時，只能根據下方提供的真實資料，不可捏造，也不可聲稱已修改資料。
+            你是 Vocab App 内的简体中文 AI 助手。一般英文学习与知识问题可以使用你的可靠知识回答；
+            涉及用户 App 内实际有哪些数据时，只能根据下方提供的真实数据，不可捏造，也不可声称已修改数据。
             $chatStyleInstruction
-            App 會在使用者確認後執行寫入。整體只回傳一個 JSON 物件，不可加 Markdown 程式碼圍欄。
-            message、article、analysis 與 explanation 等文字欄位可以使用精簡 Markdown：
-            #～### 標題、**粗體**、- 條列、1. 編號、行內公式 $...$、獨立公式 $$...$$。
-            物理、化學與數學符號優先使用標準 LaTeX（例如 \\alpha、\\sqrt{x}、\\frac{a}{b}），
-            但不要為普通短句加入多餘格式，也不要輸出 HTML。
+            App 会在用户确认后执行写入。整体只返回一个 JSON 对象，不可加 Markdown 代码围栏。
+            message、article、analysis 与 explanation 等文字字段可以使用精简 Markdown：
+            #～### 标题、**粗体**、- 条列、1. 编号、行内公式 $...$、独立公式 $$...$$。
+            物理、化学与数学符号优先使用标准 LaTeX（例如 \\alpha、\\sqrt{x}、\\frac{a}{b}），
+            但不要为普通短句加入多余格式，也不要输出 HTML。
 
             type 只能是 REPLY、CREATE_FOLDER、UPDATE_FOLDER、CREATE_GRAMMAR、UPDATE_GRAMMAR、UPDATE_CARDS、TRANSFER_CARDS、ADD_CARDS、SPLIT_FOLDER、
             MERGE_FOLDERS、ENRICH_CARDS、NORMALIZE_CHINESE、AUDIT_REPORT、CREATE_WEAKNESS_FOLDER、UPDATE_DAILY_PLAN、
             LEARNING_ANALYSIS、SORT、COUNTABILITY、ARTICLE、CONFUSABLES、QUIZ。
-            通用格式：{"type":"REPLY","message":"繁體中文回覆","deckId":0}
-            使用者要求新增或建立資料夾時使用 CREATE_FOLDER，另加：
-            {"name":"資料夾名稱","category":"課程名稱","description":"簡短說明，可空白","colorHex":"#426B63"}
-            如果使用者和最近對話都沒有指定要放入哪個課程，category 必須回傳空字串；
-            message 要詢問使用者要放在哪個課程，絕對不可自行選擇「通用」或猜測課程。
-            不可聲稱已建立；App 會顯示確認卡並檢查同一課程內的重複名稱。
-            UPDATE_FOLDER：{"type":"UPDATE_FOLDER","deckId":1,"name":"新名稱，未改則保留","category":"新課程，未改則保留"}
-            UPDATE_GRAMMAR：{"type":"UPDATE_GRAMMAR","grammarId":1,"course":"課程","folder":"資料夾","title":"標題","category":"分類","level":"程度","summary":"摘要","tags":"標籤"}
-            只有使用者明確要求修改既有文法時使用；grammarId 必須來自可讀取的文法資料，未要求改動的欄位必須原樣回傳。App 會先顯示確認卡。
-            CREATE_GRAMMAR：{"type":"CREATE_GRAMMAR","libraryId":1,"grammar":{"title":"文法名稱","category":"分類","level":"程度","summary":"核心概念","structure":"句型結構","usage":"使用時機","exampleSentence":"英文例句","exampleTranslation":"例句的繁體中文翻譯","commonMistakes":"常見錯誤","comparison":"比較","tags":"標籤","patterns":[{"title":"句型","formula":"結構","meaning":"意思","usage":"使用時機","examples":[{"sentence":"英文例句","translation":"繁體中文翻譯"}]}],"questions":[]}}
-            使用者要求新增文法時使用 CREATE_GRAMMAR。libraryId 必須來自下方真實文法庫，若未指定目標且存在多個可能文法庫，先詢問，絕不能猜測。
-            可以提供 questions，格式為 {"grammarPatternIndex":0,"type":"CLOZE_CHOICE","prompt":"He {{answer}} studied.","answer":"has","options":"has,have,had","explanation":"解析"}；每題恰好一個 {{answer}}，選項必須包含正確答案。
+            通用格式：{"type":"REPLY","message":"简体中文回复","deckId":0}
+            用户要求添加或创建文件夹时使用 CREATE_FOLDER，另加：
+            {"name":"文件夹名称","category":"课程名称","description":"简短说明，可空白","colorHex":"#426B63"}
+            如果用户和最近对话都没有指定要放入哪个课程，category 必须返回空字符串；
+            message 要询问用户要放在哪个课程，绝对不可自行选择「通用」或猜测课程。
+            不可声称已创建；App 会显示确认卡并检查同一课程内的重复名称。
+            UPDATE_FOLDER：{"type":"UPDATE_FOLDER","deckId":1,"name":"新名称，未改则保留","category":"新课程，未改则保留"}
+            UPDATE_GRAMMAR：{"type":"UPDATE_GRAMMAR","grammarId":1,"course":"课程","folder":"文件夹","title":"标题","category":"分类","level":"程度","summary":"摘要","tags":"标签"}
+            只有用户明确要求修改既有语法时使用；grammarId 必须来自可读取的语法数据，未要求改动的字段必须原样返回。App 会先显示确认卡。
+            CREATE_GRAMMAR：{"type":"CREATE_GRAMMAR","libraryId":1,"grammar":{"title":"语法名称","category":"分类","level":"程度","summary":"核心概念","structure":"句型结构","usage":"使用时机","exampleSentence":"英文例句","exampleTranslation":"例句的简体中文翻译","commonMistakes":"常见错误","comparison":"比较","tags":"标签","patterns":[{"title":"句型","formula":"结构","meaning":"意思","usage":"使用时机","examples":[{"sentence":"英文例句","translation":"简体中文翻译"}]}],"questions":[]}}
+            用户要求添加语法时使用 CREATE_GRAMMAR。libraryId 必须来自下方真实语法库，若未指定目标且存在多个可能语法库，先询问，绝不能猜测。
+            可以提供 questions，格式为 {"grammarPatternIndex":0,"type":"CLOZE_CHOICE","prompt":"He {{answer}} studied.","answer":"has","options":"has,have,had","explanation":"解析"}；每题恰好一个 {{answer}}，选项必须包含正确答案。
             TRANSFER_CARDS：{"type":"TRANSFER_CARDS","mode":"MOVE或COPY","targetDeckId":2,"cardIds":[1,2]}
             ADD_CARDS：{"type":"ADD_CARDS","targetDeckId":2,"cards":[{"word":"","phonetic":"","partOfSpeech":"","definition":"","exampleSentence":"","exampleTranslation":""}]}
-            外部推薦字必須是可靠英文知識，且不可聲稱原本存在 App。
-            SPLIT_FOLDER：{"type":"SPLIT_FOLDER","sourceDeckId":1,"groups":[{"name":"分類名稱","category":"課程","cardIds":[1,2]}]}
-            cardIds 只能使用提供的真實卡片，每張最多出現在一組；沒有足夠依據時先詢問使用者分類方式。
+            外部推荐字必须是可靠英文知识，且不可声称原本存在 App。
+            SPLIT_FOLDER：{"type":"SPLIT_FOLDER","sourceDeckId":1,"groups":[{"name":"分类名称","category":"课程","cardIds":[1,2]}]}
+            cardIds 只能使用提供的真实卡片，每张最多出现在一组；没有足够依据时先询问用户分类方式。
             MERGE_FOLDERS：{"type":"MERGE_FOLDERS","targetDeckId":1,"sourceDeckIds":[2,3]}
             ENRICH_CARDS：{"type":"ENRICH_CARDS","updates":[{"cardId":1,"phonetic":"","partOfSpeech":"","definition":"","exampleSentence":"","exampleTranslation":""}]}
-            只能補空白欄位，內容必須可靠，不可改寫既有欄位。
-            已有英文例句但缺翻譯時，必須忠實翻譯原有英文例句，禁止改寫或另造中文句子。
-            UPDATE_CARDS：{"type":"UPDATE_CARDS","updates":[{"cardId":1,"definition":"依使用者指令改寫的內容","exampleTranslation":"原有英文例句的翻譯"}]}
-            只有使用者明確要求修改、替換、重寫或清除欄位時使用，允許覆蓋非空白內容；未要求修改的欄位不要輸出。
-            可修改 word、phonetic、partOfSpeech、definition、exampleSentence、exampleTranslation、notes；cardId 必須是真實卡片 ID。
-            修改英文例句時若已有中文翻譯，必須一併翻譯新例句，不能留下舊句的翻譯。App 會先顯示前後差異供確認，且可復原。
-            NORMALIZE_CHINESE：{"type":"NORMALIZE_CHINESE","updates":[{"cardId":1,"definition":"繁體中文解釋","exampleTranslation":"繁體中文例句翻譯"}]}
-            只有使用者明確要求統一、修正或轉換中文文字時使用。逐張檢查提供的真實卡片，只把 definition 與 exampleTranslation 的簡體中文轉為繁體中文；
-            必須保留原意、標點和原有內容，不可翻譯或改寫英文欄位，也不可用新的例句取代原文。沒有變更的卡片不要放入 updates。
-            AUDIT_REPORT：另加 suspectedTypos：[ {"cardId":1,"suggestion":"正確拼字","reason":"理由"} ]；不確定就不要列為拼錯。
-            CREATE_WEAKNESS_FOLDER：{"type":"CREATE_WEAKNESS_FOLDER","name":"弱點複習","category":"課程，未指定留空","cardIds":[真實低評分或錯題卡ID]}
-            UPDATE_DAILY_PLAN：{"type":"UPDATE_DAILY_PLAN","dailyGoalCards":20,"dailyNewCardLimit":10,"dailyReviewLimit":50,"message":"依真實紀錄說明理由"}
-            LEARNING_ANALYSIS：另加 analysis，根據真實學習摘要分析，不可捏造次數。
+            只能补空白字段，内容必须可靠，不可改写既有字段。
+            已有英文例句但缺翻译时，必须忠实翻译原有英文例句，禁止改写或另造中文句子。
+            UPDATE_CARDS：{"type":"UPDATE_CARDS","updates":[{"cardId":1,"definition":"依用户指令改写的内容","exampleTranslation":"原有英文例句的翻译"}]}
+            只有用户明确要求修改、替换、重写或清除字段时使用，允许覆盖非空白内容；未要求修改的字段不要输出。
+            可修改 word、phonetic、partOfSpeech、definition、exampleSentence、exampleTranslation、notes；cardId 必须是真实卡片 ID。
+            修改英文例句时若已有中文翻译，必须一并翻译新例句，不能留下旧句的翻译。App 会先显示前后差异供确认，且可恢复。
+            NORMALIZE_CHINESE：{"type":"NORMALIZE_CHINESE","updates":[{"cardId":1,"definition":"简体中文解释","exampleTranslation":"简体中文例句翻译"}]}
+            只有用户明确要求统一、修正或转换中文文字时使用。逐张检查提供的真实卡片，只把 definition 与 exampleTranslation 的繁体中文转为简体中文；
+            必须保留原意、标点和原有内容，不可翻译或改写英文字段，也不可用新的例句取代原文。没有变更的卡片不要放入 updates。
+            AUDIT_REPORT：另加 suspectedTypos：[ {"cardId":1,"suggestion":"正确拼字","reason":"理由"} ]；不确定就不要列为拼错。
+            CREATE_WEAKNESS_FOLDER：{"type":"CREATE_WEAKNESS_FOLDER","name":"薄薄弱点复习","category":"课程，未指定留空","cardIds":[真实低评分或错题卡ID]}
+            UPDATE_DAILY_PLAN：{"type":"UPDATE_DAILY_PLAN","dailyGoalCards":20,"dailyNewCardLimit":10,"dailyReviewLimit":50,"message":"依真实纪录说明理由"}
+            LEARNING_ANALYSIS：另加 analysis，根据真实学习摘要分析，不可捏造次数。
             SORT 另加 direction（AZ 或 ZA）。
-            COUNTABILITY 另加 updates：[ {"cardId":1,"partOfSpeech":"n. [C]"} ]。保留原本非名詞詞性；不確定時不要輸出該卡。
-            ARTICLE 必須提供自然完整、盡量使用相關單字的英文文章，並回傳：
-            {"type":"ARTICLE","message":"簡短說明","article":"英文文章","articleTranslation":"完整繁體中文翻譯",
-            "targetCardIds":[真實卡片ID],"sentenceTranslations":[{"sentence":"英文原句","translation":"繁體中文逐句翻譯"}],
-            "questions":[{"prompt":"閱讀理解或克漏字題目","explanation":"繁體中文解析","cardId":1,"options":[{"text":"選項","correct":true}]}]}
-            targetCardIds 與 cardId 只能使用提供的真實卡片 ID。預設出 5 題並混合閱讀理解與克漏字；每題恰好一個正確答案。
-            CONFUSABLES 必須先從提供的真實 App 卡片選出 folderWord，再用你的英文知識找出外部的易混淆字；
-            不可把外部補充字說成原本就在資料夾。另加 groups：
-            [{"folderWord":"affect","relatedWords":[{"word":"effect","explanation":"兩字的詞性、意思與用法差異"}]}]
-            folderWord 必須逐字對應提供的卡片；relatedWords 可以來自模型知識。另可提供簡短 message，但不要把 groups 再序列化到 analysis 字串。
-            QUIZ 另加 questions，每題格式：
-            {"prompt":"題目","explanation":"繁體中文解釋","options":[{"text":"選項","correct":true}]}
-            預設產生 15 題，可依可用內容調整為 10～20 題；題目不可重複或只替換順序湊數。
-            每題必須恰好一個 correct=true。涉及 App 內容時必須能由提供的卡片驗證；
-            若使用模型知識補充的易混淆字，可針對真實英文用法出題，但不可聲稱外部單字已存在資料夾。
+            COUNTABILITY 另加 updates：[ {"cardId":1,"partOfSpeech":"n. [C]"} ]。保留原本非名词词性；不确定时不要输出该卡。
+            ARTICLE 必须提供自然完整、尽量使用相关单词的英文文章，并返回：
+            {"type":"ARTICLE","message":"简短说明","article":"英文文章","articleTranslation":"完整简体中文翻译",
+            "targetCardIds":[真实卡片ID],"sentenceTranslations":[{"sentence":"英文原句","translation":"简体中文逐句翻译"}],
+            "questions":[{"prompt":"阅读理解或完形填空题目","explanation":"简体中文解析","cardId":1,"options":[{"text":"选项","correct":true}]}]}
+            targetCardIds 与 cardId 只能使用提供的真实卡片 ID。默认出 5 题并混合阅读理解与完形填空；每题恰好一个正确答案。
+            CONFUSABLES 必须先从提供的真实 App 卡片选出 folderWord，再用你的英文知识找出外部的易混淆字；
+            不可把外部补充字说成原本就在文件夹。另加 groups：
+            [{"folderWord":"affect","relatedWords":[{"word":"effect","explanation":"两字的词性、意思与用法差异"}]}]
+            folderWord 必须逐字对应提供的卡片；relatedWords 可以来自模型知识。另可提供简短 message，但不要把 groups 再序列化到 analysis 字符串。
+            QUIZ 另加 questions，每题格式：
+            {"prompt":"题目","explanation":"简体中文解释","options":[{"text":"选项","correct":true}]}
+            默认产生 15 题，可依可用内容调整为 10～20 题；题目不可重复或只替换顺序凑数。
+            每题必须恰好一个 correct=true。涉及 App 内容时必须能由提供的卡片验证；
+            若使用模型知识补充的易混淆字，可针对真实英文用法出题，但不可声称外部单词已存在文件夹。
 
-            AI 可以讀取下方提供的所有資料夾與卡片，也可以回答資料夾以外的一般英文知識。
-            使用者允許 AI 寫入或修改的資料夾（這只是編輯權限，不是知識或讀取限制）：${JSONArray(selectedDecks.map { JSONObject().put("id", it.id).put("name", it.name) })}
-            目前明確指定的資料夾：${deck?.let { "${it.name}（id=${it.id}）" } ?: "未指定或多選"}
-            可用資料夾：$deckList
-            可讀取的 App 卡片：$cardList
-            可讀取及可在確認後編輯的文法筆記：$grammarList
-            可新增文法的真實文法庫：${JSONArray(grammarLibraries.value.map { JSONObject().put("id", it.id).put("course", it.course).put("name", it.name) })}
-            真實學習摘要（依低評分排序）：${JSONArray(logSummary)}
-            測驗進度摘要（已壓縮，這是 App 保存的真實狀態）：
-            ${quizHistory.ifBlank { "尚無測驗紀錄" }}
-            最近對話：
+            AI 可以读取下方提供的所有文件夹与卡片，也可以回答文件夹以外的一般英文知识。
+            用户允许 AI 写入或修改的文件夹（这只是编辑权限，不是知识或读取限制）：${JSONArray(selectedDecks.map { JSONObject().put("id", it.id).put("name", it.name) })}
+            目前明确指定的文件夹：${deck?.let { "${it.name}（id=${it.id}）" } ?: "未指定或多选"}
+            可用文件夹：$deckList
+            可读取的 App 卡片：$cardList
+            可读取及可在确认后编辑的语法笔记：$grammarList
+            可添加语法的真实语法库：${JSONArray(grammarLibraries.value.map { JSONObject().put("id", it.id).put("course", it.course).put("name", it.name) })}
+            真实学习摘要（依低评分排序）：${JSONArray(logSummary)}
+            测试进度摘要（已压缩，这是 App 保存的真实状态）：
+            ${quizHistory.ifBlank { "尚无测试纪录" }}
+            最近对话：
             $recent
 
-            使用者最新要求：$request
+            用户最新要求：$request
         """.trimIndent()
     }
 
@@ -3782,14 +3797,14 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun selectAssistantContextCards(request: String, contextDeck: Deck?): List<Flashcard> {
         val cards = allCards.value
-        val onlyAsksQuizRecord = (request.contains("成績") || request.contains("錯題") || request.contains("做到哪")) &&
-            (request.contains("測驗") || request.contains("剛剛"))
+        val onlyAsksQuizRecord = (request.contains("成绩") || request.contains("错题") || request.contains("做到哪")) &&
+            (request.contains("测试") || request.contains("刚刚"))
         if (onlyAsksQuizRecord) return emptyList()
         if (contextDeck != null) return cards.filter { it.deckId == contextDeck.id }.take(120)
         val editableIds = _assistantSelectedDeckIds.value
         val needsAppData = listOf(
-            "資料夾", "單字庫", "卡片", "這些單字", "我的單字", "排序",
-            "詞性", "易混淆", "相近", "文章", "測驗", "題目"
+            "文件夹", "单词库", "卡片", "这些单词", "我的单词", "排序",
+            "词性", "易混淆", "相近", "文章", "测试", "题目"
         ).any { request.contains(it, ignoreCase = true) }
         // A custom scope is an explicit request to let the assistant read those folders.  Do not
         // silently return an empty context merely because the wording did not contain a keyword.
@@ -3819,15 +3834,15 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
         contextCardCount: Int,
         editableDeckCount: Int
     ): String = when {
-        request.contains("測驗") || request.contains("題目") ->
-            "正在整理 ${contextCardCount} 張相關卡片與測驗紀錄，準備產生約 15 題並檢查答案…"
+        request.contains("测试") || request.contains("题目") ->
+            "正在整理 ${contextCardCount} 张相关卡片与测试纪录，准备产生约 15 题并检查答案…"
         request.contains("混淆") || request.contains("相近") || request.contains("很像") ->
-            "正在核對${contextDeck?.let { "「${it.name}」" } ?: "單字庫"}的 $contextCardCount 張卡片，並比對模型中的相近字與用法…"
+            "正在核对${contextDeck?.let { "「${it.name}」" } ?: "单词库"}的 $contextCardCount 张卡片，并比对模型中的相近字与用法…"
         request.contains("文章") ->
-            "正在挑選 $contextCardCount 個可用單字，規劃文章內容並檢查語意…"
-        request.contains("排序") || request.contains("修改") || request.contains("新增") ->
-            "正在驗證目標資料與編輯權限；目前允許修改 $editableDeckCount 個資料夾…"
-        else -> "正在整理 $contextCardCount 張相關卡片並準備回覆…"
+            "正在挑选 $contextCardCount 个可用单词，规划文章内容并检查语意…"
+        request.contains("排序") || request.contains("修改") || request.contains("添加") ->
+            "正在验证目标数据与编辑权限；目前允许修改 $editableDeckCount 个文件夹…"
+        else -> "正在整理 $contextCardCount 张相关卡片并准备回复…"
     }
 
     private fun formatAssistantDisplayText(value: String): String {
@@ -3893,12 +3908,12 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
             }
         }.take(6).joinToString("；")
         return if (root.optBoolean("completed")) {
-            "測驗狀態：已完成，答對 ${root.optInt("latestCorrect")}/${root.optInt("latestTotal")} 題" +
-                if (wrongSummary.isNotBlank()) "；錯題：$wrongSummary" else "。"
+            "测试状态：已完成，答对 ${root.optInt("latestCorrect")}/${root.optInt("latestTotal")} 题" +
+                if (wrongSummary.isNotBlank()) "；错题：$wrongSummary" else "。"
         } else {
             val current = root.optInt("currentIndex", 0).coerceAtMost(questions.length())
-            "測驗狀態：進行中，已完成 $current/${questions.length()} 題，目前答對 ${root.optInt("correctCount", 0)} 題" +
-                if (wrongSummary.isNotBlank()) "；目前錯題：$wrongSummary" else "。"
+            "测试状态：进行中，已完成 $current/${questions.length()} 题，目前答对 ${root.optInt("correctCount", 0)} 题" +
+                if (wrongSummary.isNotBlank()) "；目前错题：$wrongSummary" else "。"
         }
     }
 
@@ -3928,9 +3943,9 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                             it.word.equals(word, ignoreCase = true)
                         }
                         val sourceLabel = when {
-                            existing?.deckId == sourceCard.deckId -> "資料夾內"
-                            existing != null -> "App 其他資料夾"
-                            else -> "AI 知識補充"
+                            existing?.deckId == sourceCard.deckId -> "文件夹内"
+                            existing != null -> "App 其他文件夹"
+                            else -> "AI 知识补充"
                         }
                         val explanation = item.optString("explanation").trim()
                         add(
@@ -3944,7 +3959,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
                 if (relatedLines.isNotEmpty()) {
                     add(
                         buildString {
-                            append("${sourceCard.word}（資料夾內單字）")
+                            append("${sourceCard.word}（文件夹内单词）")
                             append("\n")
                             append(relatedLines.joinToString("\n"))
                         }
@@ -3957,8 +3972,8 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun isAssistantOperationRequest(request: String): Boolean {
         val operationWords = listOf(
-            "排序", "排列", "修改", "加上", "補上", "補齊", "建立", "新增",
-            "移動", "複製", "刪除", "清空", "文章", "測驗", "題目", "混淆"
+            "排序", "排列", "修改", "加上", "补上", "补齐", "创建", "添加",
+            "移动", "复制", "删除", "清空", "文章", "测试", "题目", "混淆"
         )
         return operationWords.any { request.contains(it, ignoreCase = true) }
     }
@@ -4012,7 +4027,7 @@ class VocabularyViewModel(application: Application) : AndroidViewModel(applicati
 
     private fun updateAssistantConversationTitle(conversationId: String, firstMessage: String) {
         _assistantConversations.value = _assistantConversations.value.map { conversation ->
-            if (conversation.id == conversationId && conversation.title in setOf("新對話", "無痕對話")) {
+            if (conversation.id == conversationId && conversation.title in setOf("新对话", "无痕对话")) {
                 conversation.copy(title = firstMessage.replace("\n", " ").take(24))
             } else conversation
         }

@@ -37,7 +37,7 @@ object SrsCalculator {
     fun getIntervalText(card: Flashcard, rating: Int): String {
         require(rating in 1..4) { "Review rating must be between 1 and 4." }
         val days = calculateSchedule(card, rating).intervalDays
-        return if (days == 0) "< 10 分鐘" else "$days 天後"
+        return if (days == 0) "< 10 分钟" else "$days 天后"
     }
 
     private fun calculateSchedule(card: Flashcard, rating: Int): Schedule {

@@ -188,12 +188,12 @@ fun FlashcardReviewScreen(
                     leaveReview(onBackToDashboard)
                 }
             },
-            title = { Text("繼續上次學習？") },
+            title = { Text("继续上次学习？") },
             text = {
                 val learned = savedRoundAtEntry?.let {
                     (it.totalCardCount - it.remainingCardIds.size).coerceAtLeast(0)
                 } ?: 0
-                Text("上次已學習 $learned 張，可以接著原本的卡片順序繼續。")
+                Text("上次已学习 $learned 张，可以接著原本的卡片顺序继续。")
             },
             confirmButton = {
                 TextButton(
@@ -202,7 +202,7 @@ fun FlashcardReviewScreen(
                         startChoice = LearningStartChoice.CONTINUE
                     }
                 ) {
-                    Text("接續上次")
+                    Text("接续上次")
                 }
             },
             dismissButton = {
@@ -212,7 +212,7 @@ fun FlashcardReviewScreen(
                         showOrderDialog = true
                     }
                 ) {
-                    Text("重新學習")
+                    Text("重新学习")
                 }
             }
         )
@@ -226,14 +226,14 @@ fun FlashcardReviewScreen(
                     leaveReview(onBackToDashboard)
                 }
             },
-            title = { Text("選擇卡片順序") },
-            text = { Text("選擇這一輪要依資料夾順序學習，或隨機排列卡片。") },
+            title = { Text("选择卡片顺序") },
+            text = { Text("选择这一轮要依文件夹顺序学习，或随机排列卡片。") },
             confirmButton = {
                 TextButton(onClick = {
                     showOrderDialog = false
                     startChoice = LearningStartChoice.RANDOM
                 }) {
-                    Text("隨機排列")
+                    Text("随机排列")
                 }
             },
             dismissButton = {
@@ -241,7 +241,7 @@ fun FlashcardReviewScreen(
                     showOrderDialog = false
                     startChoice = LearningStartChoice.ORDERED
                 }) {
-                    Text("依照順序")
+                    Text("依照顺序")
                 }
             }
         )
@@ -359,10 +359,10 @@ fun FlashcardReviewScreen(
                 title = {
                     Text(
                         text = when {
-                            !sessionLoaded -> "準備中"
-                            !isSessionComplete -> "學習 · ${remainingCardIds.size} 張"
-                            isEmptySession -> "沒有單字"
-                            else -> "本輪完成"
+                            !sessionLoaded -> "准备中"
+                            !isSessionComplete -> "学习 · ${remainingCardIds.size} 张"
+                            isEmptySession -> "没有单词"
+                            else -> "本轮完成"
                         },
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
@@ -407,7 +407,7 @@ fun FlashcardReviewScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "進度",
+                            text = "进度",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -465,7 +465,7 @@ fun FlashcardReviewScreen(
                     IconButton(onClick = { autoPlaying = !autoPlaying }) {
                         Icon(
                             if (autoPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                            contentDescription = if (autoPlaying) "暫停自動播放" else "開始自動播放"
+                            contentDescription = if (autoPlaying) "暂停自动播放" else "开始自动播放"
                         )
                     }
                 }
@@ -513,9 +513,9 @@ fun FlashcardReviewScreen(
 
                             Text(
                                 text = when {
-                                    isEmptySession -> "這裡沒有單字"
-                                    allRemembered -> "全部記熟了"
-                                    else -> "本輪完成"
+                                    isEmptySession -> "这里没有单词"
+                                    allRemembered -> "全部记熟了"
+                                    else -> "本轮完成"
                                 },
                                 style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -527,11 +527,11 @@ fun FlashcardReviewScreen(
                             Text(
                                 text = when {
                                     isEmptySession ->
-                                        "先新增或匯入單字，再開始學習。"
+                                        "先添加或导入单词，再开始学习。"
                                     allRemembered ->
-                                        "可以前往測驗，或重新學習全部卡片。"
+                                        "可以前往测试，或重新学习全部卡片。"
                                     else ->
-                                        "還有 $nextRoundCardCount 張不熟，下次會接著練習。"
+                                        "还有 $nextRoundCardCount 张不熟，下次会接著练习。"
                                 },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
@@ -553,7 +553,7 @@ fun FlashcardReviewScreen(
                                         .testTag("prompt_to_games_button")
                                 ) {
                                     Text(
-                                        text = "前往測驗",
+                                        text = "前往测试",
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                                     )
                                 }
@@ -575,7 +575,7 @@ fun FlashcardReviewScreen(
                                     modifier = Modifier.fillMaxWidth().height(48.dp)
                                 ) {
                                     Icon(Icons.Default.Refresh, contentDescription = null)
-                                    Text("重新學習")
+                                    Text("重新学习")
                                 }
 
                                 Spacer(modifier = Modifier.height(10.dp))
@@ -589,7 +589,7 @@ fun FlashcardReviewScreen(
                                         .testTag("finish_review_button")
                                 ) {
                                     Text(
-                                        text = "返回學習",
+                                        text = "返回学习",
                                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                                     )
                                 }
@@ -609,14 +609,14 @@ fun FlashcardReviewScreen(
                                     },
                                     modifier = Modifier.fillMaxWidth().height(52.dp)
                                 ) {
-                                    Text("繼續複習（$nextRoundCardCount）")
+                                    Text("继续复习（$nextRoundCardCount）")
                                 }
                                 Spacer(modifier = Modifier.height(10.dp))
                                 OutlinedButton(
                                     onClick = { leaveReview(onBackToDashboard) },
                                     modifier = Modifier.fillMaxWidth().height(48.dp)
                                 ) {
-                                    Text("返回學習")
+                                    Text("返回学习")
                                 }
                             } else {
                                 Button(
@@ -631,7 +631,7 @@ fun FlashcardReviewScreen(
                                         .testTag("finish_review_button")
                                 ) {
                                     Text(
-                                        text = "返回學習",
+                                        text = "返回学习",
                                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                                     )
                                 }

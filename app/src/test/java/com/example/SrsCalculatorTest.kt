@@ -13,7 +13,7 @@ class SrsCalculatorTest {
         id = 1,
         deckId = 1,
         word = "resilient",
-        definition = "有韌性的"
+        definition = "有韧性的"
     )
 
     @Test
@@ -27,14 +27,14 @@ class SrsCalculatorTest {
         assertEquals(0, result.repetitionCount)
         assertFalse(result.isMastered)
         assertTrue(result.nextReviewTimestamp >= before + 9 * 60_000)
-        assertEquals("< 10 分鐘", SrsCalculator.getIntervalText(card, 1))
+        assertEquals("< 10 分钟", SrsCalculator.getIntervalText(card, 1))
     }
 
     @Test
     fun goodAndEasyPreviewMatchStoredInterval() {
         for (rating in 2..4) {
             val result = SrsCalculator.calculateNextReview(card, rating)
-            assertEquals("${result.intervalDays} 天後", SrsCalculator.getIntervalText(card, rating))
+            assertEquals("${result.intervalDays} 天后", SrsCalculator.getIntervalText(card, rating))
         }
     }
 

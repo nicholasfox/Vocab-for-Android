@@ -70,7 +70,7 @@ fun GrammarImportScreen(
             busy = true; message = null
             runCatching { onRecognize(uris, "ENRICH") }
                 .onSuccess(onPreview)
-                .onFailure { message = it.message ?: "無法辨識內容" }
+                .onFailure { message = it.message ?: "无法识别内容" }
             busy = false
         }
     }
@@ -79,10 +79,10 @@ fun GrammarImportScreen(
     val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { ok -> if (ok) pendingCameraUri?.let { process(listOf(it)) } }
     val scanner = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) runCatching { GmsDocumentScanningResult.fromActivityResultIntent(result.data)?.pages?.map { it.imageUri }.orEmpty() }
-            .onSuccess(::process).onFailure { message = "無法讀取掃描結果，請重新掃描或改用相片" }
+            .onSuccess(::process).onFailure { message = "无法读取扫描结果，请重新扫描或改用照片" }
     }
     val shareFile = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        if (uri != null) scope.launch { busy = true; message = null; runCatching { onImportShare(uri) }.onSuccess(onPreview).onFailure { message = it.message ?: "無法讀取分享檔" }; busy = false }
+        if (uri != null) scope.launch { busy = true; message = null; runCatching { onImportShare(uri) }.onSuccess(onPreview).onFailure { message = it.message ?: "无法读取分享档" }; busy = false }
     }
     fun launchCamera() {
         val file = File(context.cacheDir, "grammar_import_${System.currentTimeMillis()}.jpg")
@@ -95,41 +95,41 @@ fun GrammarImportScreen(
             .setResultFormats(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
             .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL).build()
         runCatching { GmsDocumentScanning.getClient(options).getStartScanIntent(activity) }
-            .onFailure { message = it.message ?: "此裝置不支援掃描服務" }
+            .onFailure { message = it.message ?: "此设备不支持扫描服务" }
             .getOrNull()
             ?.addOnSuccessListener { scanner.launch(IntentSenderRequest.Builder(it).build()) }
-            ?.addOnFailureListener { message = it.message ?: "無法開啟掃描器" }
+            ?.addOnFailureListener { message = it.message ?: "无法打开扫描器" }
     }
     if (showPasteDialog) AlertDialog(
-        onDismissRequest = { if (!busy) showPasteDialog = false }, title = { Text("貼上文法內容") },
+        onDismissRequest = { if (!busy) showPasteDialog = false }, title = { Text("贴上语法内容") },
         text = { OutlinedTextField(pastedText, { pastedText = it }, label = { Text("教材文字") }, minLines = 7) },
-        confirmButton = { Button(enabled = pastedText.isNotBlank() && !busy, onClick = { scope.launch { busy = true; message = null; runCatching { onRecognizeText(pastedText, "ENRICH") }.onSuccess { showPasteDialog = false; onPreview(listOf(it)) }.onFailure { message = it.message ?: "無法整理文字" }; busy = false } }) { Text("建立預覽") } },
+        confirmButton = { Button(enabled = pastedText.isNotBlank() && !busy, onClick = { scope.launch { busy = true; message = null; runCatching { onRecognizeText(pastedText, "ENRICH") }.onSuccess { showPasteDialog = false; onPreview(listOf(it)) }.onFailure { message = it.message ?: "无法整理文字" }; busy = false } }) { Text("创建预览") } },
         dismissButton = { TextButton(onClick = { showPasteDialog = false }) { Text("取消") } }
     )
     Scaffold(
-        topBar = { TopAppBar(title = { Text("匯入文法") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) }
+        topBar = { TopAppBar(title = { Text("导入语法") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) }
     ) { padding ->
         LazyColumn(Modifier.padding(padding).fillMaxSize(), contentPadding = PaddingValues(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             item {
-                Text("選擇教材來源", style = MaterialTheme.typography.headlineSmall)
-                Text("建立新的文法筆記", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text("选择教材来源", style = MaterialTheme.typography.headlineSmall)
+                Text("创建新的语法笔记", color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            item { ModernListRow("手動建立", "整理核心概念、句型與練習題", Icons.Default.EditNote, onManual) }
-            item { ModernListRow("AI 依主題建立", "輸入想學的文法與程度", Icons.Default.AutoAwesome, onAiCreate) }
-            item { CalmSectionHeader("匯入教材") }
+            item { ModernListRow("手动创建", "整理核心概念、句型与练习题", Icons.Default.EditNote, onManual) }
+            item { ModernListRow("AI 依主题创建", "输入想学的语法与程度", Icons.Default.AutoAwesome, onAiCreate) }
+            item { CalmSectionHeader("导入教材") }
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     FilledTonalIconButton(onClick = ::launchCamera, enabled = !busy, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.CameraAlt, "拍照") }
-                    FilledTonalIconButton(onClick = ::launchScanner, enabled = !busy, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.DocumentScanner, "掃描") }
-                    FilledTonalIconButton(onClick = { gallery.launch("image/*") }, enabled = !busy, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.PhotoLibrary, "相片") }
+                    FilledTonalIconButton(onClick = ::launchScanner, enabled = !busy, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.DocumentScanner, "扫描") }
+                    FilledTonalIconButton(onClick = { gallery.launch("image/*") }, enabled = !busy, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Icon(Icons.Default.PhotoLibrary, "照片") }
                 }
             }
-            item { ModernListRow("檔案", "PDF、Word、圖片與文字檔", Icons.Default.FileOpen, { if (!busy) files.launch(arrayOf("image/*", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain")) }) }
-            item { ModernListRow("貼上文字", "貼上教材內容", Icons.Default.ContentPaste, { if (!busy) showPasteDialog = true }) }
-            item { ModernListRow("分享檔", "匯入 .vocabshare", Icons.Default.Share, { if (!busy) shareFile.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) }) }
+            item { ModernListRow("文件", "PDF、Word、图片与文字档", Icons.Default.FileOpen, { if (!busy) files.launch(arrayOf("image/*", "application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain")) }) }
+            item { ModernListRow("贴上文字", "贴上教材内容", Icons.Default.ContentPaste, { if (!busy) showPasteDialog = true }) }
+            item { ModernListRow("分享档", "导入 .vocabshare", Icons.Default.Share, { if (!busy) shareFile.launch(arrayOf("application/json", "application/octet-stream", "text/plain")) }) }
             if (busy) item {
                 Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.surface) {
-                    Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { CircularProgressIndicator(Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("AI 正在辨識、整理並補齊…") }
+                    Row(Modifier.fillMaxWidth().padding(18.dp), verticalAlignment = Alignment.CenterVertically) { CircularProgressIndicator(Modifier.size(24.dp)); Spacer(Modifier.width(12.dp)); Text("AI 正在识别、整理并补齐…") }
                 }
             }
             message?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
@@ -187,12 +187,12 @@ fun GrammarNoteDetailScreen(
     var showComparison by remember { mutableStateOf(false) }
     var showWhy by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
-    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text("刪除文法筆記？") }, text = { Text("筆記、題目與弱點紀錄會一併刪除，且無法復原。") }, confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text("刪除", color = MaterialTheme.colorScheme.error) } }, dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("取消") } })
+    if (confirmDelete) AlertDialog(onDismissRequest = { confirmDelete = false }, title = { Text("删除语法笔记？") }, text = { Text("笔记、题目与薄薄弱点纪录会一并删除，且无法恢复。") }, confirmButton = { TextButton(onClick = { confirmDelete = false; onDelete() }) { Text("删除", color = MaterialTheme.colorScheme.error) } }, dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("取消") } })
     Scaffold(
-        topBar = { TopAppBar(title = { Text(note.title, maxLines = 1, overflow = TextOverflow.Ellipsis) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }, actions = { IconButton(onClick = onFavorite) { Icon(if (note.favorite) Icons.Default.Star else Icons.Default.StarBorder, "收藏") }; IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "編輯") }; IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.Delete, "刪除") } }) },
-        bottomBar = { Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = onLearn, modifier = Modifier.weight(1f)) { Text("開始學習") }; Button(onClick = onQuiz, enabled = questionCount > 0, modifier = Modifier.weight(1f)) { Text("開始測驗") } } }
+        topBar = { TopAppBar(title = { Text(note.title, maxLines = 1, overflow = TextOverflow.Ellipsis) }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }, actions = { IconButton(onClick = onFavorite) { Icon(if (note.favorite) Icons.Default.Star else Icons.Default.StarBorder, "收藏") }; IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "编辑") }; IconButton(onClick = { confirmDelete = true }) { Icon(Icons.Default.Delete, "删除") } }) },
+        bottomBar = { Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = onLearn, modifier = Modifier.weight(1f)) { Text("开始学习") }; Button(onClick = onQuiz, enabled = questionCount > 0, modifier = Modifier.weight(1f)) { Text("开始测试") } } }
     ) { padding -> LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { AssistChip(onClick = {}, label = { Text(note.course) }); note.tags.split(',', '、').firstOrNull { it.isNotBlank() }?.let { AssistChip(onClick = {}, label = { Text(it.trim()) }) }; Text("熟練度 ${note.masteryPercent}%", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically)) } }
+        item { Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { AssistChip(onClick = {}, label = { Text(note.course) }); note.tags.split(',', '、').firstOrNull { it.isNotBlank() }?.let { AssistChip(onClick = {}, label = { Text(it.trim()) }) }; Text("熟练度 ${note.masteryPercent}%", color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.align(Alignment.CenterVertically)) } }
         if (note.summary.isNotBlank()) item { GrammarPanel("核心概念") { Text(note.summary) } }
         if (patterns.isNotEmpty()) itemsIndexed(patterns, key = { _, pattern -> pattern.id }) { index, pattern ->
             GrammarPanel(pattern.title.ifBlank { "句型 ${index + 1}" }) {
@@ -201,7 +201,7 @@ fun GrammarNoteDetailScreen(
                     Text("${pattern.masteryPercent}%", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (pattern.meaning.isNotBlank()) Text(pattern.meaning)
-                if (pattern.usage.isNotBlank()) Text("使用時機\n${pattern.usage}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                if (pattern.usage.isNotBlank()) Text("使用时机\n${pattern.usage}", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 examples.filter { it.grammarPatternId == pattern.id }.forEach { example ->
                     HorizontalDivider()
                     Row(verticalAlignment = Alignment.Top) {
@@ -218,14 +218,14 @@ fun GrammarNoteDetailScreen(
             if (note.structure.isNotBlank()) item { GrammarPanel("句型") { Text(note.structure) } }
             if (note.exampleSentence.isNotBlank()) item { GrammarPanel("例句") { Text(note.exampleSentence); if (note.exampleTranslation.isNotBlank()) Text(note.exampleTranslation, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
         }
-        if (note.commonMistakes.isNotBlank()) item { ExpandableGrammarPanel("常見錯誤", showMistakes, { showMistakes = !showMistakes }, note.commonMistakes) }
+        if (note.commonMistakes.isNotBlank()) item { ExpandableGrammarPanel("常见错误", showMistakes, { showMistakes = !showMistakes }, note.commonMistakes) }
         if (note.comparison.isNotBlank()) item { ExpandableGrammarPanel("容易混淆", showComparison, { showComparison = !showComparison }, note.comparison) }
         item { Spacer(Modifier.height(70.dp)) }
     } }
 }
 
 @Composable private fun GrammarPanel(title: String, content: @Composable ColumnScope.() -> Unit) { Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Text(title, fontWeight = FontWeight.Bold); content() } } }
-@Composable private fun ExpandableGrammarPanel(title: String, expanded: Boolean, onToggle: () -> Unit, text: String) { Card(onClick = onToggle, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Row { Text(title, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) "收起" else "展開") }; if (expanded) Text(text) } } }
+@Composable private fun ExpandableGrammarPanel(title: String, expanded: Boolean, onToggle: () -> Unit, text: String) { Card(onClick = onToggle, colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) { Row { Text(title, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)); Icon(if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore, if (expanded) "收起" else "展开") }; if (expanded) Text(text) } } }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -244,26 +244,26 @@ fun GrammarImportPreviewScreen(
     var editSummary by remember { mutableStateOf("") }
     val selectedDrafts = drafts.filterIndexed { i, _ -> selected.getOrElse(i) { false } }
     editingIndex?.let { index -> AlertDialog(
-        onDismissRequest = { editingIndex = null }, title = { Text("編輯匯入內容") },
-        text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedTextField(editTitle, { editTitle = it }, label = { Text("文法名稱") }); OutlinedTextField(editSummary, { editSummary = it }, label = { Text("核心概念") }, minLines = 3) } },
-        confirmButton = { Button(enabled = editTitle.isNotBlank(), onClick = { drafts[index] = drafts[index].copy(title = editTitle.trim(), summary = editSummary); editingIndex = null }) { Text("套用") } },
+        onDismissRequest = { editingIndex = null }, title = { Text("编辑导入内容") },
+        text = { Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedTextField(editTitle, { editTitle = it }, label = { Text("语法名称") }); OutlinedTextField(editSummary, { editSummary = it }, label = { Text("核心概念") }, minLines = 3) } },
+        confirmButton = { Button(enabled = editTitle.isNotBlank(), onClick = { drafts[index] = drafts[index].copy(title = editTitle.trim(), summary = editSummary); editingIndex = null }) { Text("应用") } },
         dismissButton = { TextButton(onClick = { editingIndex = null }) { Text("取消") } }
     ) }
     Scaffold(
-        topBar = { TopAppBar(title = { Text("匯入預覽") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) },
-        bottomBar = { Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("重新辨識") }; Button(enabled = selectedDrafts.isNotEmpty(), onClick = { onSave(selectedDrafts, course, duplicateMode) }, modifier = Modifier.weight(1f)) { Text("儲存 ${selectedDrafts.size} 篇") } } }
+        topBar = { TopAppBar(title = { Text("导入预览") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "返回") } }) },
+        bottomBar = { Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("重新识别") }; Button(enabled = selectedDrafts.isNotEmpty(), onClick = { onSave(selectedDrafts, course, duplicateMode) }, modifier = Modifier.weight(1f)) { Text("保存 ${selectedDrafts.size} 篇") } } }
     ) { padding -> LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             ExposedDropdownMenuBox(expanded = courseMenu, onExpandedChange = { courseMenu = it }, modifier = Modifier.weight(1f)) {
-                GrammarDropdownAnchor("課程", course, Modifier.menuAnchor().fillMaxWidth())
+                GrammarDropdownAnchor("课程", course, Modifier.menuAnchor().fillMaxWidth())
                 ExposedDropdownMenu(expanded = courseMenu, onDismissRequest = { courseMenu = false }) { courses.forEach { DropdownMenuItem(text = { Text(it, maxLines = 1, overflow = TextOverflow.Ellipsis) }, onClick = { course = it; courseMenu = false }) } }
             }
             ExposedDropdownMenuBox(expanded = duplicateMenu, onExpandedChange = { duplicateMenu = it }, modifier = Modifier.weight(1f)) {
-                GrammarDropdownAnchor("重複處理", when (duplicateMode) { "SKIP" -> "略過同名文法"; "COPY" -> "另存新筆記"; else -> "覆蓋同名文法" }, Modifier.menuAnchor().fillMaxWidth())
-                ExposedDropdownMenu(expanded = duplicateMenu, onDismissRequest = { duplicateMenu = false }) { listOf("OVERWRITE" to "覆蓋同名文法", "SKIP" to "略過同名文法", "COPY" to "另存新筆記").forEach { (v, label) -> DropdownMenuItem(text = { Text(label) }, onClick = { duplicateMode = v; duplicateMenu = false }) } }
+                GrammarDropdownAnchor("重复处理", when (duplicateMode) { "SKIP" -> "略过同名语法"; "COPY" -> "另存新笔记"; else -> "覆盖同名语法" }, Modifier.menuAnchor().fillMaxWidth())
+                ExposedDropdownMenu(expanded = duplicateMenu, onDismissRequest = { duplicateMenu = false }) { listOf("OVERWRITE" to "覆盖同名语法", "SKIP" to "略过同名语法", "COPY" to "另存新笔记").forEach { (v, label) -> DropdownMenuItem(text = { Text(label) }, onClick = { duplicateMode = v; duplicateMenu = false }) } }
             }
         } }
-        itemsIndexed(drafts) { index, draft -> Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Checkbox(selected[index], { selected[index] = it }); Column(Modifier.weight(1f)) { Text(draft.title.ifBlank { "未命名文法" }, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis); Text("${draft.patterns.size} 組句型 · ${draft.patterns.sumOf { it.examples.size }} 個例句 · ${draft.questions.size} 題", color = MaterialTheme.colorScheme.onSurfaceVariant); AssistChip(onClick = {}, label = { Text("AI 已整理") }) }; IconButton(onClick = { editingIndex = index; editTitle = draft.title; editSummary = draft.summary }) { Icon(Icons.Default.Edit, "編輯") } } } }
+        itemsIndexed(drafts) { index, draft -> Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Checkbox(selected[index], { selected[index] = it }); Column(Modifier.weight(1f)) { Text(draft.title.ifBlank { "未命名语法" }, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis); Text("${draft.patterns.size} 组句型 · ${draft.patterns.sumOf { it.examples.size }} 个例句 · ${draft.questions.size} 题", color = MaterialTheme.colorScheme.onSurfaceVariant); AssistChip(onClick = {}, label = { Text("AI 已整理") }) }; IconButton(onClick = { editingIndex = index; editTitle = draft.title; editSummary = draft.summary }) { Icon(Icons.Default.Edit, "编辑") } } } }
         item { Spacer(Modifier.height(70.dp)) }
     } }
 }
@@ -273,13 +273,13 @@ fun GrammarImportPreviewScreen(
 fun GrammarQuizResultScreen(noteTitle: String, result: GrammarQuizResult, questions: List<GrammarQuestion>, onBack: () -> Unit, onPracticeWrong: () -> Unit, onRetryAll: () -> Unit) {
     val wrong = questions.filter { it.id in result.wrongQuestionIds }.sortedByDescending { result.wrongCounts[it.id] ?: 0 }
     var showWrongDetails by remember { mutableStateOf(false) }
-    Scaffold(topBar = { TopAppBar(title = { Text("測驗完成") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.Close, "關閉") } }) }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text("测试完成") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.Close, "关闭") } }) }) { padding ->
         LazyColumn(Modifier.padding(padding), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            item { Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text("本次正確率", color = MaterialTheme.colorScheme.onSurfaceVariant); Text("${result.accuracyPercent}%", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold); Text("首次答對 ${result.firstTryCorrect}／${result.totalQuestions} · 共作答 ${result.totalAttempts} 次") } } }
-            item { Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { Text("熟練度變化", fontWeight = FontWeight.Bold); Row { Text(noteTitle, modifier = Modifier.weight(1f)); Text("${result.masteryBefore}% → ${result.masteryAfter}%", fontWeight = FontWeight.Bold) }; LinearProgressIndicator(progress = { result.masteryAfter / 100f }, modifier = Modifier.fillMaxWidth()); Text("依首次答對與本次錯題計算。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
-            if (wrong.isNotEmpty()) item { Text("需要加強", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
-            if (showWrongDetails) itemsIndexed(wrong) { _, q -> Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text(q.prompt.replace("{{answer}}", "____"), maxLines = 2); Text("正確答案：${q.answer}"); Text("錯 ${result.wrongCounts[q.id] ?: 1} 次", color = MaterialTheme.colorScheme.error) } } } }
-            item { if (wrong.isNotEmpty()) { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = { showWrongDetails = !showWrongDetails }, modifier = Modifier.weight(1f)) { Text(if (showWrongDetails) "收起錯題" else "查看錯題") }; Button(onClick = onPracticeWrong, modifier = Modifier.weight(1f)) { Text("弱點練習") } } } else Button(onClick = onRetryAll, modifier = Modifier.fillMaxWidth()) { Text("再次測驗") } }
+            item { Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) { Text("本次正确率", color = MaterialTheme.colorScheme.onSurfaceVariant); Text("${result.accuracyPercent}%", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold); Text("首次答对 ${result.firstTryCorrect}／${result.totalQuestions} · 共作答 ${result.totalAttempts} 次") } } }
+            item { Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { Text("熟练度变化", fontWeight = FontWeight.Bold); Row { Text(noteTitle, modifier = Modifier.weight(1f)); Text("${result.masteryBefore}% → ${result.masteryAfter}%", fontWeight = FontWeight.Bold) }; LinearProgressIndicator(progress = { result.masteryAfter / 100f }, modifier = Modifier.fillMaxWidth()); Text("依首次答对与本次错题计算。", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } } }
+            if (wrong.isNotEmpty()) item { Text("需要加强", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
+            if (showWrongDetails) itemsIndexed(wrong) { _, q -> Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text(q.prompt.replace("{{answer}}", "____"), maxLines = 2); Text("正确答案：${q.answer}"); Text("错 ${result.wrongCounts[q.id] ?: 1} 次", color = MaterialTheme.colorScheme.error) } } } }
+            item { if (wrong.isNotEmpty()) { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { OutlinedButton(onClick = { showWrongDetails = !showWrongDetails }, modifier = Modifier.weight(1f)) { Text(if (showWrongDetails) "收起错题" else "查看错题") }; Button(onClick = onPracticeWrong, modifier = Modifier.weight(1f)) { Text("薄薄弱点练习") } } } else Button(onClick = onRetryAll, modifier = Modifier.fillMaxWidth()) { Text("再次测试") } }
         }
     }
 }
@@ -316,7 +316,7 @@ fun GrammarQuizFlowScreen(
         onComplete(GrammarQuizResult(noteId, original.size, firstTryCorrect, totalAttempts, wrongCounts.keys.toList(), wrongCounts.toMap(), masteryBefore, (masteryBefore + reward - penalty).coerceIn(0, 100)))
     }
     Scaffold(
-        topBar = { TopAppBar(title = { Text("文法測驗") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.Close, "退出") } }, actions = { Text("${(index + 1).coerceAtMost(queue.size)}／${queue.size}", modifier = Modifier.padding(end = 16.dp)) }) },
+        topBar = { TopAppBar(title = { Text("语法测试") }, navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.Close, "退出") } }, actions = { Text("${(index + 1).coerceAtMost(queue.size)}／${queue.size}", modifier = Modifier.padding(end = 16.dp)) }) },
         bottomBar = { if (question != null) Row(Modifier.fillMaxWidth().navigationBarsPadding().padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(enabled = !checked, onClick = { hint = true }, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Lightbulb, null); Spacer(Modifier.width(5.dp)); Text("提示") }
             val choices = question.options.split(',', '、', '\n').map(String::trim).filter(String::isNotBlank)
@@ -332,23 +332,23 @@ fun GrammarQuizFlowScreen(
                 else if (index < queue.lastIndex) { index++; clearResponse() }
                 else if (wrongQueue.isNotEmpty()) { queue = wrongQueue.toList(); wrongQueue.clear(); index = 0; clearResponse() }
                 else finish()
-            }, modifier = Modifier.weight(1f)) { Text(if (!checked) "確認答案" else if (correct) "下一題" else "再答一次") }
+            }, modifier = Modifier.weight(1f)) { Text(if (!checked) "确认答案" else if (correct) "下一题" else "再答一次") }
         } }
     ) { padding ->
-        if (question == null) Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) { Text("這篇文法尚未建立練習題") }
+        if (question == null) Box(Modifier.padding(padding).fillMaxSize(), contentAlignment = Alignment.Center) { Text("这篇语法尚未创建练习题") }
         else {
             val choices = remember(question.id, noteId) { question.options.split(',', '、', '\n').map(String::trim).filter(String::isNotBlank).distinct().take(4).shuffled() }
             Column(Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(horizontal = 18.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 LinearProgressIndicator(progress = { (index + 1f) / queue.size.coerceAtLeast(1) }, modifier = Modifier.fillMaxWidth())
-                Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { AssistChip(onClick = {}, label = { Text(if (choices.isEmpty()) "填空" else "選擇") }); Text(question.prompt.replace("{{answer}}", "____"), style = MaterialTheme.typography.titleLarge); if (question.translation.isNotBlank()) Text(question.translation, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
+                Card(shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) { Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) { AssistChip(onClick = {}, label = { Text(if (choices.isEmpty()) "填空" else "选择") }); Text(question.prompt.replace("{{answer}}", "____"), style = MaterialTheme.typography.titleLarge); if (question.translation.isNotBlank()) Text(question.translation, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
                 if (choices.isNotEmpty()) Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     choices.forEach { choice ->
                         ModernChoiceRow(text = choice, selected = selected == choice, enabled = !checked, onClick = { selected = choice }, label = ('A' + choices.indexOf(choice)).toString())
                     }
                 }
-                else OutlinedTextField(input, { input = it }, enabled = !checked, label = { Text("輸入完整答案") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-                if (hint && !checked) Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) { Row(Modifier.padding(14.dp)) { Icon(Icons.Default.Lightbulb, null); Spacer(Modifier.width(8.dp)); Text(question.explanation.ifBlank { "想想這個時間或語境需要使用哪一種文法形式。" }) } }
-                if (checked) Card(colors = CardDefaults.cardColors(containerColor = if (correct) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer)) { Column(Modifier.fillMaxWidth().padding(14.dp)) { Text(if (correct) "答對了" else "答錯了", fontWeight = FontWeight.Bold); if (!correct) Text("正確答案：${question.answer}"); if (question.explanation.isNotBlank()) Text(question.explanation) } }
+                else OutlinedTextField(input, { input = it }, enabled = !checked, label = { Text("输入完整答案") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                if (hint && !checked) Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) { Row(Modifier.padding(14.dp)) { Icon(Icons.Default.Lightbulb, null); Spacer(Modifier.width(8.dp)); Text(question.explanation.ifBlank { "想想这个时间或语境需要使用哪一种语法形式。" }) } }
+                if (checked) Card(colors = CardDefaults.cardColors(containerColor = if (correct) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer)) { Column(Modifier.fillMaxWidth().padding(14.dp)) { Text(if (correct) "答对了" else "答错了", fontWeight = FontWeight.Bold); if (!correct) Text("正确答案：${question.answer}"); if (question.explanation.isNotBlank()) Text(question.explanation) } }
             }
         }
     }

@@ -8,7 +8,7 @@ import okhttp3.Request
 import java.net.URLEncoder
 import java.util.concurrent.TimeUnit
 
-/** On-demand lookup of the public Cambridge English–Traditional Chinese entry page. */
+/** On-demand lookup of the public Cambridge English–Simplified Chinese entry page. */
 object CambridgeDictionaryLookupService {
     private val client = OkHttpClient.Builder()
         .connectTimeout(12, TimeUnit.SECONDS)
@@ -18,16 +18,16 @@ object CambridgeDictionaryLookupService {
 
     suspend fun lookup(rawWord: String): DictionaryEntry = withContext(Dispatchers.IO) {
         val word = rawWord.trim().lowercase()
-        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "劍橋辭典僅支援英文單字或短語" }
+        require(word.matches(Regex("[a-z][a-z' -]{0,79}"))) { "剑桥辞典仅支持英文单词或短语" }
         val slug = URLEncoder.encode(word, "UTF-8").replace("+", "%20")
         val request = Request.Builder()
-            .url("https://dictionary.cambridge.org/dictionary/english-chinese-traditional/$slug")
+            .url("https://dictionary.cambridge.org/dictionary/english-chinese-simplified/$slug")
             .header("User-Agent", "Mozilla/5.0 (Linux; Android 14) Vocab/2.8.0")
-            .header("Accept-Language", "zh-TW,zh;q=0.9,en;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
             .build()
         client.newCall(request).execute().use { response ->
             check(response.isSuccessful) {
-                if (response.code == 404) "劍橋辭典找不到這個單字" else "劍橋辭典暫時無法查詢（${response.code}）"
+                if (response.code == 404) "剑桥辞典找不到这个单词" else "剑桥辞典暂时无法查询（${response.code}）"
             }
             parse(word, response.body?.string().orEmpty())
         }
@@ -50,7 +50,7 @@ object CambridgeDictionaryLookupService {
         val englishDefinitions = all("class=\"[^\"]*\\bdef\\b[^\"]*\"[^>]*>(.*?)</", 5)
         val example = first("class=\"[^\"]*\\beg\\b[^\"]*\"[^>]*>(.*?)</")
         val definition = translations.ifEmpty { englishDefinitions }.joinToString("；")
-        check(definition.isNotBlank()) { "劍橋辭典沒有可顯示的解釋" }
+        check(definition.isNotBlank()) { "剑桥辞典没有可显示的解释" }
         return DictionaryEntry(
             word = headword.ifBlank { requestedWord },
             phonetic = phonetic.takeIf(String::isNotBlank)?.let { "/${it.trim('/')} /".replace("/ ", "/") }.orEmpty(),

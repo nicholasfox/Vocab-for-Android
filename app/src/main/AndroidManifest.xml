@@ -54,7 +54,7 @@
         </receiver>
         <receiver
             android:name=".widgets.VocabWidgetProvider"
-            android:label="今日進度"
+            android:label="今日进度"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -65,7 +65,7 @@
         </receiver>
         <receiver
             android:name=".widgets.DailyWordWidgetProvider"
-            android:label="每日單字"
+            android:label="每日单词"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -76,7 +76,7 @@
         </receiver>
         <receiver
             android:name=".widgets.DueReviewWidgetProvider"
-            android:label="待複習"
+            android:label="待复习"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -87,7 +87,7 @@
         </receiver>
         <receiver
             android:name=".widgets.StreakWidgetProvider"
-            android:label="連續學習"
+            android:label="连续学习"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

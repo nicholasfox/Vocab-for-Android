@@ -54,7 +54,7 @@ import kotlinx.coroutines.delay
 fun AddFolderDialog(
     existingCourses: List<String>,
     defaultCourse: String? = null,
-    itemLabel: String = "資料夾",
+    itemLabel: String = "文件夹",
     onDismiss: () -> Unit,
     onConfirm: (courseName: String, folderName: String, description: String, colorHex: String) -> Unit
 ) {
@@ -92,7 +92,7 @@ fun AddFolderDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "新增$itemLabel",
+                text = "添加$itemLabel",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
             )
         },
@@ -106,7 +106,7 @@ fun AddFolderDialog(
             ) {
                 // Course Selection or Creation
                 Text(
-                    text = "課程",
+                    text = "课程",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -122,7 +122,7 @@ fun AddFolderDialog(
                             onValueChange = {},
                             readOnly = true,
                             singleLine = true,
-                            label = { Text("選擇課程") },
+                            label = { Text("选择课程") },
                             trailingIcon = {
                                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = isCourseMenuExpanded)
                             },
@@ -145,7 +145,7 @@ fun AddFolderDialog(
                                 )
                             }
                             DropdownMenuItem(
-                                text = { Text("新增課程…") },
+                                text = { Text("添加课程…") },
                                 onClick = {
                                     isCourseMenuExpanded = false
                                     isAddingNewCourse = true
@@ -158,7 +158,7 @@ fun AddFolderDialog(
                     OutlinedTextField(
                         value = newCourseInput,
                         onValueChange = { newCourseInput = it },
-                        label = { Text("課程名稱") },
+                        label = { Text("课程名称") },
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
@@ -172,7 +172,7 @@ fun AddFolderDialog(
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text("改選現有課程")
+                            Text("改选现有课程")
                         }
                     }
                 }
@@ -188,7 +188,7 @@ fun AddFolderDialog(
                 OutlinedTextField(
                     value = folderName,
                     onValueChange = { folderName = it },
-                    label = { Text("名稱 *") },
+                    label = { Text("名称 *") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth().testTag("folder_name_input")
@@ -198,7 +198,7 @@ fun AddFolderDialog(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { description = it },
-                    label = { Text("說明（選填）") },
+                    label = { Text("说明（选填）") },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -219,7 +219,7 @@ fun AddFolderDialog(
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.testTag("confirm_create_folder_button")
             ) {
-                Text("建立$itemLabel", fontWeight = FontWeight.Bold)
+                Text("创建$itemLabel", fontWeight = FontWeight.Bold)
             }
         },
         dismissButton = {

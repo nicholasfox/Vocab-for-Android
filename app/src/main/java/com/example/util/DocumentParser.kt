@@ -43,13 +43,13 @@ object DocumentParser {
             contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length }
         }.getOrNull() ?: -1L
         require(inputLength <= MAX_INPUT_BYTES || inputLength < 0L) {
-            "檔案超過 25 MB，請先壓縮或分成較小檔案"
+            "文件超过 25 MB，请先压缩或分成较小文件"
         }
         require(!isLegacyDoc) {
-            "舊版 DOC 無法可靠解析，請另存為 DOCX 或 PDF 後再匯入"
+            "旧版 DOC 无法可靠解析，请另存为 DOCX 或 PDF 后再导入"
         }
         require(!isImage) {
-            "圖片必須使用設定中選擇的多模態 AI 直接辨識"
+            "图片必须使用设置中选择的多模态 AI 直接识别"
         }
 
         if (isPdf) {
@@ -81,7 +81,7 @@ object DocumentParser {
             return@withContext rawText
         }
 
-        throw IllegalArgumentException("不支援此檔案格式，請使用 PDF、DOCX 或文字檔")
+        throw IllegalArgumentException("不支持此文件格式，请使用 PDF、DOCX 或文字档")
     }
 
     /**
@@ -98,7 +98,7 @@ object DocumentParser {
             tempFile = File.createTempFile("ai_chat_pdf_", ".pdf", context.cacheDir)
             context.contentResolver.openInputStream(uri)?.use { input ->
                 FileOutputStream(tempFile).use(input::copyTo)
-            } ?: error("無法開啟 PDF")
+            } ?: error("无法打开 PDF")
 
             ParcelFileDescriptor.open(tempFile, ParcelFileDescriptor.MODE_READ_ONLY).use { pfd ->
                 PdfRenderer(pfd).use { renderer ->
@@ -121,7 +121,7 @@ object DocumentParser {
                                     page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
                                     val bytes = ByteArrayOutputStream().use { output ->
                                         check(bitmap.compress(Bitmap.CompressFormat.JPEG, 88, output)) {
-                                            "無法處理 PDF 第 ${index + 1} 頁"
+                                            "无法处理 PDF 第 ${index + 1} 页"
                                         }
                                         output.toByteArray()
                                     }
@@ -240,7 +240,7 @@ object DocumentParser {
     ): Pair<String, List<OcrCardCandidate>> = withContext(Dispatchers.IO) {
         val rawText = extractTextFromUri(context, uri, maxPdfPages)
         require(rawText.isNotBlank()) {
-            "沒有讀取到文字；請確認影像清晰、方向正確且文字沒有被裁切"
+            "没有读取到文字；请确认影像清晰、方向正确且文字没有被裁切"
         }
 
         val localCandidates = OcrWordParser.parseTextToCards(rawText, 0L)

@@ -15,41 +15,41 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class Ai311RegressionTest {
-    private val original = OcrCardCandidate("bank", "n.", "銀行", "She waited by the river bank.", phonetic = "/bæŋk/")
+    private val original = OcrCardCandidate("bank", "n.", "银行", "She waited by the river bank.", phonetic = "/bæŋk/")
 
     @Test fun completionTranslatesTheExistingSentenceWithoutReplacingIt() {
-        val generated = original.copy(exampleTranslation = "她在河岸邊等候。")
+        val generated = original.copy(exampleTranslation = "她在河岸边等候。")
         val result = mergeAiCompletion(original, generated)
         assertEquals(original.exampleSentence, result.exampleSentence)
-        assertEquals("她在河岸邊等候。", result.exampleTranslation)
+        assertEquals("她在河岸边等候。", result.exampleTranslation)
         assertEquals(original.definition, result.definition)
     }
 
     @Test fun translationForANewSentenceIsNotAttachedToTheOriginal() {
-        val generated = original.copy(exampleSentence = "I work at a bank.", exampleTranslation = "我在銀行工作。")
+        val generated = original.copy(exampleSentence = "I work at a bank.", exampleTranslation = "我在银行工作。")
         val result = mergeAiCompletion(original, generated)
         assertEquals(original.exampleSentence, result.exampleSentence)
         assertEquals("", result.exampleTranslation)
     }
 
     @Test fun completionNeverOverwritesExistingTranslationOrOtherPopulatedFields() {
-        val complete = original.copy(exampleTranslation = "原有翻譯")
-        assertEquals(complete, mergeAiCompletion(complete, original.copy(definition = "河岸", exampleTranslation = "新翻譯")))
+        val complete = original.copy(exampleTranslation = "原有翻译")
+        assertEquals(complete, mergeAiCompletion(complete, original.copy(definition = "河岸", exampleTranslation = "新翻译")))
     }
 
     @Test fun emptySentenceCanReceiveAMatchingNewSentenceAndTranslation() {
         val empty = original.copy(exampleSentence = "")
-        val result = mergeAiCompletion(empty, original.copy(exampleTranslation = "她在河岸邊等候。"))
+        val result = mergeAiCompletion(empty, original.copy(exampleTranslation = "她在河岸边等候。"))
         assertEquals(original.exampleSentence, result.exampleSentence)
-        assertEquals("她在河岸邊等候。", result.exampleTranslation)
+        assertEquals("她在河岸边等候。", result.exampleTranslation)
     }
 
     @Test fun explicitChatUpdateReplacesNonemptyFieldsButKeepsOmittedFieldsAndSrs() {
-        val card = Flashcard(id = 8, deckId = 3, word = "bank", definition = "銀行",
-            exampleSentence = original.exampleSentence, exampleTranslation = "既有翻譯", notes = "原註記", intervalDays = 21, repetitionCount = 5)
-        val updated = applyAssistantCardUpdate(card, JSONObject().put("definition", "河岸").put("notes", "依使用者指令修改"))
+        val card = Flashcard(id = 8, deckId = 3, word = "bank", definition = "银行",
+            exampleSentence = original.exampleSentence, exampleTranslation = "既有翻译", notes = "原注记", intervalDays = 21, repetitionCount = 5)
+        val updated = applyAssistantCardUpdate(card, JSONObject().put("definition", "河岸").put("notes", "依用户指令修改"))
         assertEquals("河岸", updated.definition)
-        assertEquals("依使用者指令修改", updated.notes)
+        assertEquals("依用户指令修改", updated.notes)
         assertEquals(card.exampleSentence, updated.exampleSentence)
         assertEquals(card.exampleTranslation, updated.exampleTranslation)
         assertEquals(21, updated.intervalDays)
@@ -60,12 +60,12 @@ class Ai311RegressionTest {
     }
 
     @Test fun explicitClearAndWordRenameAreSupportedButNullDoesNotClear() {
-        val card = Flashcard(deckId = 3, word = "bank", definition = "銀行", notes = "原註記")
+        val card = Flashcard(deckId = 3, word = "bank", definition = "银行", notes = "原注记")
         val updated = applyAssistantCardUpdate(card, JSONObject().put("word", "Shore").put("notes", "").put("definition", JSONObject.NULL))
         assertEquals("Shore", updated.word)
         assertEquals("shore", updated.normalizedWord)
         assertEquals("", updated.notes)
-        assertEquals("銀行", updated.definition)
+        assertEquals("银行", updated.definition)
         assertTrue(runCatching { applyAssistantCardUpdate(card, JSONObject().put("word", " ")) }.isFailure)
     }
 }

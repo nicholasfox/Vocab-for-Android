@@ -10,14 +10,14 @@ class OcrWordParserTest {
     @Test
     fun delimitedCardKeepsPartOfSpeechDefinitionAndSentenceInOrder() {
         val cards = OcrWordParser.parseTextToCards(
-            "active | adj. | 活躍的；積極的 | The dog is very active.",
+            "active | adj. | 活跃的；积极的 | The dog is very active.",
             deckId = 1L
         )
 
         assertEquals(1, cards.size)
         assertEquals("active", cards.single().word)
         assertEquals("adj.", cards.single().partOfSpeech)
-        assertEquals("活躍的；積極的", cards.single().definition)
+        assertEquals("活跃的；积极的", cards.single().definition)
         assertEquals("The dog is very active.", cards.single().exampleSentence)
     }
 
@@ -35,15 +35,15 @@ class OcrWordParserTest {
     fun duplicateWordsAreRemovedWithoutChangingFirstSeenOrder() {
         val cards = OcrWordParser.parseTextToCards(
             """
-            apple | 蘋果
+            apple | 苹果
             banana | 香蕉
-            Apple | 不應覆蓋第一筆
+            Apple | 不应覆盖第一笔
             """.trimIndent(),
             deckId = 1L
         )
 
         assertEquals(listOf("apple", "banana"), cards.map { it.word })
-        assertEquals("蘋果", cards.first().definition)
+        assertEquals("苹果", cards.first().definition)
     }
 
     @Test
@@ -51,13 +51,13 @@ class OcrWordParserTest {
         val cards = OcrWordParser.parseTextToCards(
             """
             resilient
-            有韌性的；能迅速恢復的
+            有韧性的；能迅速恢复的
             """.trimIndent(),
             deckId = 1L
         )
 
         assertEquals(1, cards.size)
         assertEquals("resilient", cards.single().word)
-        assertEquals("有韌性的；能迅速恢復的", cards.single().definition)
+        assertEquals("有韧性的；能迅速恢复的", cards.single().definition)
     }
 }

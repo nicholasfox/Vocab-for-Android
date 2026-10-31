@@ -171,7 +171,7 @@ abstract class AppDatabase : RoomDatabase() {
         val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE grammar_notes ADD COLUMN category TEXT NOT NULL DEFAULT '其他'")
-                db.execSQL("ALTER TABLE grammar_notes ADD COLUMN level TEXT NOT NULL DEFAULT '未分級'")
+                db.execSQL("ALTER TABLE grammar_notes ADD COLUMN level TEXT NOT NULL DEFAULT '未分级'")
                 db.execSQL("ALTER TABLE grammar_questions ADD COLUMN grammarPatternId INTEGER NOT NULL DEFAULT 0")
                 db.execSQL(
                     """
@@ -231,7 +231,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
         val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE grammar_notes ADD COLUMN folder TEXT NOT NULL DEFAULT '未分類'")
+                db.execSQL("ALTER TABLE grammar_notes ADD COLUMN folder TEXT NOT NULL DEFAULT '未分类'")
                 db.execSQL(
                     """
                     CREATE TABLE IF NOT EXISTS grammar_writing_records (

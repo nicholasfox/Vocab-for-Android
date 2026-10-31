@@ -91,7 +91,7 @@ fun StudyHubScreen(
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("學習", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                        Text("学习", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                     }
                 },
                 actions = {
@@ -117,14 +117,14 @@ fun StudyHubScreen(
                 item {
                     CalmEmptyState(
                         icon = Icons.Default.Folder,
-                        title = "還沒有資料夾",
-                        message = "先建立資料夾，再開始學習。"
+                        title = "还没有文件夹",
+                        message = "先创建文件夹，再开始学习。"
                     )
                 }
             } else {
                 item {
                     Text(
-                        text = "選擇課程",
+                        text = "选择课程",
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -142,7 +142,7 @@ fun StudyHubScreen(
                                 modifier = Modifier.clickable { selectedCourse = null }
                             ) {
                                 Text(
-                                    text = "全部資料夾 (${decks.size})",
+                                    text = "全部文件夹 (${decks.size})",
                                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
                                     else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -177,7 +177,7 @@ fun StudyHubScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.Style, contentDescription = null)
-                        Text("複習全部 · $courseCardCount")
+                        Text("复习全部 · $courseCardCount")
                     }
                 }
                 items(filteredDecks) { deck ->

@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="活躍的；積極的"
+        android:text="活跃的；积极的"
         android:textColor="#FFD4DEE7"
         android:textSize="10sp" />
 

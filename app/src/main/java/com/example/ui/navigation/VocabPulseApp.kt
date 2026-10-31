@@ -243,14 +243,14 @@ fun VocabApp(
     if (showSwitchConfirmDialog) {
         com.example.ui.components.ModernAlertDialog(
             onDismissRequest = { showSwitchConfirmDialog = false },
-            title = { androidx.compose.material3.Text("切換產品世界？") },
-            text = { androidx.compose.material3.Text("您目前的編輯或測驗進度將會取消，確定要切換嗎？") },
+            title = { androidx.compose.material3.Text("切换产品世界？") },
+            text = { androidx.compose.material3.Text("您目前的编辑或测试进度将会取消，确定要切换吗？") },
             confirmButton = {
                 androidx.compose.material3.Button(onClick = {
                     showSwitchConfirmDialog = false
                     performWorldSwitch(targetGrammarMode)
                 }) {
-                    androidx.compose.material3.Text("確定切換")
+                    androidx.compose.material3.Text("确定切换")
                 }
             },
             dismissButton = {
@@ -264,14 +264,14 @@ fun VocabApp(
     if (generatingAiTopic != null) {
         com.example.ui.components.ModernAlertDialog(
             onDismissRequest = {},
-            title = { androidx.compose.material3.Text("AI 正在生成特訓中…") },
+            title = { androidx.compose.material3.Text("AI 正在生成特训中…") },
             text = {
                 androidx.compose.foundation.layout.Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     CircularProgressIndicator()
-                    androidx.compose.material3.Text("正在為【$generatingAiTopic】產生專業文法概念與特訓題目，請稍候")
+                    androidx.compose.material3.Text("正在为【$generatingAiTopic】产生专业语法概念与特训题目，请稍候")
                 }
             },
             confirmButton = {}
@@ -363,7 +363,7 @@ fun VocabApp(
                             } else {
                                 setOf(deckId)
                             }
-                            pendingQuizTitle = if (deckId == null) "全站所有單字卡"
+                            pendingQuizTitle = if (deckId == null) "全站所有单词卡"
                             else decks.firstOrNull { it.id == deckId }?.name.orEmpty()
                             currentTab = 3
                         },
@@ -373,12 +373,12 @@ fun VocabApp(
                         showTopBar = false,
                         onOpenExternalImport = { navController.navigate(Routes.EXTERNAL_IMPORT) },
                         onStartInteractiveReading = { deckId ->
-                            val deckName = decks.firstOrNull { it.id == deckId }?.name ?: "指定資料夾"
+                            val deckName = decks.firstOrNull { it.id == deckId }?.name ?: "指定文件夹"
                             readingStartedAt = System.currentTimeMillis()
                             viewModel.openAssistant(deckId)
                             navController.navigate(Routes.GENERATED_READING) { launchSingleTop = true }
                             viewModel.sendAssistantMessage(
-                                "請根據資料夾「$deckName」產生一篇自然的互動閱讀文章，盡量使用資料夾內的目標單字，並附完整繁體中文翻譯、逐句翻譯與 5 題閱讀測驗。"
+                                "请根据文件夹「$deckName」产生一篇自然的互动阅读文章，尽量使用文件夹内的目标单词，并附完整简体中文翻译、逐句翻译与 5 题阅读测试。"
                             )
                         },
                         onOpenStudyCalendar = { navController.navigate(Routes.STUDY_CALENDAR) },
@@ -578,21 +578,21 @@ fun VocabApp(
                                 readingStartedAt = System.currentTimeMillis()
                                 viewModel.openAssistant(deck.id)
                                 navController.navigate(Routes.GENERATED_READING)
-                                viewModel.sendAssistantMessage("請根據資料夾「${deck.name}」產生一篇自然的互動閱讀文章，優先使用待複習與不熟悉的目標單字，附繁體中文逐句翻譯與 5 題閱讀理解。")
+                                viewModel.sendAssistantMessage("请根据文件夹「${deck.name}」产生一篇自然的互动阅读文章，优先使用待复习与不熟悉的目标单词，附简体中文逐句翻译与 5 题阅读理解。")
                             },
                             onGenerateTopic = { topic ->
                                 selectedArticleId = null
                                 readingStartedAt = System.currentTimeMillis()
                                 viewModel.openAssistant(null)
                                 navController.navigate(Routes.GENERATED_READING)
-                                viewModel.sendAssistantMessage("請依照以下主題與需求產生一篇自然的互動英文閱讀文章，附繁體中文逐句翻譯、重要單字資料與 5 題閱讀理解。主題與需求：$topic")
+                                viewModel.sendAssistantMessage("请依照以下主题与需求产生一篇自然的互动英文阅读文章，附简体中文逐句翻译、重要单词数据与 5 题阅读理解。主题与需求：$topic")
                             },
                             onImport = { source ->
                                 selectedArticleId = null
                                 readingStartedAt = System.currentTimeMillis()
                                 viewModel.openAssistant(null)
                                 navController.navigate(Routes.GENERATED_READING)
-                                viewModel.sendAssistantMessage("請保留以下英文文章原文，只整理標題、段落、繁體中文逐句翻譯與 5 題閱讀理解；不要改寫原文。若內容是公開網址，請明確指出無法直接讀取時需要使用者貼上內文。\n\n$source")
+                                viewModel.sendAssistantMessage("请保留以下英文文章原文，只整理标题、段落、简体中文逐句翻译与 5 题阅读理解；不要改写原文。若内容是公开网址，请明确指出无法直接读取时需要用户贴上正文。\n\n$source")
                             },
                             onRecognizeSources = viewModel::recognizeGrammarWritingSources,
                             onOpenArticle = { message -> selectedArticleId = message.id; navController.navigate(Routes.GENERATED_READING) }
@@ -647,9 +647,9 @@ fun VocabApp(
                         ?: selectedDeckId?.let(::setOf)
                         ?: decks.map { it.id }.toSet()
                     pendingQuizTitle = when {
-                        reviewDeckIds != null -> "目前課程全部資料夾"
+                        reviewDeckIds != null -> "目前课程全部文件夹"
                         selectedDeckId != null -> decks.firstOrNull { it.id == selectedDeckId }?.name.orEmpty()
-                        else -> "全站所有單字卡"
+                        else -> "全站所有单词卡"
                     }
                     currentTab = 3
                     navController.navigate(Routes.MAIN) {
@@ -737,8 +737,8 @@ fun VocabApp(
                     it.role == "ASSISTANT" && it.createdAt >= readingStartedAt && it.kind != "ARTICLE"
                 }?.content?.takeIf { !assistantBusy }
                 AiGenerationLoadingScreen(
-                    title = "文章閱讀",
-                    status = assistantStatus ?: "AI 正在根據資料夾產生文章…",
+                    title = "文章阅读",
+                    status = assistantStatus ?: "AI 正在根据文件夹产生文章…",
                     error = failure,
                     onBack = { viewModel.stopAssistantRequest(); navController.popBackStack() }
                 )
@@ -830,7 +830,7 @@ fun VocabApp(
                     auditStartedAt = System.currentTimeMillis()
                     viewModel.openAssistant(null)
                     viewModel.sendAssistantMessage(
-                        "請對我的單字庫執行完整資料品質檢查，特別檢查疑似拼字錯誤與中文解釋是否可疑；只回報有可靠依據的問題，不確定時請明確標示並不要直接修改。"
+                        "请对我的单词库执行完整数据质量检查，特别检查疑似拼字错误与中文解释是否可疑；只回报有可靠依据的问题，不确定时请明确标示并不要直接修改。"
                     )
                 },
                 aiRunning = assistantBusy && auditStartedAt > 0,
@@ -894,8 +894,8 @@ fun VocabApp(
                     pendingQuizDeckIds = scopeIds ?: decks.map { it.id }.toSet()
                     pendingQuizTitle = when {
                         scopeIds?.size == 1 -> decks.firstOrNull { it.id == scopeIds.first() }?.name.orEmpty()
-                        scopeIds != null -> "目前課程全部資料夾"
-                        else -> "全站所有單字卡"
+                        scopeIds != null -> "目前课程全部文件夹"
+                        else -> "全站所有单词卡"
                     }
                     currentTab = 3
                 },
@@ -949,6 +949,7 @@ fun VocabApp(
                 aiConnectionStatus = aiConnectionStatus,
                 onAiProviderChange = viewModel::updateAiProvider,
                 onAiModelChange = viewModel::updateAiModel,
+                onAiBaseUrlChange = viewModel::updateAiBaseUrl,
                 onAiChatStyleChange = viewModel::updateAiChatStyle,
                 onAiPromptChange = viewModel::updateAiWordPrompt,
                 onResetAiPrompt = viewModel::resetAiWordPrompt,
@@ -1151,7 +1152,7 @@ fun VocabApp(
                 ?: (if (note != null) grammarQuestions.filter { it.grammarNoteId == note.id } else emptyList())
             if (result == null) Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             else GrammarQuizResultScreen(
-                noteTitle = title.ifBlank { "文法測驗" },
+                noteTitle = title.ifBlank { "语法测试" },
                 result = result,
                 questions = questions,
                 onBack = { customQuizQuestions = null; customQuizTitle = ""; grammarQuizFilterIds = null; navController.popBackStack() },

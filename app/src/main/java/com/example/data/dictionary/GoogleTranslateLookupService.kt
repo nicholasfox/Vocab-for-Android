@@ -25,17 +25,17 @@ object GoogleTranslateLookupService {
         require(
             if (chineseQuery) word.length <= 80
             else word.lowercase().matches(Regex("[a-z][a-z' -]{0,79}"))
-        ) { "請輸入英文單字、英文短語或中文解釋" }
+        ) { "请输入英文单词、英文短语或中文解释" }
         val root = request(word, includeDictionary = !chineseQuery, chineseToEnglish = chineseQuery)
         if (chineseQuery) parseChineseQuery(word, root) else parse(word.lowercase(), root)
     }
 
     private fun parseChineseQuery(requestedText: String, root: JSONArray): DictionaryEntry {
-        val rows = root.optJSONArray(0) ?: error("Google 翻譯沒有回傳翻譯結果")
+        val rows = root.optJSONArray(0) ?: error("Google 翻译没有返回翻译结果")
         val english = buildString {
             for (index in 0 until rows.length()) append(rows.optJSONArray(index)?.optString(0).orEmpty())
         }.trim()
-        check(english.isNotBlank()) { "找不到對應的英文" }
+        check(english.isNotBlank()) { "找不到对应的英文" }
         return DictionaryEntry(
             word = english,
             phonetic = "",
@@ -43,12 +43,12 @@ object GoogleTranslateLookupService {
             definition = requestedText,
             exampleSentence = "",
             exampleTranslation = "",
-            category = "Google 中英翻譯"
+            category = "Google 中英翻译"
         )
     }
 
     internal fun parse(requestedWord: String, root: JSONArray): DictionaryEntry {
-        val translationRows = root.optJSONArray(0) ?: error("Google 翻譯沒有回傳翻譯結果")
+        val translationRows = root.optJSONArray(0) ?: error("Google 翻译没有返回翻译结果")
         val firstTranslation = translationRows.optJSONArray(0)
         val translated = firstTranslation?.optString(0).orEmpty().trim()
         val returnedWord = firstTranslation?.optString(1).orEmpty().trim().ifBlank { requestedWord }
@@ -74,7 +74,7 @@ object GoogleTranslateLookupService {
             definition = definitions.joinToString("／").ifBlank { translated },
             exampleSentence = example,
             exampleTranslation = "",
-            category = "Google 翻譯"
+            category = "Google 翻译"
         )
     }
 
@@ -111,7 +111,7 @@ object GoogleTranslateLookupService {
             .get()
             .build()
         client.newCall(request).execute().use { response ->
-            check(response.isSuccessful) { "Google 翻譯暫時無法查詢（${response.code}）" }
+            check(response.isSuccessful) { "Google 翻译暂时无法查询（${response.code}）" }
             return JSONArray(response.body?.string().orEmpty())
         }
     }

@@ -146,7 +146,7 @@ internal object PublicDeckWebViewImporter {
               };
               const valid = (word, definition) => word && definition && word !== definition &&
                 word.length <= 500 && definition.length <= 10000 &&
-                !["詞語\u0000定義", "正面\u0000背面", "word\u0000definition", "front\u0000back"]
+                !["词语\u0000定义", "正面\u0000背面", "word\u0000definition", "front\u0000back"]
                   .includes(word.toLocaleLowerCase() + "\u0000" + definition.toLocaleLowerCase());
               const add = (word, definition, exampleSentence = "") => {
                 word = clean(word); definition = clean(definition); exampleSentence = clean(exampleSentence);
@@ -246,7 +246,7 @@ internal object PublicDeckWebViewImporter {
                 }
             }
         }.distinctBy { it.word.lowercase() }
-        require(cards.isNotEmpty()) { "${source.name} 公開頁沒有可驗證的正面／背面資料" }
+        require(cards.isNotEmpty()) { "${source.name} 公开页没有可验证的正面／背面数据" }
         ParsedExternalDeck(root.optString("title").ifBlank { source.name }, source.name, cards)
     }
 
@@ -282,7 +282,7 @@ internal object PublicDeckWebViewImporter {
                 if (completed.get()) return@evaluateJavascript
                 if (accepts(raw)) finish(Result.success(raw))
                 else if (attempts < MAX_ATTEMPTS) handler.postDelayed(::extract, RETRY_DELAY_MS)
-                else finish(Result.failure(IllegalStateException("${source.name} 頁面沒有公開可匯入的資料，或網站要求登入／驗證")))
+                else finish(Result.failure(IllegalStateException("${source.name} 页面没有公开可导入的数据，或网站要求登录／验证")))
             }
         }
 
@@ -310,7 +310,7 @@ internal object PublicDeckWebViewImporter {
             }
 
             override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
-                if (request.isForMainFrame) finish(Result.failure(IllegalStateException("${source.name} 頁面載入失敗：${error.description}")))
+                if (request.isForMainFrame) finish(Result.failure(IllegalStateException("${source.name} 页面加载失败：${error.description}")))
             }
         }
         dialog.setContentView(webView, ViewGroup.LayoutParams(1, 1))
@@ -322,7 +322,7 @@ internal object PublicDeckWebViewImporter {
         dialog.show()
         dialog.window?.setLayout(1, 1)
         handler.postDelayed({
-            finish(Result.failure(IllegalStateException("${source.name} 讀取逾時，請確認網路或改用公開分享網址")))
+            finish(Result.failure(IllegalStateException("${source.name} 读取逾时，请确认网络或改用公开分享网址")))
         }, TIMEOUT_MS)
         continuation.invokeOnCancellation {
             if (completed.compareAndSet(false, true)) handler.post(::cleanup)

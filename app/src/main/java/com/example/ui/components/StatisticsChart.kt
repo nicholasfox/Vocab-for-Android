@@ -56,7 +56,7 @@ fun StatisticsChart(
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "學習進度",
+                text = "学习进度",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -70,7 +70,7 @@ fun StatisticsChart(
             ) {
                 StatBadge(
                     count = totalCards,
-                    label = "總數",
+                    label = "总数",
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.weight(1f)
                 )

@@ -115,7 +115,7 @@ fun WordLookupScreen(
         saveHistory(normalized)
         scope.launch {
             onLookup(normalized).onSuccess { result = it }
-                .onFailure { error = it.message ?: "查詢失敗，請稍後再試" }
+                .onFailure { error = it.message ?: "查询失败，请稍后再试" }
             loading = false
         }
     }
@@ -123,7 +123,7 @@ fun WordLookupScreen(
     if (showDeckPicker) {
         AlertDialog(
             onDismissRequest = { showDeckPicker = false },
-            title = { Text("加入資料夾") },
+            title = { Text("加入文件夹") },
             text = {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(decks, key = { it.id }) { deck ->
@@ -139,7 +139,7 @@ fun WordLookupScreen(
                         OutlinedButton(
                             onClick = { showDeckPicker = false; showCreateFolder = true },
                             modifier = Modifier.fillMaxWidth()
-                        ) { Icon(Icons.Default.Add, null); Text("新增資料夾") }
+                        ) { Icon(Icons.Default.Add, null); Text("添加文件夹") }
                     }
                 }
             },
@@ -167,11 +167,11 @@ fun WordLookupScreen(
                     OutlinedTextField(
                         value = query,
                         onValueChange = { query = it; searched = false },
-                        placeholder = { Text("搜尋英文單字或中文解釋") },
+                        placeholder = { Text("搜索英文单词或中文解释") },
                         trailingIcon = {
                             IconButton(onClick = { if (query.isNotBlank()) search() }) {
                                 if (loading) CircularProgressIndicator(modifier = Modifier.padding(8.dp))
-                                else Icon(Icons.Default.Search, "搜尋")
+                                else Icon(Icons.Default.Search, "搜索")
                             }
                         },
                         singleLine = true,
@@ -193,7 +193,7 @@ fun WordLookupScreen(
             if (!searched) {
                 item {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("搜尋紀錄", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("搜索纪录", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         if (history.isNotEmpty()) TextButton(onClick = {
                             history = emptyList(); preferences.edit().remove("history").apply()
                         }) { Text("全部清除") }
@@ -209,19 +209,19 @@ fun WordLookupScreen(
                         IconButton(onClick = {
                             history = history - item
                             preferences.edit().putString("history", JSONArray(history).toString()).apply()
-                        }) { Icon(Icons.Default.Close, "刪除") }
+                        }) { Icon(Icons.Default.Close, "删除") }
                     }
                 }
             } else {
                 error?.let { item { Text(it, color = MaterialTheme.colorScheme.error) } }
                 if (localMatches.isNotEmpty()) {
-                    item { Text("我的單字庫", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
+                    item { Text("我的单词库", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
                     items(localMatches, key = { it.id }) { card ->
                         LocalDictionaryResult(card = card, onClick = { onOpenLocalCard(card) })
                     }
                 }
                 result?.let { entry ->
-                    item { Text(result?.category ?: "線上字典", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
+                    item { Text(result?.category ?: "线上字典", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold) }
                     item {
                         DictionaryResultCard(
                             entry = entry,
@@ -231,7 +231,7 @@ fun WordLookupScreen(
                                 scope.launch {
                                     runCatching { onAiComplete(entry.word) }.onSuccess { enriched ->
                                         if (enriched != null) result = enriched
-                                    }.onFailure { error = "AI 補齊失敗：${it.message ?: "請檢查 API 設定"}" }
+                                    }.onFailure { error = "AI 补齐失败：${it.message ?: "请检查 API 设置"}" }
                                     aiLoading = false
                                 }
                             },
@@ -240,7 +240,7 @@ fun WordLookupScreen(
                     }
                 }
                 if (!loading && result == null && localMatches.isEmpty() && error == null) {
-                    item { Text("找不到符合的結果", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+                    item { Text("找不到符合的结果", color = MaterialTheme.colorScheme.onSurfaceVariant) }
                 }
             }
         }
@@ -279,16 +279,16 @@ private fun DictionaryResultCard(entry: DictionaryEntry, aiLoading: Boolean, onA
             Text(entry.definition, style = MaterialTheme.typography.titleMedium)
             if (entry.exampleSentence.isNotBlank()) Text(entry.exampleSentence)
             if (entry.exampleTranslation.isNotBlank()) Text(entry.exampleTranslation, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text("資料來源：${entry.category}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("数据来源：${entry.category}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             if (entry.category.startsWith("ECDICT")) {
-                TextButton(onClick = { uriHandler.openUri("https://github.com/skywind3000/ECDICT") }) { Text("查看 ECDICT 原始專案（MIT）") }
+                TextButton(onClick = { uriHandler.openUri("https://github.com/skywind3000/ECDICT") }) { Text("查看 ECDICT 原始项目（MIT）") }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = onAiComplete, enabled = !aiLoading, modifier = Modifier.weight(1f)) {
                     if (aiLoading) CircularProgressIndicator(modifier = Modifier.padding(4.dp)) else Icon(Icons.Default.AutoAwesome, null)
-                    Text(if (aiLoading) "補齊中" else "AI 補齊")
+                    Text(if (aiLoading) "补齐中" else "AI 补齐")
                 }
-                Button(onClick = onAdd, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Add, null); Text("加入資料夾") }
+                Button(onClick = onAdd, modifier = Modifier.weight(1f)) { Icon(Icons.Default.Add, null); Text("加入文件夹") }
             }
         }
     }

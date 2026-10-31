@@ -92,8 +92,8 @@ fun FoldersManagementScreen(
     onJumpToStudy: (deckId: Long) -> Unit,
     onJumpToQuiz: (deckId: Long) -> Unit,
     onOpenAssistant: () -> Unit = {},
-    onImportShare:suspend(List<SharedFolder>,String,Boolean)->Result<List<Long>> = {_,_,_->Result.failure(IllegalStateException("匯入尚未連接"))},
-    onUndoShare:suspend(List<Long>)->Result<Unit> = {Result.failure(IllegalStateException("匯入尚未連接"))},
+    onImportShare:suspend(List<SharedFolder>,String,Boolean)->Result<List<Long>> = {_,_,_->Result.failure(IllegalStateException("导入尚未连接"))},
+    onUndoShare:suspend(List<Long>)->Result<Unit> = {Result.failure(IllegalStateException("导入尚未连接"))},
     shareUndoIds:List<Long> = emptyList(),
     scanUndoCount:Int=0,
     onUndoScan:()->Unit={},
@@ -111,7 +111,7 @@ fun FoldersManagementScreen(
     var renamedCourseValue by remember { mutableStateOf("") }
 
     val courses = remember(decks) {
-        decks.map { it.category }.distinct().ifEmpty { listOf("通用課程") }
+        decks.map { it.category }.distinct().ifEmpty { listOf("通用课程") }
     }
     var selectedCourseFilter by remember { mutableStateOf<String?>(null) }
 
@@ -147,8 +147,8 @@ fun FoldersManagementScreen(
         }
     }
 
-    if(showAddMenu){AlertDialog(onDismissRequest={showAddMenu=false},title={Text("新增資料夾")},text={Column{TextButton(onClick={showAddMenu=false;showAddDialog=true}){Text("建立資料夾")};TextButton(onClick={showAddMenu=false;importRequested=true}){Text("匯入分享檔案")}}},confirmButton={TextButton(onClick={showAddMenu=false}){Text("取消")}})}
-    if(confirmUndoScan){AlertDialog(onDismissRequest={confirmUndoScan=false},title={Text("撤回上次單字匯入？")},text={Text("移除該批新字卡與後續修改，原有字卡保留。")},confirmButton={TextButton(onClick={confirmUndoScan=false;onUndoScan()}){Text("撤回")}},dismissButton={TextButton(onClick={confirmUndoScan=false}){Text("取消")}})}
+    if(showAddMenu){AlertDialog(onDismissRequest={showAddMenu=false},title={Text("添加文件夹")},text={Column{TextButton(onClick={showAddMenu=false;showAddDialog=true}){Text("创建文件夹")};TextButton(onClick={showAddMenu=false;importRequested=true}){Text("导入分享文件")}}},confirmButton={TextButton(onClick={showAddMenu=false}){Text("取消")}})}
+    if(confirmUndoScan){AlertDialog(onDismissRequest={confirmUndoScan=false},title={Text("撤回上次单词导入？")},text={Text("移除该批新卡片与后续修改，原有卡片保留。")},confirmButton={TextButton(onClick={confirmUndoScan=false;onUndoScan()}){Text("撤回")}},dismissButton={TextButton(onClick={confirmUndoScan=false}){Text("取消")}})}
     if (showAddDialog) {
         AddFolderDialog(
             existingCourses = courses,
@@ -176,8 +176,8 @@ fun FoldersManagementScreen(
     deckToDelete?.let { deck ->
         AlertDialog(
             onDismissRequest = { deckToDelete = null },
-            title = { Text("確定刪除資料夾「${deck.name}」？", fontWeight = FontWeight.Bold) },
-            text = { Text("刪除此資料夾將一併移除其中的所有單字卡，此操作無法復原。") },
+            title = { Text("确定删除文件夹「${deck.name}」？", fontWeight = FontWeight.Bold) },
+            text = { Text("删除此文件夹将一并移除其中的所有单词卡，此操作无法恢复。") },
             confirmButton = {
                 Button(
                     onClick = {
@@ -186,7 +186,7 @@ fun FoldersManagementScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("確定刪除", color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
+                    Text("确定删除", color = MaterialTheme.colorScheme.onError, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = {
@@ -200,12 +200,12 @@ fun FoldersManagementScreen(
     courseToRename?.let { originalName ->
         AlertDialog(
             onDismissRequest = { courseToRename = null },
-            title = { Text("重新命名課程", fontWeight = FontWeight.Bold) },
+            title = { Text("重新命名课程", fontWeight = FontWeight.Bold) },
             text = {
                 OutlinedTextField(
                     value = renamedCourseValue,
                     onValueChange = { renamedCourseValue = it },
-                    label = { Text("課程名稱") },
+                    label = { Text("课程名称") },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -222,7 +222,7 @@ fun FoldersManagementScreen(
                     enabled = renamedCourseValue.isNotBlank() &&
                         renamedCourseValue.trim() != originalName
                 ) {
-                    Text("儲存")
+                    Text("保存")
                 }
             },
             dismissButton = {
@@ -239,7 +239,7 @@ fun FoldersManagementScreen(
                 windowInsets = WindowInsets(0, 0, 0, 0),
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("資料夾", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                        Text("文件夹", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                     }
                 },
                 actions = {
@@ -258,7 +258,7 @@ fun FoldersManagementScreen(
                 shape = CircleShape,
                 modifier = Modifier.padding(bottom = 98.dp).testTag("add_folder_fab")
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "新增資料夾")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "添加文件夹")
             }
         },
         modifier = modifier
@@ -275,10 +275,10 @@ fun FoldersManagementScreen(
         ) {
             item {
                 FolderSharingPanel(decks,allCards,selectedCourseFilter,shareDeckId,{shareDeckId=null},importRequested,{importRequested=false},onImportShare,onUndoShare,shareUndoIds)
-                if(scanUndoCount>0)TextButton(onClick={confirmUndoScan=true}){Text("撤回上次單字匯入（$scanUndoCount 字）")}
+                if(scanUndoCount>0)TextButton(onClick={confirmUndoScan=true}){Text("撤回上次单词导入（$scanUndoCount 字）")}
                 // Course Category Filter Chips
                 Text(
-                    text = "選擇課程",
+                    text = "选择课程",
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -297,7 +297,7 @@ fun FoldersManagementScreen(
                             modifier = Modifier.clickable { selectedCourseFilter = null }
                         ) {
                             Text(
-                                text = "全部資料夾 (${decks.size})",
+                                text = "全部文件夹 (${decks.size})",
                                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
                                 color = if (selectedCourseFilter == null) MaterialTheme.colorScheme.onPrimaryContainer
                                 else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -339,10 +339,10 @@ fun FoldersManagementScreen(
                     ) {
                         Icon(Icons.Default.Edit, contentDescription = null)
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("重新命名課程「$course」")
+                        Text("重新命名课程「$course」")
                     }
                 } ?: Text(
-                    text = "拖曳卡片右上方把手可調整整體順序。",
+                    text = "拖动卡片右上方把手可调整整体顺序。",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp)
@@ -353,8 +353,8 @@ fun FoldersManagementScreen(
                 item {
                     CalmEmptyState(
                         icon = Icons.Default.Folder,
-                        title = "還沒有資料夾",
-                        message = "點右下角新增第一個資料夾。"
+                        title = "还没有文件夹",
+                        message = "点右下角添加第一个文件夹。"
                     )
                 }
             } else {

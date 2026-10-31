@@ -27,9 +27,9 @@ object AnkiPackageParser {
                         entry = zip.nextEntry
                     }
                 }
-            } ?: error("無法讀取 Anki 檔案")
+            } ?: error("无法读取 Anki 文件")
             require(foundDatabase) {
-                "此 .apkg 使用新版壓縮格式或不是有效的 Anki 牌組；請從 Anki 匯出相容格式或改用 CSV"
+                "此 .apkg 使用新版压缩格式或不是有效的 Anki 牌组；请从 Anki 导出相容格式或改用 CSV"
             }
 
             val cards = mutableListOf<ExternalCardCandidate>()
@@ -51,8 +51,8 @@ object AnkiPackageParser {
                     }
                 }
             }
-            require(cards.isNotEmpty()) { "Anki 牌組裡找不到至少兩欄的文字卡片" }
-            ParsedExternalDeck("Anki 匯入牌組", "Anki", cards)
+            require(cards.isNotEmpty()) { "Anki 牌组里找不到至少两栏的文卡片片" }
+            ParsedExternalDeck("Anki 导入牌组", "Anki", cards)
         } finally {
             databaseFile.delete()
         }

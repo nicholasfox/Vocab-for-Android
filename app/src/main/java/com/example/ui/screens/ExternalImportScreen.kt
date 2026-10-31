@@ -77,10 +77,10 @@ import com.example.ui.components.ImportDestinationSelector
 import kotlinx.coroutines.launch
 
 private enum class ExternalImportMode(val label: String) {
-    URL("分享網址"),
-    SEARCH("搜尋平台"),
-    PASTE("貼上文字"),
-    FILE("匯入檔案")
+    URL("分享网址"),
+    SEARCH("搜索平台"),
+    PASTE("贴上文字"),
+    FILE("导入文件")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +91,7 @@ fun ExternalImportScreen(
     onImportCards: (List<ExternalCardCandidate>, Long, (Int) -> Unit) -> Unit,
     aiAvailable: Boolean = false,
     onFormatCardsWithAi: suspend (List<ExternalCardCandidate>) -> AiExternalFormattingResult = {
-        AiExternalFormattingResult(it, 0, it.count { card -> card.selected }, "尚未設定可用的個人 AI API")
+        AiExternalFormattingResult(it, 0, it.count { card -> card.selected }, "尚未设置可用的个人 AI API")
     },
     onBack: () -> Unit
 ) {
@@ -117,7 +117,7 @@ fun ExternalImportScreen(
     var shareUrl by remember { mutableStateOf("") }
     var pastedText by remember { mutableStateOf("") }
     var guidance by remember {
-        mutableStateOf("貼上分享網址後會辨識來源；公開文字、CSV、TSV、JSON 可直接預覽。")
+        mutableStateOf("贴上分享网址后会识别来源；公开文字、CSV、TSV、JSON 可直接预览。")
     }
     var loading by remember { mutableStateOf(false) }
     var importedCount by remember { mutableStateOf<Int?>(null) }
@@ -130,7 +130,7 @@ fun ExternalImportScreen(
         candidates.clear()
         candidates.addAll(cards.map { it.copy(sourceName = it.sourceName.ifBlank { source }) })
         aiPrepared = false
-        guidance = "$title：找到 ${cards.size} 張卡片，請勾選後匯入。"
+        guidance = "$title：找到 ${cards.size} 张卡片，请勾选后导入。"
         importedCount = null
     }
 
@@ -138,7 +138,7 @@ fun ExternalImportScreen(
         runCatching {
             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }.onFailure {
-            guidance = "無法開啟網站：${it.message ?: "找不到瀏覽器"}"
+            guidance = "无法打开网站：${it.message ?: "找不到浏览器"}"
         }
     }
 
@@ -148,7 +148,7 @@ fun ExternalImportScreen(
             loading = true
             runCatching { ExternalDeckImporter.parseUri(context, uri) }
                 .onSuccess { showParsed(it.title, it.sourceName, it.cards) }
-                .onFailure { guidance = "檔案解析失敗：${it.message ?: "格式不支援"}" }
+                .onFailure { guidance = "文件解析失败：${it.message ?: "格式不支持"}" }
             loading = false
         }
     }
@@ -158,7 +158,7 @@ fun ExternalImportScreen(
             TopAppBar(
                 expandedHeight = 48.dp,
                 title = {
-                    Text("線上匯入", fontWeight = FontWeight.Bold)
+                    Text("线上导入", fontWeight = FontWeight.Bold)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -175,10 +175,10 @@ fun ExternalImportScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                Text("儲存到", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Text("保存到", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
                 if (decks.isEmpty()) {
                     Text(
-                        "請先建立資料夾。",
+                        "请先创建文件夹。",
                         color = MaterialTheme.colorScheme.error
                     )
                 } else {
@@ -207,7 +207,7 @@ fun ExternalImportScreen(
 
             when (mode) {
                 ExternalImportMode.URL -> item {
-                    ImportPanel("貼上分享網址", Icons.Default.Link) {
+                    ImportPanel("贴上分享网址", Icons.Default.Link) {
                         OutlinedTextField(
                             value = shareUrl,
                             onValueChange = {
@@ -229,13 +229,13 @@ fun ExternalImportScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.ContentPaste, contentDescription = null)
-                                Text("貼上")
+                                Text("贴上")
                             }
                             Button(
                                 onClick = {
                                     val url = shareUrl.trim()
                                     if (url.isBlank()) {
-                                        guidance = "請先貼上分享網址"
+                                        guidance = "请先贴上分享网址"
                                         return@Button
                                     }
                                     val source = ExternalDeckImporter.detectSource(url)
@@ -246,25 +246,25 @@ fun ExternalImportScreen(
                                             runCatching {
                                                 ExternalDeckImporter.parseText(
                                                     ExternalDeckImporter.fetchDirectText(url),
-                                                    source?.name ?: "網址匯入"
+                                                    source?.name ?: "网址导入"
                                                 )
                                             }.onSuccess {
                                                 showParsed(it.title, source?.name ?: it.sourceName, it.cards)
                                             }.onFailure {
-                                                guidance = "網址匯入失敗：${it.message ?: "無法下載"}"
+                                                guidance = "网址导入失败：${it.message ?: "无法下载"}"
                                             }
                                             loading = false
                                         }
                                         else -> scope.launch {
                                             loading = true
-                                            guidance = "正在讀取公開分享頁，只會匯入網站實際回傳的內容…"
+                                            guidance = "正在读取公开分享页，只会导入网站实际返回的内容…"
                                             runCatching {
                                                 ExternalDeckImporter.fetchSharedDeck(context, url)
                                             }.onSuccess {
                                                 showParsed(it.title, it.sourceName, it.cards)
-                                                guidance = "${it.sourceName} 公開分享頁解析成功：找到 ${it.cards.size} 張真實卡片，請預覽後再匯入。"
+                                                guidance = "${it.sourceName} 公开分享页解析成功：找到 ${it.cards.size} 张真实卡片，请预览后再导入。"
                                             }.onFailure {
-                                                guidance = "分享頁無法匯入：${it.message ?: "網站沒有公開卡片資料"}"
+                                                guidance = "分享页无法导入：${it.message ?: "网站没有公开卡片数据"}"
                                             }
                                             loading = false
                                         }
@@ -274,22 +274,22 @@ fun ExternalImportScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.Download, contentDescription = null)
-                                Text("辨識")
+                                Text("识别")
                             }
                         }
                     }
                 }
 
                 ExternalImportMode.SEARCH -> item {
-                    ImportPanel("搜尋平台", Icons.Default.Search) {
-                        Text("選擇網站", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    ImportPanel("搜索平台", Icons.Default.Search) {
+                        Text("选择网站", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         Box(modifier = Modifier.fillMaxWidth()) {
                             OutlinedButton(
                                 onClick = { sourceMenuExpanded = true },
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text(selectedSource.name, modifier = Modifier.weight(1f))
-                                Icon(Icons.Default.ArrowDropDown, contentDescription = "選擇網站")
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = "选择网站")
                             }
                             DropdownMenu(
                                 expanded = sourceMenuExpanded,
@@ -318,11 +318,11 @@ fun ExternalImportScreen(
                         Button(
                             onClick = {
                                 if (searchQuery.isBlank()) {
-                                    guidance = "請輸入搜尋關鍵字"
+                                    guidance = "请输入搜索关键字"
                                 } else scope.launch {
                                     loading = true
                                     searchResults = emptyList()
-                                    guidance = "正在搜尋 ${selectedSource.name} 的真實公開結果…"
+                                    guidance = "正在搜索 ${selectedSource.name} 的真实公开结果…"
                                     runCatching {
                                         ExternalDeckImporter.searchPublicDecks(
                                             context,
@@ -332,12 +332,12 @@ fun ExternalImportScreen(
                                     }.onSuccess { results ->
                                         searchResults = results
                                         guidance = if (results.isEmpty()) {
-                                            "${selectedSource.name} 沒有找到可辨識的公開結果"
+                                            "${selectedSource.name} 没有找到可识别的公开结果"
                                         } else {
-                                            "找到 ${results.size} 個結果，選擇後會讀取該頁實際公開的卡片。"
+                                            "找到 ${results.size} 个结果，选择后会读取该页实际公开的卡片。"
                                         }
                                     }.onFailure {
-                                        guidance = "搜尋失敗：${it.message ?: "網站沒有回傳公開結果"}"
+                                        guidance = "搜索失败：${it.message ?: "网站没有返回公开结果"}"
                                     }
                                     loading = false
                                 }
@@ -346,16 +346,16 @@ fun ExternalImportScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(Icons.Default.Search, contentDescription = null)
-                            Text("搜尋 ${selectedSource.name}")
+                            Text("搜索 ${selectedSource.name}")
                         }
                         Text(
                             when (selectedSource.capability) {
                                 ImportCapability.PUBLIC_SHARE_PAGE ->
-                                    "找到牌組後，複製分享網址回來解析。"
+                                    "找到牌组后，复制分享网址回来解析。"
                                 ImportCapability.EXPORT_AND_PASTE ->
-                                    "從平台匯出後，再回來貼上內容。"
+                                    "从平台导出后，再回来贴上内容。"
                                 else ->
-                                    "可貼分享網址，或下載檔案後匯入。"
+                                    "可贴分享网址，或下载文件后导入。"
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -394,14 +394,14 @@ fun ExternalImportScreen(
                                             when (selectedSource.capability) {
                                                 ImportCapability.PUBLIC_SHARE_PAGE -> scope.launch {
                                                     loading = true
-                                                    guidance = "正在依原始順序讀取「${result.title}」…"
+                                                    guidance = "正在依原始顺序读取「${result.title}」…"
                                                     runCatching {
                                                         ExternalDeckImporter.fetchSharedDeck(context, result.url)
                                                     }.onSuccess {
                                                         showParsed(it.title, it.sourceName, it.cards)
-                                                        guidance = "${it.sourceName} 解析完成：${it.cards.size} 張，已保留來源順序並移除重複項目。"
+                                                        guidance = "${it.sourceName} 解析完成：${it.cards.size} 张，已保留来源顺序并移除重复项目。"
                                                     }.onFailure {
-                                                        guidance = "此結果無法匯入：${it.message ?: "頁面沒有公開卡片資料"}"
+                                                        guidance = "此结果无法导入：${it.message ?: "页面没有公开卡片数据"}"
                                                     }
                                                     loading = false
                                                 }
@@ -420,8 +420,8 @@ fun ExternalImportScreen(
                                             contentDescription = null
                                         )
                                         Text(
-                                            if (selectedSource.capability == ImportCapability.PUBLIC_SHARE_PAGE) "選擇並匯入"
-                                            else "開啟官方頁面"
+                                            if (selectedSource.capability == ImportCapability.PUBLIC_SHARE_PAGE) "选择并导入"
+                                            else "打开官方页面"
                                         )
                                     }
                                 }
@@ -431,11 +431,11 @@ fun ExternalImportScreen(
                 }
 
                 ExternalImportMode.PASTE -> item {
-                    ImportPanel("貼上文字", Icons.Default.ContentPaste) {
+                    ImportPanel("贴上文字", Icons.Default.ContentPaste) {
                         OutlinedTextField(
                             value = pastedText,
                             onValueChange = { pastedText = it },
-                            label = { Text("每行：單字［Tab］解釋［Tab］例句") },
+                            label = { Text("每行：单词［Tab］解释［Tab］例句") },
                             minLines = 6,
                             maxLines = 12,
                             modifier = Modifier.fillMaxWidth()
@@ -446,26 +446,26 @@ fun ExternalImportScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Icon(Icons.Default.ContentPaste, contentDescription = null)
-                                Text("貼上剪貼簿")
+                                Text("贴上剪贴簿")
                             }
                             Button(
                                 onClick = {
                                     runCatching { ExternalDeckImporter.parseText(pastedText, selectedSource.name) }
                                         .onSuccess { showParsed(it.title, selectedSource.name, it.cards) }
-                                        .onFailure { guidance = "解析失敗：${it.message ?: "格式不正確"}" }
+                                        .onFailure { guidance = "解析失败：${it.message ?: "格式不正确"}" }
                                 },
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("預覽")
+                                Text("预览")
                             }
                         }
                     }
                 }
 
                 ExternalImportMode.FILE -> item {
-                    ImportPanel("選擇匯出檔案", Icons.Default.Download) {
+                    ImportPanel("选择导出文件", Icons.Default.Download) {
                         Text(
-                            "支援 CSV、TSV、TXT、JSON 與 Anki APKG。",
+                            "支持 CSV、TSV、TXT、JSON 与 Anki APKG。",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Button(
@@ -482,7 +482,7 @@ fun ExternalImportScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Icon(Icons.Default.Download, contentDescription = null)
-                            Text("選擇檔案")
+                            Text("选择文件")
                         }
                     }
                 }
@@ -532,9 +532,9 @@ fun ExternalImportScreen(
                                 Text("AI 整理", fontWeight = FontWeight.Bold)
                                 Text(
                                     if (aiAvailable) {
-                                        "補齊欄位，確認後再儲存。"
+                                        "补齐字段，确认后再保存。"
                                     } else {
-                                        "設定 API 後可用；目前保留原始內容。"
+                                        "设置 API 后可用；目前保留原始内容。"
                                     },
                                     style = MaterialTheme.typography.bodySmall
                                 )
@@ -549,9 +549,9 @@ fun ExternalImportScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("匯入預覽", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("导入预览", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                             Text(
-                                "已選 ${candidates.count { it.selected }}／${candidates.size}",
+                                "已选 ${candidates.count { it.selected }}／${candidates.size}",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -562,7 +562,7 @@ fun ExternalImportScreen(
                             }
                             if (shouldSelect && candidates.any { !it.aiFormatted }) aiPrepared = false
                         }) {
-                            Text(if (candidates.any { !it.selected }) "全選" else "全不選")
+                            Text(if (candidates.any { !it.selected }) "全选" else "全不选")
                         }
                     }
                 }
@@ -625,7 +625,7 @@ fun ExternalImportScreen(
                             if (aiFormattingEnabled && aiAvailable && !aiPrepared) {
                                 scope.launch {
                                     loading = true
-                                    guidance = "AI 正在依照目前順序整理 ${candidates.count { it.selected }} 張卡片…"
+                                    guidance = "AI 正在依照目前顺序整理 ${candidates.count { it.selected }} 张卡片…"
                                     val result = runCatching {
                                         onFormatCardsWithAi(candidates.toList())
                                     }.getOrElse {
@@ -633,13 +633,13 @@ fun ExternalImportScreen(
                                             cards = candidates.toList(),
                                             formattedCount = 0,
                                             fallbackCount = candidates.count { card -> card.selected },
-                                            message = "AI 整理失敗：${it.message ?: "未知錯誤"}"
+                                            message = "AI 整理失败：${it.message ?: "未知错误"}"
                                         )
                                     }
                                     candidates.clear()
                                     candidates.addAll(result.cards)
                                     aiPrepared = true
-                                    guidance = "${result.message}。請檢查預覽，確認後再按儲存。"
+                                    guidance = "${result.message}。请检查预览，确认后再按保存。"
                                     loading = false
                                 }
                             } else {
@@ -648,7 +648,7 @@ fun ExternalImportScreen(
                                     importedCount = it
                                     loading = false
                                     if (it > 0) {
-                                        guidance = "已依目前預覽順序匯入 $it 張卡片；同資料夾不會建立重複單字。"
+                                        guidance = "已依目前预览顺序导入 $it 张卡片；同文件夹不会创建重复单词。"
                                     }
                                 }
                             }
@@ -660,12 +660,12 @@ fun ExternalImportScreen(
                             if (aiFormattingEnabled && aiAvailable && !aiPrepared) {
                                 "AI 整理 · ${candidates.count { it.selected }}"
                             } else {
-                                "儲存 · ${candidates.count { it.selected }}"
+                                "保存 · ${candidates.count { it.selected }}"
                             }
                         )
                     }
                     importedCount?.let {
-                        Text("本次完成：$it 張", color = MaterialTheme.colorScheme.primary)
+                        Text("本次完成：$it 张", color = MaterialTheme.colorScheme.primary)
                     }
                     Spacer(Modifier.height(32.dp))
                 }
@@ -680,7 +680,7 @@ fun ExternalImportScreen(
                     }
                 },
                 modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(44.dp)
-            ) { Icon(Icons.Default.KeyboardArrowUp, "回到第一個單字") }
+            ) { Icon(Icons.Default.KeyboardArrowUp, "回到第一个单词") }
         }
         if (candidates.isNotEmpty() && listState.canScrollForward) {
             FloatingActionButton(

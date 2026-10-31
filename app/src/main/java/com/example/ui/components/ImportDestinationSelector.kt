@@ -63,7 +63,7 @@ fun ImportDestinationSelector(
             modifier = Modifier.weight(1f)
         ) {
             ImportDropdownAnchor(
-                label = "選擇課程",
+                label = "选择课程",
                 value = selectedCourse.orEmpty(),
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )
@@ -86,7 +86,7 @@ fun ImportDestinationSelector(
             modifier = Modifier.weight(1f)
         ) {
             ImportDropdownAnchor(
-                label = "選擇資料夾",
+                label = "选择文件夹",
                 value = courseDecks.firstOrNull { it.id == selectedDeckId }?.name.orEmpty(),
                 modifier = Modifier.menuAnchor().fillMaxWidth()
             )

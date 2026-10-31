@@ -207,7 +207,7 @@ fun AiAssistantScreen(
         if (result.resultCode == Activity.RESULT_OK) {
             val pages = runCatching { GmsDocumentScanningResult.fromActivityResultIntent(result.data)
                 ?.pages.orEmpty().map { it.imageUri } }.getOrElse {
-                attachmentError = "無法讀取掃描結果，請重新掃描或改用相片"
+                attachmentError = "无法读取扫描结果，请重新扫描或改用照片"
                 emptyList()
             }
             attachments = (attachments + pages).distinct().take(5)
@@ -229,9 +229,9 @@ fun AiAssistantScreen(
     conversationPendingDelete?.let { id ->
         AlertDialog(
             onDismissRequest = { conversationPendingDelete = null },
-            title = { Text("刪除這則對話？") },
-            text = { Text("對話內容與附件紀錄會一併刪除，且無法復原。") },
-            confirmButton = { Button(onClick = { onDeleteConversation(id); conversationPendingDelete = null }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("刪除") } },
+            title = { Text("删除这则对话？") },
+            text = { Text("对话内容与附件纪录会一并删除，且无法恢复。") },
+            confirmButton = { Button(onClick = { onDeleteConversation(id); conversationPendingDelete = null }, colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)) { Text("删除") } },
             dismissButton = { TextButton(onClick = { conversationPendingDelete = null }) { Text("取消") } }
         )
     }
@@ -263,7 +263,7 @@ fun AiAssistantScreen(
         if (outcome.succeeded) {
             attachments = emptyList()
         } else {
-            attachmentError = outcome.errorMessage ?: "附件無法讀取或傳送，請確認格式後重試"
+            attachmentError = outcome.errorMessage ?: "附件无法读取或传送，请确认格式后重试"
         }
     }
 
@@ -281,9 +281,9 @@ fun AiAssistantScreen(
     attachmentError?.let { error ->
         AlertDialog(
             onDismissRequest = { attachmentError = null },
-            title = { Text("無法加入附件") },
+            title = { Text("无法加入附件") },
             text = { Text(error) },
-            confirmButton = { TextButton(onClick = { attachmentError = null }) { Text("確定") } }
+            confirmButton = { TextButton(onClick = { attachmentError = null }) { Text("确定") } }
         )
     }
 
@@ -305,7 +305,7 @@ fun AiAssistantScreen(
                         showAttachmentSources = false
                         photoPicker.launch("image/*")
                     }
-                    AttachmentSourceButton(Icons.Default.CameraAlt, "拍攝") {
+                    AttachmentSourceButton(Icons.Default.CameraAlt, "拍摄") {
                         showAttachmentSources = false
                         runCatching {
                             val file = File.createTempFile("ai_chat_camera_", ".jpg", context.cacheDir)
@@ -315,26 +315,26 @@ fun AiAssistantScreen(
                         }.onSuccess { uri ->
                             pendingCameraUri = uri
                             cameraLauncher.launch(uri)
-                        }.onFailure { attachmentError = it.localizedMessage ?: "無法開啟相機" }
+                        }.onFailure { attachmentError = it.localizedMessage ?: "无法打开相机" }
                     }
-                    AttachmentSourceButton(Icons.Default.DocumentScanner, "掃描") {
+                    AttachmentSourceButton(Icons.Default.DocumentScanner, "扫描") {
                         showAttachmentSources = false
                         val activity = context.findAssistantActivity()
                         if (activity == null) {
-                            attachmentError = "此裝置無法啟動文件掃描"
+                            attachmentError = "此设备无法启动文件扫描"
                         } else {
                             runCatching { GmsDocumentScanning.getClient(scannerOptions).getStartScanIntent(activity) }
-                                .onFailure { attachmentError = it.localizedMessage ?: "此裝置不支援掃描服務" }
+                                .onFailure { attachmentError = it.localizedMessage ?: "此设备不支持扫描服务" }
                                 .getOrNull()
                                 ?.addOnSuccessListener { sender ->
                                     scannerLauncher.launch(IntentSenderRequest.Builder(sender).build())
                                 }
                                 ?.addOnFailureListener {
-                                    attachmentError = it.localizedMessage ?: "請確認 Google Play 服務與網路"
+                                    attachmentError = it.localizedMessage ?: "请确认 Google Play 服务与网络"
                                 }
                         }
                     }
-                    AttachmentSourceButton(Icons.Default.InsertDriveFile, "檔案") {
+                    AttachmentSourceButton(Icons.Default.InsertDriveFile, "文件") {
                         showAttachmentSources = false
                         filePicker.launch(
                             arrayOf(
@@ -386,12 +386,12 @@ fun AiAssistantScreen(
         AlertDialog(
             onDismissRequest = { showClearConfirmation = false },
             title = { Text("清空全部聊天？") },
-            text = { Text("所有已保存的對話都會刪除；已經套用到單字庫的操作不會被撤銷。") },
+            text = { Text("所有已保存的对话都会删除；已经应用到单词库的操作不会被撤销。") },
             confirmButton = {
                 TextButton(onClick = {
                     onClearChats()
                     showClearConfirmation = false
-                }) { Text("確認清空", color = MaterialTheme.colorScheme.error) }
+                }) { Text("确认清空", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showClearConfirmation = false }) { Text("取消") }
@@ -403,11 +403,11 @@ fun AiAssistantScreen(
         val allSelected = decks.isNotEmpty() && draftScope.containsAll(decks.map { it.id })
         AlertDialog(
             onDismissRequest = { showScopeSelector = false },
-            title = { Text("AI 可編輯的資料夾") },
+            title = { Text("AI 可编辑的文件夹") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        "AI 仍可讀取整個單字庫並回答其他知識；這裡只限制它能修改哪些資料夾。",
+                        "AI 仍可读取整个单词库并回答其他知识；这里只限制它能修改哪些文件夹。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -429,7 +429,7 @@ fun AiAssistantScreen(
                                     draftScope = if (it) decks.map { deck -> deck.id }.toSet() else emptySet()
                                 }
                             )
-                            Text("全部資料夾 (${decks.size})", fontWeight = FontWeight.Bold)
+                            Text("全部文件夹 (${decks.size})", fontWeight = FontWeight.Bold)
                         }
                     }
                     LazyColumn(
@@ -480,7 +480,7 @@ fun AiAssistantScreen(
                         showScopeSelector = false
                     },
                     enabled = draftScope.isNotEmpty() || decks.isEmpty()
-                ) { Text("套用") }
+                ) { Text("应用") }
             },
             dismissButton = {
                 TextButton(onClick = { showScopeSelector = false }) { Text("取消") }
@@ -491,7 +491,7 @@ fun AiAssistantScreen(
     if (showHistory) {
         AlertDialog(
             onDismissRequest = { showHistory = false },
-            title = { Text("對話紀錄") },
+            title = { Text("对话纪录") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -503,7 +503,7 @@ fun AiAssistantScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null)
-                            Text("新對話")
+                            Text("新对话")
                         }
                         OutlinedButton(
                             onClick = {
@@ -513,7 +513,7 @@ fun AiAssistantScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Icon(Icons.Default.VisibilityOff, contentDescription = null)
-                            Text("無痕")
+                            Text("无痕")
                         }
                     }
                     LazyColumn(
@@ -543,7 +543,7 @@ fun AiAssistantScreen(
                                         overflow = TextOverflow.Ellipsis
                                     )
                                     IconButton(onClick = { conversationPendingDelete = conversation.id }) {
-                                        Icon(Icons.Default.Delete, contentDescription = "刪除對話")
+                                        Icon(Icons.Default.Delete, contentDescription = "删除对话")
                                     }
                                 }
                             }
@@ -572,11 +572,11 @@ fun AiAssistantScreen(
                         Text("Vocab AI", fontWeight = FontWeight.Bold)
                         Text(
                             when {
-                                currentConversation?.incognito == true -> "無痕對話・離開後不保存"
-                                selectedDeckIds.size == decks.size && decks.isNotEmpty() -> "可編輯全部 ${decks.size} 個資料夾"
-                                selectedDeckIds.size > 1 -> "可編輯 ${selectedDeckIds.size} 個資料夾"
-                                contextDeckName != null -> "可編輯：$contextDeckName"
-                                else -> "可讀取全部內容；尚未指定編輯範圍"
+                                currentConversation?.incognito == true -> "无痕对话・离开后不保存"
+                                selectedDeckIds.size == decks.size && decks.isNotEmpty() -> "可编辑全部 ${decks.size} 个文件夹"
+                                selectedDeckIds.size > 1 -> "可编辑 ${selectedDeckIds.size} 个文件夹"
+                                contextDeckName != null -> "可编辑：$contextDeckName"
+                                else -> "可读取全部内容；尚未指定编辑范围"
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -592,10 +592,10 @@ fun AiAssistantScreen(
                 },
                 actions = {
                     IconButton(onClick = { onNewConversation(false) }) {
-                        Icon(Icons.Default.Add, contentDescription = "新對話")
+                        Icon(Icons.Default.Add, contentDescription = "新对话")
                     }
                     IconButton(onClick = { showHistory = true }) {
-                        Icon(Icons.Default.History, contentDescription = "對話紀錄")
+                        Icon(Icons.Default.History, contentDescription = "对话纪录")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -641,7 +641,7 @@ fun AiAssistantScreen(
                             onQuizRestart = onQuizRestart,
                             onOpenQuiz = { activeQuizMessageId = message.id },
                             onOpenArticle = { activeArticleMessageId = message.id },
-                            onContinueArticle = {onSend("繼續補齊文章",emptyList())},
+                            onContinueArticle = {onSend("继续补齐文章",emptyList())},
                             onPreviewImage = { previewImageUri = it }
                         )
                     }
@@ -704,10 +704,10 @@ fun AiAssistantScreen(
                         Icon(Icons.Default.Folder, contentDescription = null, modifier = Modifier.size(18.dp))
                         Text(
                             when {
-                                decks.isEmpty() -> "目前沒有資料夾"
-                                selectedDeckIds.size == decks.size -> "可編輯：全部資料夾 (${decks.size})"
-                                selectedDeckIds.size == 1 -> "可編輯：${decks.firstOrNull { it.id in selectedDeckIds }?.name ?: "1 個資料夾"}"
-                                else -> "可編輯：已選 ${selectedDeckIds.size} 個資料夾"
+                                decks.isEmpty() -> "目前没有文件夹"
+                                selectedDeckIds.size == decks.size -> "可编辑：全部文件夹 (${decks.size})"
+                                selectedDeckIds.size == 1 -> "可编辑：${decks.firstOrNull { it.id in selectedDeckIds }?.name ?: "1 个文件夹"}"
+                                else -> "可编辑：已选 ${selectedDeckIds.size} 个文件夹"
                             },
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
@@ -715,7 +715,7 @@ fun AiAssistantScreen(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = "選擇資料夾")
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "选择文件夹")
                     }
                 }
                 Row(
@@ -727,12 +727,12 @@ fun AiAssistantScreen(
                         onClick = { showAttachmentSources = true },
                         enabled = !busy
                     ) {
-                        Icon(Icons.Default.AttachFile, contentDescription = "附加圖片或文件")
+                        Icon(Icons.Default.AttachFile, contentDescription = "附加图片或文件")
                     }
                     OutlinedTextField(
                         value = input,
                         onValueChange = { input = it.take(4_000) },
-                        placeholder = { Text("告訴 AI 你想做什麼…") },
+                        placeholder = { Text("告诉 AI 你想做什么…") },
                         textStyle = MaterialTheme.typography.bodyMedium,
                         shape = RoundedCornerShape(18.dp),
                         minLines = 1,
@@ -754,9 +754,9 @@ fun AiAssistantScreen(
                     ) {
                         Box(contentAlignment = Alignment.Center) {
                             if (busy) {
-                                Icon(Icons.Default.Stop, contentDescription = "停止 AI 回覆")
+                                Icon(Icons.Default.Stop, contentDescription = "停止 AI 回复")
                             } else {
-                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "傳送")
+                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "传送")
                             }
                         }
                     }
@@ -775,14 +775,14 @@ private fun AssistantWelcome(
 ) {
     Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Icon(Icons.Default.AutoAwesome, null, Modifier.size(30.dp), tint = MaterialTheme.colorScheme.primary)
-        Text("一起整理與練習", style = MaterialTheme.typography.headlineSmall)
-        Text("選好可讀取的資料夾，告訴 AI 你想做什麼。任何修改都會先讓你確認。", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        if (!apiConfigured) Button(onClick = onOpenSettings) { Text("設定 AI API") }
+        Text("一起整理与练习", style = MaterialTheme.typography.headlineSmall)
+        Text("选好可读取的文件夹，告诉 AI 你想做什么。任何修改都会先让你确认。", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (!apiConfigured) Button(onClick = onOpenSettings) { Text("设置 AI API") }
         else listOf(
-            "整理資料" to "依照字母排序這個資料夾",
-            "比較容易混淆的單字" to "找出容易混淆的單字",
-            "建立閱讀文章" to "根據這個資料夾寫一篇文章",
-            "練習互動測驗" to "製作五題互動測驗"
+            "整理数据" to "依照字母排序这个文件夹",
+            "比较容易混淆的单词" to "找出容易混淆的单词",
+            "创建阅读文章" to "根据这个文件夹写一篇文章",
+            "练习互动测试" to "制作五题互动测试"
         ).forEach { (title, prompt) -> ModernListRow(title, icon = Icons.Default.AutoAwesome, onClick = { onSuggestion(prompt) }) }
     }
 }
@@ -842,7 +842,7 @@ private fun AssistantPendingAttachment(
         ) {
             AsyncImage(
                 model = uri,
-                contentDescription = "預覽圖片",
+                contentDescription = "预览图片",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -855,7 +855,7 @@ private fun AssistantPendingAttachment(
             modifier = Modifier.align(Alignment.TopEnd).size(26.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Icon(Icons.Default.Close, contentDescription = "移除圖片", modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Close, contentDescription = "移除图片", modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -883,7 +883,7 @@ private fun AssistantSentAttachments(
                 ) {
                     AsyncImage(
                         model = uri,
-                        contentDescription = "訊息圖片",
+                        contentDescription = "消息图片",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -930,7 +930,7 @@ private fun AssistantImagePreviewDialog(
             ) {
                 AsyncImage(
                     model = uri,
-                    contentDescription = "放大圖片",
+                    contentDescription = "放大图片",
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp, max = 620.dp)
                 )
@@ -940,9 +940,9 @@ private fun AssistantImagePreviewDialog(
                 ) {
                     TextButton(onClick = onCopy) {
                         Icon(Icons.Default.ContentCopy, contentDescription = null)
-                        Text("複製圖片")
+                        Text("复制图片")
                     }
-                    TextButton(onClick = onDismiss) { Text("關閉") }
+                    TextButton(onClick = onDismiss) { Text("关闭") }
                 }
             }
         }
@@ -960,14 +960,14 @@ private fun isAssistantImage(context: Context, uri: Uri): Boolean {
 private fun copyAssistantImage(context: Context, uri: Uri) {
     runCatching {
         val copyUri = if (uri.scheme == "file") {
-            val file = uri.path?.let(::File) ?: error("圖片位置無效")
+            val file = uri.path?.let(::File) ?: error("图片位置无效")
             FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         } else uri
         val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newUri(context.contentResolver, "Vocab 圖片", copyUri))
-        Toast.makeText(context, "已複製圖片", Toast.LENGTH_SHORT).show()
+        clipboard.setPrimaryClip(ClipData.newUri(context.contentResolver, "Vocab 图片", copyUri))
+        Toast.makeText(context, "已复制图片", Toast.LENGTH_SHORT).show()
     }.onFailure {
-        Toast.makeText(context, "無法複製圖片", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, "无法复制图片", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -1020,9 +1020,9 @@ private fun AssistantMessageBubble(
                         Text(
                             when (message.kind) {
                                 "ARTICLE" -> "AI 文章"
-                                "CONFUSABLES" -> "易混淆單字"
-                                "QUIZ" -> "互動測驗"
-                                else -> "操作紀錄"
+                                "CONFUSABLES" -> "易混淆单词"
+                                "QUIZ" -> "互动测试"
+                                else -> "操作纪录"
                             },
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
@@ -1039,7 +1039,7 @@ private fun AssistantMessageBubble(
                         ) {
                             Icon(
                                 Icons.Default.ContentCopy,
-                                contentDescription = "複製訊息",
+                                contentDescription = "复制消息",
                                 modifier = Modifier.size(17.dp)
                             )
                         }
@@ -1060,9 +1060,9 @@ private fun AssistantMessageBubble(
                 }
                 if (message.kind == "ARTICLE") {
                     val incomplete=runCatching{JSONObject(message.payload).has("complete")&&!JSONObject(message.payload).optBoolean("complete")}.getOrDefault(false)
-                    if(incomplete)OutlinedButton(onClick=onContinueArticle,modifier=Modifier.fillMaxWidth()){Text("繼續補齊文章")}
+                    if(incomplete)OutlinedButton(onClick=onContinueArticle,modifier=Modifier.fillMaxWidth()){Text("继续补齐文章")}
                     Button(onClick = onOpenArticle, modifier = Modifier.fillMaxWidth()) {
-                        Text("開始互動閱讀")
+                        Text("开始互动阅读")
                     }
                 }
             }
@@ -1182,7 +1182,7 @@ private fun AssistantTypingIndicator(detail: String?) {
                     }
                 }
                 Text(
-                    detail?.takeIf { it.isNotBlank() } ?: "AI 正在輸入",
+                    detail?.takeIf { it.isNotBlank() } ?: "AI 正在输入",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1367,13 +1367,13 @@ private fun AssistantQuizSummary(
         if (completed) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Text("測驗完成・${root.optInt("latestCorrect")}/${root.optInt("latestTotal")}", fontWeight = FontWeight.Bold)
+                Text("测试完成・${root.optInt("latestCorrect")}/${root.optInt("latestTotal")}", fontWeight = FontWeight.Bold)
             }
-            TextButton(onClick = onOpenQuiz) { Text("查看結果與錯題") }
-            TextButton(onClick = onRestart) { Text("重新測驗") }
+            TextButton(onClick = onOpenQuiz) { Text("查看结果与错题") }
+            TextButton(onClick = onRestart) { Text("重新测试") }
         } else {
-            Text("AI 測驗・共 $total 題", style = MaterialTheme.typography.bodySmall)
-            Button(onClick = onOpenQuiz, modifier = Modifier.fillMaxWidth()) { Text("進入測驗") }
+            Text("AI 测试・共 $total 题", style = MaterialTheme.typography.bodySmall)
+            Button(onClick = onOpenQuiz, modifier = Modifier.fillMaxWidth()) { Text("进入测试") }
         }
     }
 }
@@ -1392,13 +1392,13 @@ private fun AssistantQuizScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("AI 測驗", fontWeight = FontWeight.Bold)
-                        Text("完成後會保存到對話紀錄", style = MaterialTheme.typography.labelSmall)
+                        Text("AI 测试", fontWeight = FontWeight.Bold)
+                        Text("完成后会保存到对话纪录", style = MaterialTheme.typography.labelSmall)
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回 AI 對話")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回 AI 对话")
                     }
                 }
             )
@@ -1453,7 +1453,7 @@ private fun AssistantActionCard(
             Text(action.description, style = MaterialTheme.typography.bodyMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
                 OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f)) { Text("取消") }
-                Button(onClick = onConfirm, modifier = Modifier.weight(1f)) { Text("確認執行") }
+                Button(onClick = onConfirm, modifier = Modifier.weight(1f)) { Text("确认执行") }
             }
         }
     }
@@ -1502,10 +1502,10 @@ private fun AssistantInlineQuiz(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                Text("測驗完成", fontWeight = FontWeight.Bold)
+                Text("测试完成", fontWeight = FontWeight.Bold)
             }
             Text(
-                "答對 ${root.optInt("latestCorrect")}/${root.optInt("latestTotal")} 題",
+                "答对 ${root.optInt("latestCorrect")}/${root.optInt("latestTotal")} 题",
                 style = MaterialTheme.typography.bodyMedium
             )
             if (completedAt > 0L) {
@@ -1518,11 +1518,11 @@ private fun AssistantInlineQuiz(
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (savedWrongAnswers.isNotEmpty()) {
                     OutlinedButton(onClick = { showWrongAnswers = !showWrongAnswers }) {
-                        Text(if (showWrongAnswers) "收起錯題" else "查看錯題")
+                        Text(if (showWrongAnswers) "收起错题" else "查看错题")
                     }
                 }
                 OutlinedButton(onClick = { onRestart(messageId) }) {
-                    Text("重新測驗")
+                    Text("重新测试")
                 }
             }
             if (showWrongAnswers) {
@@ -1545,9 +1545,9 @@ private fun AssistantInlineQuiz(
                             color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.45f)
                         ) {
                             Column(modifier = Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                Text("第 ${wrong.key + 1} 題　${wrongQuestion.optString("prompt")}", fontWeight = FontWeight.Bold)
+                                Text("第 ${wrong.key + 1} 题　${wrongQuestion.optString("prompt")}", fontWeight = FontWeight.Bold)
                                 Text("你的答案：$selectedText", color = MaterialTheme.colorScheme.error)
-                                Text("正確答案：$correctText")
+                                Text("正确答案：$correctText")
                                 wrongQuestion.optString("explanation").takeIf { it.isNotBlank() }?.let {
                                     Text(it, style = MaterialTheme.typography.bodySmall)
                                 }
@@ -1614,7 +1614,7 @@ private fun AssistantInlineQuiz(
                     }
                 },
                 modifier = Modifier.align(Alignment.End)
-            ) { Text(if (questionIndex == questions.length() - 1) "完成" else "下一題") }
+            ) { Text(if (questionIndex == questions.length() - 1) "完成" else "下一题") }
         }
     }
 }

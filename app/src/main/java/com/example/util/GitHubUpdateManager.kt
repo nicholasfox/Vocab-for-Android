@@ -57,7 +57,7 @@ object GitHubUpdateManager {
                 .build()
             client.newCall(request).execute().use { response ->
                 if (response.code == 404) return@withContext UpdateCheckResult.UpToDate
-                if (!response.isSuccessful) error("GitHub 回應 ${response.code}")
+                if (!response.isSuccessful) error("GitHub 回应 ${response.code}")
                 val root = JSONObject(response.body?.string().orEmpty())
                 val version = root.getString("tag_name").removePrefix("v")
                 val assets = root.getJSONArray("assets")
@@ -69,7 +69,7 @@ object GitHubUpdateManager {
                         break
                     }
                 }
-                if (apkUrl.isBlank()) error("最新版本沒有可安裝的 APK")
+                if (apkUrl.isBlank()) error("最新版本没有可安装的 APK")
                 val release = GitHubRelease(
                     version = version,
                     name = root.optString("name", "Vocab v$version"),
@@ -83,7 +83,7 @@ object GitHubUpdateManager {
                     UpdateCheckResult.UpToDate
                 }
             }
-        }.getOrElse { UpdateCheckResult.Failed(it.message ?: "無法檢查更新") }
+        }.getOrElse { UpdateCheckResult.Failed(it.message ?: "无法检查更新") }
     }
 
     suspend fun downloadApk(
@@ -99,15 +99,15 @@ object GitHubUpdateManager {
             if (!forceDownload && isUsableApk(context, target, release.version)) {
                 return@runCatching target
             }
-            if (wifiOnly && !isOnWifi(context)) error("目前不是 Wi-Fi 連線")
+            if (wifiOnly && !isOnWifi(context)) error("目前不是 Wi-Fi 连接")
             val partial = File(updateDir, "${target.name}.part").apply { delete() }
             val request = Request.Builder()
                 .url(release.apkUrl)
                 .header("User-Agent", "Vocab-Android/${BuildConfig.VERSION_NAME}")
                 .build()
             client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) error("下載失敗（${response.code}）")
-                val body = response.body ?: error("下載內容是空的")
+                if (!response.isSuccessful) error("下载失败（${response.code}）")
+                val body = response.body ?: error("下载内容是空的")
                 val total = body.contentLength()
                 body.byteStream().use { input ->
                     partial.outputStream().use { output ->
@@ -124,7 +124,7 @@ object GitHubUpdateManager {
                 }
                 if (!isUsableApk(context, partial, release.version)) {
                     partial.delete()
-                    error("下載的 APK 無效或版本不符")
+                    error("下载的 APK 无效或版本不符")
                 }
                 target.delete()
                 if (!partial.renameTo(target)) {
@@ -156,7 +156,7 @@ object GitHubUpdateManager {
 
     fun launchInstaller(context: Context, apk: File): InstallLaunchResult {
         if (!isUsableApk(context, apk)) {
-            return InstallLaunchResult.Failed("安裝檔不存在或已損毀，請重新下載")
+            return InstallLaunchResult.Failed("安装档不存在或已损毁，请重新下载")
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             !context.packageManager.canRequestPackageInstalls()
@@ -182,7 +182,7 @@ object GitHubUpdateManager {
                 }
             )
             InstallLaunchResult.InstallerOpened
-        }.getOrElse { InstallLaunchResult.Failed(it.message ?: "無法開啟系統安裝畫面") }
+        }.getOrElse { InstallLaunchResult.Failed(it.message ?: "无法打开系统安装画面") }
     }
 
     private fun updateDirectory(context: Context): File =
