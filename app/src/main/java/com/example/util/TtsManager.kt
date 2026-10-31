@@ -22,6 +22,7 @@ data class TtsVoiceOption(
 data class SpeechSegment(val text: String, val languageTag: String)
 
 class TtsManager(context: Context) : TextToSpeech.OnInitListener {
+    private val appContext = context.applicationContext
     private data class PendingSpeech(
         val text: String,
         val rate: Float,
@@ -305,7 +306,12 @@ class TtsManager(context: Context) : TextToSpeech.OnInitListener {
             _activeVoice.value = null
             return
         }
-        val engineName = runCatching { TextToSpeech.getDefaultEngine() }.getOrNull()
+        val engineName = runCatching {
+            android.provider.Settings.Secure.getString(
+                appContext.contentResolver,
+                "tts_default_synth"
+            )
+        }.getOrNull()
         _activeVoice.value = buildString {
             append(voice.locale.displayName)
             append(if (voice.isNetworkConnectionRequired) "・线上语音" else "・设备内建")
