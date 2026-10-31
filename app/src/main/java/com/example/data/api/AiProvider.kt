@@ -82,10 +82,6 @@ enum class AiProvider(
         supportsVision = true
     );
 
-    /** Providers that speak the OpenAI Chat Completions protocol. */
-    val usesChatCompletions: Boolean
-        get() = this in setOf(DEEPSEEK, MIMO, AGNES, OPENAI_COMPATIBLE)
-
     companion object {
         fun from(value: String): AiProvider =
             entries.firstOrNull { it.name == value } ?: GEMINI

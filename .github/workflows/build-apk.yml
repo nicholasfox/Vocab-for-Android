@@ -41,6 +41,13 @@ jobs:
           chmod +x gradlew
           ./gradlew testDebugUnitTest assembleDebug
 
+      - name: Show APK metadata
+        run: |
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          ls -lh "$APK"
+          AAPT2="$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)/aapt2"
+          "$AAPT2" dump badging "$APK" | head -3
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:

@@ -32,12 +32,12 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew testDebugUnitTest assembleDebug
-          cp app/build/outputs/apk/debug/app-debug.apk "Vocab-zh-${GITHUB_REF_NAME}.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "Vocab-${GITHUB_REF_NAME}.apk"
 
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" "Vocab-zh-${GITHUB_REF_NAME}.apk" \
+          gh release create "$GITHUB_REF_NAME" "Vocab-${GITHUB_REF_NAME}.apk" \
             --title "Vocab 简体 $GITHUB_REF_NAME" \
             --notes "简体中文界面与词典、自定义 AI 模型（DeepSeek / 小米 MiMo / Agnes / OpenAI 兼容）构建。APK 使用固定 debug 签名，可直接覆盖安装后续版本。"
